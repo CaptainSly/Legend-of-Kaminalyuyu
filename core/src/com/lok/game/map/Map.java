@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.lok.game.AssetManager;
+import com.lok.game.ecs.EntityEngine;
+import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.MapManager.MapID;
 
 public class Map {
@@ -52,6 +54,11 @@ public class Map {
     private final Array<Entity>	   entities;
     private final Array<Portal>	   portals;
     private final Color		   backgroundColor;
+    private final Array<Boolean>   revealedTiles;
+    private final int		   numTilesX;
+    private final int		   numTilesY;
+    private final float		   tileWidthInWorldUnits;
+    private final float		   tileHeightInWorldUnits;
 
     public Map(MapID mapID) {
 	this.mapID = mapID;
@@ -60,96 +67,105 @@ public class Map {
 	this.collisionAreas = new Array<Rectangle>();
 	this.entities = new Array<Entity>();
 	this.portals = new Array<Portal>();
-	final String backgroundColor = tiledMap.getProperties().get("backgroundcolor", String.class);
+
+	final MapProperties mapProperties = tiledMap.getProperties();
+	final String backgroundColor = mapProperties.get("backgroundcolor", String.class);
 	if (backgroundColor != null) {
 	    this.backgroundColor = Color.valueOf(backgroundColor);
 	} else {
 	    this.backgroundColor = Color.BLACK;
 	}
 
-	parseBoundary();
-	parseCollisionAreas();
-	parseEntities();
-	parsePortals();
-    }
-
-    private void parseBoundary() {
-	final MapProperties mapProperties = tiledMap.getProperties();
-	boundary.set(0, 0, // x, y
-		mapProperties.get("width", Integer.class) * mapProperties.get("tilewidth", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL, // width
-		mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL); // height
-    }
-
-    private void parseCollisionAreas() {
-	final MapProperties mapProperties = tiledMap.getProperties();
-	final int tileWidth = mapProperties.get("tilewidth", Integer.class);
-	final int tileHeight = mapProperties.get("tileheight", Integer.class);
+	tileWidthInWorldUnits = mapProperties.get("tilewidth", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL;
+	tileHeightInWorldUnits = mapProperties.get("tileheight", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL;
+	numTilesX = mapProperties.get("width", Integer.class);
+	numTilesY = mapProperties.get("height", Integer.class);
+	boundary.set(0, 0, numTilesX * tileWidthInWorldUnits, numTilesY * tileHeightInWorldUnits);
+	this.revealedTiles = new Array<Boolean>(numTilesX * numTilesY);
+	for (int i = numTilesX * numTilesY; i >= 0; --i) {
+	    revealedTiles.add(false);
+	}
 
 	for (MapLayer mapLayer : tiledMap.getLayers()) {
-	    if (!(mapLayer instanceof TiledMapTileLayer)) {
-		continue;
+	    if (mapLayer instanceof TiledMapTileLayer) {
+		parseCollisionAreas((TiledMapTileLayer) mapLayer, tileWidthInWorldUnits, tileHeightInWorldUnits);
+	    } else if ("Portals".equals(mapLayer.getName())) {
+		parsePortals(mapLayer);
+	    } else if ("Entities".equals(mapLayer.getName())) {
+		parseEntities(mapLayer);
 	    }
+	}
+    }
 
-	    final TiledMapTileLayer tiledMapTileLayer = (TiledMapTileLayer) mapLayer;
+    private void parseCollisionAreas(TiledMapTileLayer tiledMapTileLayer, float tileWidthInWorldUnits, float tileHeightInWorldUnits) {
+	for (int y = 0; y < tiledMapTileLayer.getWidth(); ++y) {
+	    for (int x = 0; x < tiledMapTileLayer.getHeight(); ++x) {
+		final Cell cell = tiledMapTileLayer.getCell(x, y);
 
-	    for (int y = 0; y < tiledMapTileLayer.getWidth(); ++y) {
-		for (int x = 0; x < tiledMapTileLayer.getHeight(); ++x) {
-		    final Cell cell = tiledMapTileLayer.getCell(x, y);
+		if (cell == null) {
+		    continue;
+		}
 
-		    if (cell == null) {
-			continue;
-		    }
-
-		    for (MapObject mapObj : cell.getTile().getObjects()) {
-			if (mapObj instanceof RectangleMapObject) {
-			    final Rectangle collisionArea = ((RectangleMapObject) mapObj).getRectangle();
-			    collisionAreas.add(new Rectangle(x * tileWidth * MapManager.WORLD_UNITS_PER_PIXEL, y * tileHeight * MapManager.WORLD_UNITS_PER_PIXEL,
-				    collisionArea.width * MapManager.WORLD_UNITS_PER_PIXEL, collisionArea.height * MapManager.WORLD_UNITS_PER_PIXEL));
-			}
+		for (MapObject mapObj : cell.getTile().getObjects()) {
+		    if (mapObj instanceof RectangleMapObject) {
+			final Rectangle collisionArea = ((RectangleMapObject) mapObj).getRectangle();
+			collisionAreas.add(new Rectangle(x * tileWidthInWorldUnits, y * tileHeightInWorldUnits, collisionArea.width * MapManager.WORLD_UNITS_PER_PIXEL,
+				collisionArea.height * MapManager.WORLD_UNITS_PER_PIXEL));
 		    }
 		}
 	    }
 	}
     }
 
-    private void parseEntities() {
-	// TODO Auto-generated method stub
+    private void parseEntities(MapLayer mapLayer) {
+	for (MapObject mapObj : mapLayer.getObjects()) {
+	    if (mapObj instanceof RectangleMapObject) {
+		final MapProperties entityProperties = mapObj.getProperties();
+		final String EntityIDStr = entityProperties.get("entityID", String.class);
+		final EntityID entityID;
 
+		if (EntityIDStr == null) {
+		    throw new GdxRuntimeException("Entity of map " + mapID + " does not have an entityID specified");
+		} else {
+		    entityID = EntityID.valueOf(EntityIDStr);
+		    if (entityID == null) {
+			throw new GdxRuntimeException("Entity of map " + mapID + " does not have a valid entityID " + EntityIDStr);
+		    }
+		}
+
+		final Rectangle entityArea = ((RectangleMapObject) mapObj).getRectangle();
+		EntityEngine.getEngine().createEntity(entityID, entityArea.x * MapManager.WORLD_UNITS_PER_PIXEL, entityArea.y * MapManager.WORLD_UNITS_PER_PIXEL);
+	    }
+	}
     }
 
-    private void parsePortals() {
-	for (MapLayer mapLayer : tiledMap.getLayers()) {
-	    if (mapLayer instanceof TiledMapTileLayer || !"Portals".equals(mapLayer.getName())) {
-		continue;
-	    }
+    private void parsePortals(MapLayer mapLayer) {
+	for (MapObject mapObj : mapLayer.getObjects()) {
+	    if (mapObj instanceof RectangleMapObject) {
+		final MapProperties portalProperties = mapObj.getProperties();
+		final Integer targetTileIndexX = portalProperties.get("targetTileIndexX", Integer.class);
+		final Integer targetTileIndexY = portalProperties.get("targetTileIndexY", Integer.class);
+		final String targetMapIDStr = portalProperties.get("targetMapID", String.class);
+		final MapID targetMapID;
 
-	    for (MapObject mapObj : mapLayer.getObjects()) {
-		if (mapObj instanceof RectangleMapObject) {
-		    final MapProperties portalProperties = mapObj.getProperties();
-		    final Integer targetTileIndexX = portalProperties.get("targetTileIndexX", Integer.class);
-		    final Integer targetTileIndexY = portalProperties.get("targetTileIndexY", Integer.class);
-		    final String targetMapIDStr = portalProperties.get("targetMapID", String.class);
-		    final MapID targetMapID;
-
-		    if (targetTileIndexX == null || targetTileIndexY == null) {
-			throw new GdxRuntimeException("Portal of map " + mapID + " does not have a valid target tile (" + targetTileIndexX + "/" + targetTileIndexY + ")");
-		    }
-		    if (targetMapIDStr == null) {
-			targetMapID = this.mapID;
-		    } else {
-			targetMapID = MapID.valueOf(targetMapIDStr);
-			if (targetMapID == null) {
-			    throw new GdxRuntimeException("Portal of map " + mapID + " does not have a valid target mapID " + targetMapIDStr);
-			}
-		    }
-
-		    final Rectangle portalArea = ((RectangleMapObject) mapObj).getRectangle();
-		    portalArea.x *= MapManager.WORLD_UNITS_PER_PIXEL;
-		    portalArea.y *= MapManager.WORLD_UNITS_PER_PIXEL;
-		    portalArea.width *= MapManager.WORLD_UNITS_PER_PIXEL;
-		    portalArea.height *= MapManager.WORLD_UNITS_PER_PIXEL;
-		    portals.add(new Portal(portalArea, new Vector2(targetTileIndexX, targetTileIndexY), targetMapID));
+		if (targetTileIndexX == null || targetTileIndexY == null) {
+		    throw new GdxRuntimeException("Portal of map " + mapID + " does not have a valid target tile (" + targetTileIndexX + "/" + targetTileIndexY + ")");
 		}
+		if (targetMapIDStr == null) {
+		    targetMapID = this.mapID;
+		} else {
+		    targetMapID = MapID.valueOf(targetMapIDStr);
+		    if (targetMapID == null) {
+			throw new GdxRuntimeException("Portal of map " + mapID + " does not have a valid target mapID " + targetMapIDStr);
+		    }
+		}
+
+		final Rectangle portalArea = ((RectangleMapObject) mapObj).getRectangle();
+		portalArea.x *= MapManager.WORLD_UNITS_PER_PIXEL;
+		portalArea.y *= MapManager.WORLD_UNITS_PER_PIXEL;
+		portalArea.width *= MapManager.WORLD_UNITS_PER_PIXEL;
+		portalArea.height *= MapManager.WORLD_UNITS_PER_PIXEL;
+		portals.add(new Portal(portalArea, new Vector2(targetTileIndexX, targetTileIndexY), targetMapID));
 	    }
 	}
     }
@@ -180,6 +196,25 @@ public class Map {
 
     public Color getBackgroundColor() {
 	return backgroundColor;
+    }
+
+    public boolean isVisible(int tileIndexX, int tileIndexY) {
+	return revealedTiles.get(tileIndexY * numTilesX + tileIndexX);
+    }
+
+    public void revealArea(Rectangle boundingRectangle, int revelationRadius) {
+	final float centerX = boundingRectangle.x + boundingRectangle.width / 2;
+	final float centerY = boundingRectangle.y + boundingRectangle.height / 2;
+	final int startTileIndexX = (int) Math.max(0, centerX / tileWidthInWorldUnits - revelationRadius);
+	final int startTileIndexY = (int) Math.max(0, centerY / tileHeightInWorldUnits - revelationRadius);
+	final int endTileIndexX = (int) Math.min(numTilesX - 1, centerX / tileWidthInWorldUnits + revelationRadius);
+	final int endTileIndexY = (int) Math.min(numTilesY - 1, centerY / tileHeightInWorldUnits + revelationRadius);
+
+	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
+	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {
+		revealedTiles.set(y * numTilesX + x, true);
+	    }
+	}
     }
 
 }

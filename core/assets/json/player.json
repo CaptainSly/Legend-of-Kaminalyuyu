@@ -1,0 +1,7 @@
+{
+  "entityID" : PLAYER,
+  "animationID" : HERO,
+  "speed" : 10,
+  "revelationRadius" : 1,
+  "boundingRectangle" : { "x" : 4, "y" : 0, "width" :26 , "height" : 9 }
+}

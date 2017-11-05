@@ -8,8 +8,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.ecs.EntityEngine;
+import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.ecs.components.PlayerControlledComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 
 // replace later on with GestureAdapter
@@ -23,17 +23,21 @@ public class GameInputProcessor extends InputAdapter implements EntityListener {
 	player = null;
 	this.speedComponentMapper = speedComponentMapper;
 	this.animationComponentMapper = animationComponentMapper;
-	EntityEngine.getEngine().addEntityListener(Family.all(PlayerControlledComponent.class).get(), this);
+	EntityEngine.getEngine().addEntityListener(Family.all(AnimationComponent.class).get(), this);
     }
 
     @Override
     public void entityAdded(Entity entity) {
-	this.player = entity;
+	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	    this.player = entity;
+	}
     }
 
     @Override
     public void entityRemoved(Entity entity) {
-	this.player = null;
+	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	    this.player = null;
+	}
     }
 
     @Override

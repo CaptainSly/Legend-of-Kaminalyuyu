@@ -13,7 +13,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 public class AnimationManager {
     public enum AnimationID {
-	HERO;
+	HERO,
+	DEMON_01;
 
 	private final int cacheIndex;
 
@@ -48,14 +49,13 @@ public class AnimationManager {
 	private Array<AnimationTypeConfgiruation> animations;
     }
 
-    private static final String			  TAG	   = AnimationManager.class.getName();
-    private static AnimationManager		  instance = null;
+    private static final String		    TAG	     = AnimationManager.class.getName();
+    private static AnimationManager	    instance = null;
 
-    private final Array<Animation<TextureRegion>> animationCache;
+    private Array<Animation<TextureRegion>> animationCache;
 
     private AnimationManager() {
-	animationCache = new Array<Animation<TextureRegion>>(true, AnimationID.values().length * AnimationType.values().length);
-	loadAnimations();
+	animationCache = null;
     }
 
     public static AnimationManager getManager() {
@@ -92,7 +92,8 @@ public class AnimationManager {
 		final Array<TextureRegion> framesOfAnimation = new Array<TextureRegion>();
 		for (int y = animationTypeConfig.firstFrameIndex.y; y <= animationTypeConfig.lastFrameIndex.y; ++y) {
 		    for (int x = animationTypeConfig.firstFrameIndex.x; x <= animationTypeConfig.lastFrameIndex.x; ++x) {
-			framesOfAnimation.add(new TextureRegion(region.getTexture(), x * frameWidth, y * frameHeight, frameWidth, frameHeight));
+			framesOfAnimation
+				.add(new TextureRegion(region.getTexture(), region.getRegionX() + x * frameWidth, region.getRegionY() + y * frameHeight, frameWidth, frameHeight));
 		    }
 		}
 
@@ -121,6 +122,7 @@ public class AnimationManager {
 
     private void loadAnimations() {
 	final long startTime = TimeUtils.millis();
+	animationCache = new Array<Animation<TextureRegion>>(true, AnimationID.values().length * AnimationType.values().length);
 	final Object fromJson = Utils.fromJson(Gdx.files.internal("json/animations.json"));
 	final Array<AnimationConfiguration> configsInFile = new Array<AnimationConfiguration>();
 	if (fromJson instanceof Array<?>) {
@@ -143,6 +145,9 @@ public class AnimationManager {
     }
 
     public Animation<TextureRegion> getAnimation(AnimationID id, AnimationType type) {
+	if (animationCache == null) {
+	    loadAnimations();
+	}
 	return animationCache.get(id.cacheIndex + type.ordinal());
     }
 }

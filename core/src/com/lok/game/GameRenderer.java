@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
@@ -20,19 +19,23 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lok.game.ecs.EntityEngine;
+import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
+import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.PositionComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
+import com.lok.game.map.MapRenderer;
 
 public class GameRenderer implements EntityListener, MapListener {
     private SpriteBatch				batch;
     private ComponentMapper<PositionComponent>	positionComponentMapper;
+    private ComponentMapper<CollisionComponent>	collisionComponentMapper;
     private ComponentMapper<AnimationComponent>	animationComponentMapper;
     private Array<Entity>			entities;
-    private OrthogonalTiledMapRenderer		mapRenderer;
+    private MapRenderer				mapRenderer;
     private Viewport				viewport;
     private Rectangle				scissors;
     private Rectangle				visibleArea;
@@ -46,6 +49,7 @@ public class GameRenderer implements EntityListener, MapListener {
 	this.player = null;
 	positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
 	animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
+	collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	entities = new Array<Entity>();
 	batch = new SpriteBatch();
 	mapRenderer = null;
@@ -63,10 +67,6 @@ public class GameRenderer implements EntityListener, MapListener {
 	visibleArea = new Rectangle(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
 	shapeRenderer = new ShapeRenderer();
-    }
-
-    public void setPlayer(Entity entity) {
-	this.player = entity;
     }
 
     public void render(float alpha) {
@@ -112,6 +112,16 @@ public class GameRenderer implements EntityListener, MapListener {
 	    shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
 	}
 
+	for (Entity entity : entities) {
+	    final CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
+	    if (collisionComponent == null) {
+		continue;
+	    }
+
+	    shapeRenderer.rect(collisionComponent.boundingRectangle.x, collisionComponent.boundingRectangle.y, collisionComponent.boundingRectangle.width,
+		    collisionComponent.boundingRectangle.height);
+	}
+
 	shapeRenderer.setColor(Color.BLUE);
 	for (Portal portal : mapPortals) {
 	    shapeRenderer.rect(portal.getArea().x, portal.getArea().y, portal.getArea().width, portal.getArea().height);
@@ -137,19 +147,25 @@ public class GameRenderer implements EntityListener, MapListener {
     @Override
     public void entityAdded(Entity entity) {
 	entities.add(entity);
+	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	    this.player = entity;
+	}
     }
 
     @Override
     public void entityRemoved(Entity entity) {
 	entities.removeValue(entity, false);
+	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	    this.player = null;
+	}
     }
 
     @Override
     public void onMapChange(MapManager manager, Map map) {
 	if (mapRenderer == null) {
-	    mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), MapManager.WORLD_UNITS_PER_PIXEL, batch);
+	    mapRenderer = new MapRenderer(map, batch);
 	} else {
-	    mapRenderer.setMap(map.getTiledMap());
+	    mapRenderer.setMap(map);
 	}
 
 	mapCollisionAreas = map.getCollisionAreas();

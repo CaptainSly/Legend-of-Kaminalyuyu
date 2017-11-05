@@ -27,18 +27,18 @@ public class MapManager {
     private static final String	     TAG		   = MapManager.class.getName();
     private static MapManager	     instance		   = null;
 
-    private final Array<Map>	     mapCache;
+    private Array<Map>		     mapCache;
     private final Array<MapListener> listeners;
 
     private MapManager() {
 	AssetManager.getManager().setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 	listeners = new Array<MapListener>();
-	this.mapCache = new Array<Map>();
-	loadMaps();
+	this.mapCache = null;
     }
 
     private void loadMaps() {
 	final long start = TimeUtils.millis();
+	mapCache = new Array<Map>();
 	for (MapID mapID : MapID.values()) {
 	    mapCache.add(new Map(mapID));
 	}
@@ -54,6 +54,10 @@ public class MapManager {
     }
 
     public void changeMap(MapID mapID) {
+	if (mapCache == null) {
+	    loadMaps();
+	}
+
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
 	final Map map = mapCache.get(mapID.ordinal());
 

@@ -1,15 +1,32 @@
-{
-  "animationID" : HERO,
-  "atlasName" : "units/units.atlas",
-  "atlasKey" : "hero",
-  "numColumns" : 4,
-  "numRows" : 4,
-  "frameDuration" : 0.25,
-  "animations" : [
-    { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
-    { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
-    { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
-    { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
-    { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
-  ]
-}
+[
+  {
+    "animationID" : HERO,
+    "atlasName" : "units/units.atlas",
+    "atlasKey" : "hero",
+    "numColumns" : 4,
+    "numRows" : 4,
+    "frameDuration" : 0.25,
+    "animations" : [
+      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
+      { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
+      { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
+      { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
+      { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
+    ]
+  },
+  {
+    "animationID" : DEMON_01,
+    "atlasName" : "units/units.atlas",
+    "atlasKey" : "demon01",
+    "numColumns" : 4,
+    "numRows" : 4,
+    "frameDuration" : 0.25,
+    "animations" : [
+      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
+      { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
+      { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
+      { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
+      { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
+    ]
+  }
+]

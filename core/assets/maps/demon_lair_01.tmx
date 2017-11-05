@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="16" tileheight="16" backgroundcolor="#2b292c" nextobjectid="2">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="16" tileheight="16" backgroundcolor="#2b292c" nextobjectid="9">
  <tileset firstgid="1" source="tilesets/demon_lair_tileset.tsx"/>
  <layer name="ground" width="100" height="100">
   <properties>
@@ -33,11 +33,48 @@
    eJzt2kEKg0AMBdAwHsPe3Fp7L7V6lM4RBIeSMu+ts8onEEIiAAAAIL+pRDxLuzruWWuPtwt9vlrHPeMQ8Rja1QEAAAAAAAAA/KulRLz9q6Rx1CxOeQAA/IRdOBe7MAAAANCCm08ubj4AAAAAAAAAQA/8rOTiZwX6NdfZf5n/NPaaxUceAAAAAAAAAABd+wKhZxV9
   </data>
  </layer>
- <objectgroup name="Portals">
+ <objectgroup color="#5500ff" name="Portals">
   <object id="1" x="776" y="70" width="47" height="24">
    <properties>
     <property name="targetTileIndexX" type="int" value="27"/>
     <property name="targetTileIndexY" type="int" value="27"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup color="#ff0000" name="Entities">
+  <object id="2" x="684" y="803" width="27" height="29">
+   <properties>
+    <property name="entityID" value="PLAYER"/>
+   </properties>
+  </object>
+  <object id="3" x="981" y="471" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
+   </properties>
+  </object>
+  <object id="4" x="598" y="449.5" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
+   </properties>
+  </object>
+  <object id="5" x="1147" y="795.5" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
+   </properties>
+  </object>
+  <object id="6" x="270" y="703.5" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
+   </properties>
+  </object>
+  <object id="7" x="415" y="1121.5" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
+   </properties>
+  </object>
+  <object id="8" x="1031" y="1227.5" width="22" height="21">
+   <properties>
+    <property name="entityID" value="DEMON_01"/>
    </properties>
   </object>
  </objectgroup>
