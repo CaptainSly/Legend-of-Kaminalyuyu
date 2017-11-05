@@ -203,12 +203,10 @@ public class Map {
     }
 
     public void revealArea(Rectangle boundingRectangle, int revelationRadius) {
-	final float centerX = boundingRectangle.x + boundingRectangle.width / 2;
-	final float centerY = boundingRectangle.y + boundingRectangle.height / 2;
-	final int startTileIndexX = (int) Math.max(0, centerX / tileWidthInWorldUnits - revelationRadius);
-	final int startTileIndexY = (int) Math.max(0, centerY / tileHeightInWorldUnits - revelationRadius);
-	final int endTileIndexX = (int) Math.min(numTilesX - 1, centerX / tileWidthInWorldUnits + revelationRadius);
-	final int endTileIndexY = (int) Math.min(numTilesY - 1, centerY / tileHeightInWorldUnits + revelationRadius);
+	final int startTileIndexX = (int) Math.max(0, boundingRectangle.x / tileWidthInWorldUnits - revelationRadius);
+	final int startTileIndexY = (int) Math.max(0, boundingRectangle.y / tileHeightInWorldUnits - revelationRadius);
+	final int endTileIndexX = (int) Math.min(numTilesX - 1, (boundingRectangle.x + boundingRectangle.width) / tileWidthInWorldUnits + revelationRadius);
+	final int endTileIndexY = (int) Math.min(numTilesY - 1, (boundingRectangle.y + boundingRectangle.height) / tileHeightInWorldUnits + revelationRadius);
 
 	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
 	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {

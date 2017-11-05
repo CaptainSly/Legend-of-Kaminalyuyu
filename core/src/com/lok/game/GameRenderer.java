@@ -118,8 +118,8 @@ public class GameRenderer implements EntityListener, MapListener {
 		continue;
 	    }
 
-	    shapeRenderer.rect(collisionComponent.boundingRectangle.x, collisionComponent.boundingRectangle.y, collisionComponent.boundingRectangle.width,
-		    collisionComponent.boundingRectangle.height);
+	    shapeRenderer.rect(collisionComponent.collisionRectangle.x, collisionComponent.collisionRectangle.y, collisionComponent.collisionRectangle.width,
+		    collisionComponent.collisionRectangle.height);
 	}
 
 	shapeRenderer.setColor(Color.BLUE);

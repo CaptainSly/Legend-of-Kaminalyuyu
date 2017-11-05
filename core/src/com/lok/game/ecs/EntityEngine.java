@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -40,7 +41,7 @@ public class EntityEngine {
 	private AnimationID animationID;
 	private float	    speed;
 	private int	    revelationRadius;
-	private Rectangle   boundingRectangle;
+	private Rectangle   collisionRectangle;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();
@@ -166,10 +167,14 @@ public class EntityEngine {
 	    entity.add(speedComponent);
 	}
 
+	Rectangle.tmp.set(0, 0, 0, 0);
 	if (entityConfig.animationID != null) {
 	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
 	    animationComponent.animationID = entityConfig.animationID;
 	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
+	    final TextureRegion keyFrame = animationComponent.animation.getKeyFrame(0);
+	    Rectangle.tmp.width = keyFrame.getRegionWidth();
+	    Rectangle.tmp.height = keyFrame.getRegionHeight();
 	    entity.add(animationComponent);
 	}
 
@@ -179,16 +184,22 @@ public class EntityEngine {
 	    entity.add(mapRevelationComponent);
 	}
 
-	if (entityConfig.boundingRectangle != null) {
+	if (entityConfig.collisionRectangle != null) {
 	    final CollisionComponent collisionComponent = engine.createComponent(CollisionComponent.class);
-	    collisionComponent.rectOffset.set(entityConfig.boundingRectangle.x * MapManager.WORLD_UNITS_PER_PIXEL,
-		    entityConfig.boundingRectangle.y * MapManager.WORLD_UNITS_PER_PIXEL);
+	    collisionComponent.rectOffset.set(entityConfig.collisionRectangle.x * MapManager.WORLD_UNITS_PER_PIXEL,
+		    entityConfig.collisionRectangle.y * MapManager.WORLD_UNITS_PER_PIXEL);
+
+	    collisionComponent.collisionRectangle.set( // params
+		    entityConfig.collisionRectangle.x *= MapManager.WORLD_UNITS_PER_PIXEL, // x
+		    entityConfig.collisionRectangle.y *= MapManager.WORLD_UNITS_PER_PIXEL, // y
+		    entityConfig.collisionRectangle.width *= MapManager.WORLD_UNITS_PER_PIXEL, // width
+		    entityConfig.collisionRectangle.height *= MapManager.WORLD_UNITS_PER_PIXEL); // height
 
 	    collisionComponent.boundingRectangle.set( // params
-		    entityConfig.boundingRectangle.x *= MapManager.WORLD_UNITS_PER_PIXEL, // x
-		    entityConfig.boundingRectangle.y *= MapManager.WORLD_UNITS_PER_PIXEL, // y
-		    entityConfig.boundingRectangle.width *= MapManager.WORLD_UNITS_PER_PIXEL, // width
-		    entityConfig.boundingRectangle.height *= MapManager.WORLD_UNITS_PER_PIXEL); // height
+		    Rectangle.tmp.x *= MapManager.WORLD_UNITS_PER_PIXEL, // x
+		    Rectangle.tmp.y *= MapManager.WORLD_UNITS_PER_PIXEL, // y
+		    Rectangle.tmp.width *= MapManager.WORLD_UNITS_PER_PIXEL, // width
+		    Rectangle.tmp.height *= MapManager.WORLD_UNITS_PER_PIXEL); // height
 	    entity.add(collisionComponent);
 	}
 

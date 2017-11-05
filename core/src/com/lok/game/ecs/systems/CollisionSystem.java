@@ -23,8 +23,9 @@ public class CollisionSystem extends IteratingSystem {
 	final PositionComponent positionComponent = positionComponentMapper.get(entity);
 	final CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
 
-	collisionComponent.boundingRectangle.setPosition(positionComponent.position.x + collisionComponent.rectOffset.x,
+	collisionComponent.collisionRectangle.setPosition(positionComponent.position.x + collisionComponent.rectOffset.x,
 		positionComponent.position.y + collisionComponent.rectOffset.y);
+	collisionComponent.boundingRectangle.setPosition(positionComponent.position);
     }
 
 }
