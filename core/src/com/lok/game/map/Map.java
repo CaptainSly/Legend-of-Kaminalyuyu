@@ -34,8 +34,8 @@ public class Map {
 	    return area;
 	}
 
-	public boolean isInside(Vector2 position) {
-	    return area.contains(position);
+	public boolean isColliding(Rectangle rectangle) {
+	    return area.overlaps(rectangle);
 	}
 
 	public Vector2 getTargetPosition() {
@@ -165,7 +165,8 @@ public class Map {
 		portalArea.y *= MapManager.WORLD_UNITS_PER_PIXEL;
 		portalArea.width *= MapManager.WORLD_UNITS_PER_PIXEL;
 		portalArea.height *= MapManager.WORLD_UNITS_PER_PIXEL;
-		portals.add(new Portal(portalArea, new Vector2(targetTileIndexX, targetTileIndexY), targetMapID));
+		portals.add(new Portal(portalArea,
+			new Vector2(targetTileIndexX * tileWidthInWorldUnits, numTilesY * tileHeightInWorldUnits - targetTileIndexY * tileHeightInWorldUnits), targetMapID));
 	    }
 	}
     }
@@ -210,6 +211,14 @@ public class Map {
 
 	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
 	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {
+		// do not reveal corner areas
+		if ((x == startTileIndexX && y == startTileIndexY) || // left top
+			(x == startTileIndexX && y == endTileIndexY) || // left bottom
+			(x == endTileIndexX && y == startTileIndexY) || // right top
+			(x == endTileIndexX && y == endTileIndexY)) { // right bottom
+		    continue;
+		}
+
 		revealedTiles.set(y * numTilesX + x, true);
 	    }
 	}

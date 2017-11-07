@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.lok.game.AnimationManager.AnimationType;
@@ -85,6 +86,30 @@ public class GameInputProcessor extends InputAdapter implements EntityListener {
 	    case Keys.DOWN:
 	    case Keys.LEFT:
 	    case Keys.RIGHT:
+		if (Gdx.input.isKeyPressed(Keys.UP)) {
+		    speedComponent.speed.set(0, speedComponent.maxSpeed);
+		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_UP);
+		    return true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+		    speedComponent.speed.set(0, -speedComponent.maxSpeed);
+		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_DOWN);
+		    return true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+		    speedComponent.speed.set(-speedComponent.maxSpeed, 0);
+		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_LEFT);
+		    return true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+		    speedComponent.speed.set(speedComponent.maxSpeed, 0);
+		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_RIGHT);
+		    return true;
+		}
+		if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.RIGHT)) {
+		    return true;
+		}
+
 		speedComponent.speed.set(0, 0);
 		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
 		return true;

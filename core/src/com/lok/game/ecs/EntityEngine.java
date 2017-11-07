@@ -7,8 +7,8 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
@@ -22,6 +22,7 @@ import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.PositionComponent;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.AIWanderSystem;
 import com.lok.game.ecs.systems.AnimationSystem;
@@ -41,6 +42,7 @@ public class EntityEngine {
 	private AnimationID animationID;
 	private float	    speed;
 	private int	    revelationRadius;
+	private Vector2	    size;
 	private Rectangle   collisionRectangle;
     }
 
@@ -60,11 +62,12 @@ public class EntityEngine {
 	final ComponentMapper<AnimationComponent> animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 	final ComponentMapper<MapRevelationComponent> mapRevelationComponentMapper = ComponentMapper.getFor(MapRevelationComponent.class);
 	final ComponentMapper<CollisionComponent> collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
+	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 
-	engine.addSystem(new MovementSystem(positionComponentMapper, speedComponentMapper));
+	engine.addSystem(new MovementSystem(positionComponentMapper, speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
 	engine.addSystem(new CollisionSystem(positionComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
-	engine.addSystem(new MapRevelationSystem(positionComponentMapper, collisionComponentMapper, mapRevelationComponentMapper));
+	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
 	engine.addSystem(new AIWanderSystem(positionComponentMapper, aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
 
@@ -167,14 +170,10 @@ public class EntityEngine {
 	    entity.add(speedComponent);
 	}
 
-	Rectangle.tmp.set(0, 0, 0, 0);
 	if (entityConfig.animationID != null) {
 	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
 	    animationComponent.animationID = entityConfig.animationID;
 	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
-	    final TextureRegion keyFrame = animationComponent.animation.getKeyFrame(0);
-	    Rectangle.tmp.width = keyFrame.getRegionWidth();
-	    Rectangle.tmp.height = keyFrame.getRegionHeight();
 	    entity.add(animationComponent);
 	}
 
@@ -184,22 +183,21 @@ public class EntityEngine {
 	    entity.add(mapRevelationComponent);
 	}
 
+	if (entityConfig.size != null) {
+	    final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
+	    sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
+	    entity.add(sizeComponent);
+	}
+
 	if (entityConfig.collisionRectangle != null) {
 	    final CollisionComponent collisionComponent = engine.createComponent(CollisionComponent.class);
 	    collisionComponent.rectOffset.set(entityConfig.collisionRectangle.x * MapManager.WORLD_UNITS_PER_PIXEL,
 		    entityConfig.collisionRectangle.y * MapManager.WORLD_UNITS_PER_PIXEL);
 
-	    collisionComponent.collisionRectangle.set( // params
-		    entityConfig.collisionRectangle.x *= MapManager.WORLD_UNITS_PER_PIXEL, // x
-		    entityConfig.collisionRectangle.y *= MapManager.WORLD_UNITS_PER_PIXEL, // y
-		    entityConfig.collisionRectangle.width *= MapManager.WORLD_UNITS_PER_PIXEL, // width
-		    entityConfig.collisionRectangle.height *= MapManager.WORLD_UNITS_PER_PIXEL); // height
+	    collisionComponent.collisionRectangle.set(x + collisionComponent.rectOffset.x, y + collisionComponent.rectOffset.y, // position
+		    entityConfig.collisionRectangle.width * MapManager.WORLD_UNITS_PER_PIXEL, // width
+		    entityConfig.collisionRectangle.height * MapManager.WORLD_UNITS_PER_PIXEL); // height
 
-	    collisionComponent.boundingRectangle.set( // params
-		    Rectangle.tmp.x *= MapManager.WORLD_UNITS_PER_PIXEL, // x
-		    Rectangle.tmp.y *= MapManager.WORLD_UNITS_PER_PIXEL, // y
-		    Rectangle.tmp.width *= MapManager.WORLD_UNITS_PER_PIXEL, // width
-		    Rectangle.tmp.height *= MapManager.WORLD_UNITS_PER_PIXEL); // height
 	    entity.add(collisionComponent);
 	}
 

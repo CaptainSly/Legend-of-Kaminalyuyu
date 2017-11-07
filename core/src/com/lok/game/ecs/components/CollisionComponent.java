@@ -7,13 +7,11 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class CollisionComponent implements Component, Poolable {
     public Vector2   rectOffset		= new Vector2(0, 0);
-    public Rectangle boundingRectangle	= new Rectangle(0, 0, 0, 0);
     public Rectangle collisionRectangle	= new Rectangle(0, 0, 0, 0);
 
     @Override
     public void reset() {
 	rectOffset.set(0, 0);
-	boundingRectangle.set(0, 0, 0, 0);
 	collisionRectangle.set(0, 0, 0, 0);
     }
 }

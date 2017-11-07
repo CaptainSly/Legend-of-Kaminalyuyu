@@ -23,6 +23,7 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.PositionComponent;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
@@ -32,6 +33,7 @@ import com.lok.game.map.MapRenderer;
 public class GameRenderer implements EntityListener, MapListener {
     private SpriteBatch				batch;
     private ComponentMapper<PositionComponent>	positionComponentMapper;
+    private ComponentMapper<SizeComponent>	sizeComponentMapper;
     private ComponentMapper<CollisionComponent>	collisionComponentMapper;
     private ComponentMapper<AnimationComponent>	animationComponentMapper;
     private Array<Entity>			entities;
@@ -48,6 +50,7 @@ public class GameRenderer implements EntityListener, MapListener {
     public GameRenderer() {
 	this.player = null;
 	positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
+	sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 	animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 	collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	entities = new Array<Entity>();
@@ -60,7 +63,7 @@ public class GameRenderer implements EntityListener, MapListener {
 	mapCollisionAreas = null;
 	mapBackgroundColor = Color.BLACK;
 
-	EntityEngine.getEngine().addEntityListener(Family.one(AnimationComponent.class).get(), this);
+	EntityEngine.getEngine().addEntityListener(Family.one(AnimationComponent.class, SizeComponent.class).get(), this);
 	MapManager.getManager().addListener(this);
 
 	scissors = new Rectangle();
@@ -78,10 +81,10 @@ public class GameRenderer implements EntityListener, MapListener {
 
 	if (player != null) {
 	    final PositionComponent playerPosComp = positionComponentMapper.get(player);
-	    playerPosComp.previousPosition.interpolate(playerPosComp.position, alpha, Interpolation.smoother);
 	    viewport.getCamera().position.set(playerPosComp.position.x, playerPosComp.position.y, 0);
-	    visibleArea.setCenter(playerPosComp.previousPosition);
+	    visibleArea.setCenter(playerPosComp.position);
 	}
+
 	viewport.getCamera().update();
 	mapRenderer.setView(viewport.getCamera().combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
 	mapRenderer.render();
@@ -91,18 +94,20 @@ public class GameRenderer implements EntityListener, MapListener {
 
 	for (int i = 0; i < entities.size; ++i) {
 	    final Entity entity = entities.get(i);
-	    final PositionComponent posComp = positionComponentMapper.get(entity);
 	    final AnimationComponent animationComp = animationComponentMapper.get(entity);
 
 	    if (animationComp.animation != null) {
+		final PositionComponent posComp = positionComponentMapper.get(entity);
+		final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+
 		posComp.previousPosition.interpolate(posComp.position, alpha, Interpolation.smoother);
 		final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
-		batch.draw(keyFrame, posComp.previousPosition.x, posComp.previousPosition.y, keyFrame.getRegionWidth() * MapManager.WORLD_UNITS_PER_PIXEL,
-			keyFrame.getRegionHeight() * MapManager.WORLD_UNITS_PER_PIXEL);
+		batch.draw(keyFrame, posComp.previousPosition.x, posComp.previousPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
 	    }
 	}
 
 	batch.end();
+	batch.flush();
 
 	shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
 	shapeRenderer.begin(ShapeType.Line);
@@ -127,9 +132,17 @@ public class GameRenderer implements EntityListener, MapListener {
 	    shapeRenderer.rect(portal.getArea().x, portal.getArea().y, portal.getArea().width, portal.getArea().height);
 	}
 
+	for (Entity entity : entities) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+	    if (sizeComp == null) {
+		continue;
+	    }
+
+	    shapeRenderer.rect(sizeComp.boundingRectangle.x, sizeComp.boundingRectangle.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
+	}
+
 	shapeRenderer.end();
 
-	batch.flush();
 	ScissorStack.popScissors();
     }
 
