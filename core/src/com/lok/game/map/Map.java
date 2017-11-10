@@ -88,7 +88,8 @@ public class Map {
 
 	for (MapLayer mapLayer : tiledMap.getLayers()) {
 	    if (mapLayer instanceof TiledMapTileLayer) {
-		parseCollisionAreas((TiledMapTileLayer) mapLayer, tileWidthInWorldUnits, tileHeightInWorldUnits);
+		final TiledMapTileLayer tiledMapLayer = (TiledMapTileLayer) mapLayer;
+		parseCollisionAreas(tiledMapLayer, tileWidthInWorldUnits, tileHeightInWorldUnits);
 	    } else if ("Portals".equals(mapLayer.getName())) {
 		parsePortals(mapLayer);
 	    } else if ("Entities".equals(mapLayer.getName())) {
@@ -201,6 +202,23 @@ public class Map {
 
     public boolean isVisible(int tileIndexX, int tileIndexY) {
 	return revealedTiles.get(tileIndexY * numTilesX + tileIndexX);
+    }
+
+    public boolean isVisible(Rectangle boundingRectangle) {
+	final int startTileIndexX = (int) (boundingRectangle.x / tileWidthInWorldUnits);
+	final int startTileIndexY = (int) (boundingRectangle.y / tileHeightInWorldUnits);
+	final int endTileIndexX = (int) ((boundingRectangle.x + boundingRectangle.width) / tileWidthInWorldUnits);
+	final int endTileIndexY = (int) ((boundingRectangle.y + boundingRectangle.height) / tileHeightInWorldUnits);
+
+	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
+	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {
+		if (revealedTiles.get(y * numTilesX + x)) {
+		    return true;
+		}
+	    }
+	}
+
+	return false;
     }
 
     public void revealArea(Rectangle boundingRectangle, int revelationRadius) {

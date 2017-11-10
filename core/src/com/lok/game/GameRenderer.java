@@ -9,10 +9,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
@@ -35,7 +34,6 @@ public class GameRenderer implements EntityListener, MapListener {
     private ComponentMapper<PositionComponent>	positionComponentMapper;
     private ComponentMapper<SizeComponent>	sizeComponentMapper;
     private ComponentMapper<CollisionComponent>	collisionComponentMapper;
-    private ComponentMapper<AnimationComponent>	animationComponentMapper;
     private Array<Entity>			entities;
     private MapRenderer				mapRenderer;
     private Viewport				viewport;
@@ -51,7 +49,6 @@ public class GameRenderer implements EntityListener, MapListener {
 	this.player = null;
 	positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
 	sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
-	animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 	collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	entities = new Array<Entity>();
 	batch = new SpriteBatch();
@@ -86,25 +83,14 @@ public class GameRenderer implements EntityListener, MapListener {
 	}
 
 	viewport.getCamera().update();
-	mapRenderer.setView(viewport.getCamera().combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
-	mapRenderer.render();
-
 	batch.setProjectionMatrix(viewport.getCamera().combined);
 	batch.begin();
 
-	for (int i = 0; i < entities.size; ++i) {
-	    final Entity entity = entities.get(i);
-	    final AnimationComponent animationComp = animationComponentMapper.get(entity);
-
-	    if (animationComp.animation != null) {
-		final PositionComponent posComp = positionComponentMapper.get(entity);
-		final SizeComponent sizeComp = sizeComponentMapper.get(entity);
-
-		posComp.previousPosition.interpolate(posComp.position, alpha, Interpolation.smoother);
-		final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
-		batch.draw(keyFrame, posComp.previousPosition.x, posComp.previousPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
-	    }
-	}
+	mapRenderer.setView(viewport.getCamera().combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
+	AnimatedTiledMapTile.updateAnimationBaseTime();
+	mapRenderer.renderBackgroundLayers();
+	mapRenderer.renderEntityLayer(entities, alpha);
+	mapRenderer.renderForegroundLayers();
 
 	batch.end();
 	batch.flush();
