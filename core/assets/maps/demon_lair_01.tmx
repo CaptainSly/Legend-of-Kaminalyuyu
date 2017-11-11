@@ -18,12 +18,12 @@
  </layer>
  <layer name="entityLayer" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJztyjENAEAIBLAL/h0+YtBA8gNDOzcBAAAA2HmVdP17AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHDJAL0MA3c=
+   eJztykENADAIBLBLkDH868QEn4X23QQAAACAn71KuvYeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwHUDh1IAew==
   </data>
  </layer>
  <layer name="foreground1" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt2ssNhDAMBUArKQM6B5ZtjE8ppIhoZTYzZ9+eLFnWiwAAAID8lhKxln5z8E+mGjHXfnMAAAAAAAAAAG+1l4iv/lAaV8vilgcAwE+4hXNxCwMAAAA9+Pnk4ucDAAAAAAAAAIxAZyUXnRUY19Z2/2P/0zhaFqc8AAAAAAAAAACG9gCAmxIH
+   eJzt2ssJwEAIBUDZ/jvIt698S8mWEMgShJ05e/IhiBgBAAAA+Q0lYizt6vhmqz3eX/T5bR0AAAAAAAAAALSwlIjVv0oaV83ilgcAwC/swrnYhQEAAIAW3HxycfMBAAAAAAAAAHrgZyUXPyvQr6nO/mz+0zhqFqc8AAAAAAAAAAC69gC2VRUD
   </data>
  </layer>
  <objectgroup color="#5500ff" name="Portals">

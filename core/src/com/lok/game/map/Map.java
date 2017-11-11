@@ -19,7 +19,7 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.MapManager.MapID;
 
 public class Map {
-    public class Portal {
+    public static class Portal {
 	private final Rectangle	area;
 	private final Vector2	targetPosition;
 	private final MapID	targetMapID;
@@ -172,34 +172,6 @@ public class Map {
 	}
     }
 
-    public TiledMap getTiledMap() {
-	return tiledMap;
-    }
-
-    public Array<Rectangle> getCollisionAreas() {
-	return collisionAreas;
-    }
-
-    public Rectangle getBoundary() {
-	return boundary;
-    }
-
-    public Array<Entity> getEntities() {
-	return entities;
-    }
-
-    public Array<Portal> getPortals() {
-	return portals;
-    }
-
-    public void dispose() {
-	tiledMap.dispose();
-    }
-
-    public Color getBackgroundColor() {
-	return backgroundColor;
-    }
-
     public boolean isVisible(int tileIndexX, int tileIndexY) {
 	return revealedTiles.get(tileIndexY * numTilesX + tileIndexX);
     }
@@ -242,4 +214,39 @@ public class Map {
 	}
     }
 
+    public TiledMap getTiledMap() {
+	return tiledMap;
+    }
+
+    public Array<Rectangle> getCollisionAreas() {
+	return collisionAreas;
+    }
+
+    public Rectangle getBoundary() {
+	return boundary;
+    }
+
+    public Array<Entity> getEntities() {
+	return entities;
+    }
+
+    public Array<Portal> getPortals() {
+	return portals;
+    }
+
+    public Color getBackgroundColor() {
+	return backgroundColor;
+    }
+
+    public float getTileHeightInWorldUnits() {
+	return tileHeightInWorldUnits;
+    }
+
+    public float getTileWidthInWorldUnits() {
+	return tileWidthInWorldUnits;
+    }
+
+    public void dispose() {
+	tiledMap.dispose();
+    }
 }

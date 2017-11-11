@@ -325,14 +325,27 @@
 <icon BUILTIN="button_ok"/>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1509645977781" ID="ID_437202698" MODIFIED="1510344599712" TEXT="GameRendererr">
+<node COLOR="#990000" CREATED="1509645977781" FOLDED="true" ID="ID_437202698" MODIFIED="1510388439395" TEXT="GameRendererr">
 <font NAME="SansSerif" SIZE="14"/>
-<node COLOR="#111111" CREATED="1510344519017" ID="ID_1945600192" MODIFIED="1510344527409" TEXT="alles zu MapRenderer migrieren"/>
-<node COLOR="#111111" CREATED="1510344528714" ID="ID_674658758" MODIFIED="1510344540005" TEXT="MapRenderer zu GameRenderer umbenennen und in allgemeines package schieben"/>
-<node COLOR="#111111" CREATED="1510344544906" ID="ID_980450705" MODIFIED="1510344553890" TEXT="code optimieren in Renderer"/>
-<node COLOR="#111111" CREATED="1510344561441" ID="ID_55653685" MODIFIED="1510344564566" TEXT="debugmsgs hinzuf&#xfc;gen"/>
-<node COLOR="#111111" CREATED="1510344565645" ID="ID_519075728" MODIFIED="1510344576079" TEXT="shapeRenderer nur in debugmodus"/>
-<node COLOR="#111111" CREATED="1510344729934" ID="ID_1696678718" MODIFIED="1510344740927" TEXT="remove the flag check for EntityID.Player"/>
+<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1510344519017" ID="ID_1945600192" MODIFIED="1510388121075" TEXT="alles zu MapRenderer migrieren">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1510344528714" ID="ID_674658758" MODIFIED="1510388123832" TEXT="MapRenderer zu GameRenderer umbenennen und in allgemeines package schieben">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1510344544906" ID="ID_980450705" MODIFIED="1510388126251" TEXT="code optimieren in Renderer">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1510344561441" ID="ID_55653685" MODIFIED="1510388429618" TEXT="debugmsgs hinzuf&#xfc;gen">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1510344565645" ID="ID_519075728" MODIFIED="1510388130991" TEXT="shapeRenderer nur in debugmodus">
+<icon BUILTIN="button_ok"/>
+</node>
+</node>
+<node COLOR="#990000" CREATED="1510344729934" ID="ID_1696678718" MODIFIED="1510388444623" TEXT="remove the flag check for EntityID.Player">
+<font NAME="SansSerif" SIZE="14"/>
 </node>
 <node COLOR="#990000" CREATED="1509736250819" ID="ID_802316882" MODIFIED="1510344746437" TEXT="ECS">
 <font NAME="SansSerif" SIZE="14"/>
