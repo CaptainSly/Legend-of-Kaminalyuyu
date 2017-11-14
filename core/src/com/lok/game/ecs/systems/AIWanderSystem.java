@@ -6,31 +6,30 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.ecs.components.PositionComponent;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 
 public class AIWanderSystem extends IteratingSystem implements MapListener {
-    private final ComponentMapper<PositionComponent>  positionComponentMapper;
+    private final ComponentMapper<SizeComponent>      sizeComponentMapper;
     private final ComponentMapper<SpeedComponent>     speedComponentMapper;
     private final ComponentMapper<AIWanderComponent>  aiWanderComponentMapper;
     private final ComponentMapper<AnimationComponent> animationComponentMapper;
     private Rectangle				      mapBoundary;
     private Array<Rectangle>			      mapCollisionAreas;
 
-    public AIWanderSystem(ComponentMapper<PositionComponent> positionComponentMapper, ComponentMapper<AIWanderComponent> aiWanderComponentMapper,
+    public AIWanderSystem(ComponentMapper<SizeComponent> sizeComponentMapper, ComponentMapper<AIWanderComponent> aiWanderComponentMapper,
 	    ComponentMapper<SpeedComponent> speedComponentMapper, ComponentMapper<AnimationComponent> animationComponentMapper) {
 	super(Family.all(AIWanderComponent.class, SpeedComponent.class).get());
 
-	this.positionComponentMapper = positionComponentMapper;
+	this.sizeComponentMapper = sizeComponentMapper;
 	this.aiWanderComponentMapper = aiWanderComponentMapper;
 	this.speedComponentMapper = speedComponentMapper;
 	this.animationComponentMapper = animationComponentMapper;
@@ -43,11 +42,11 @@ public class AIWanderSystem extends IteratingSystem implements MapListener {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 	final AIWanderComponent aiWanderComponent = aiWanderComponentMapper.get(entity);
-	final PositionComponent positionComponent = positionComponentMapper.get(entity);
+	final SizeComponent sizeComponent = sizeComponentMapper.get(entity);
 	final SpeedComponent speedComponent = speedComponentMapper.get(entity);
 	final AnimationComponent animationComponent = animationComponentMapper.get(entity);
 
-	if (isOutsideMapOrWithinCollisionArea(positionComponent.position)) {
+	if (isOutsideMapOrWithinCollisionArea(sizeComponent.boundingRectangle.x, sizeComponent.boundingRectangle.y)) {
 	    // entity leaving map -> send it back
 	    if (speedComponent.speed.x > 0) {
 		// right -> left
@@ -102,8 +101,8 @@ public class AIWanderSystem extends IteratingSystem implements MapListener {
 	}
     }
 
-    private boolean isOutsideMapOrWithinCollisionArea(Vector2 position) {
-	if (mapBoundary != null && !mapBoundary.contains(position)) {
+    private boolean isOutsideMapOrWithinCollisionArea(float x, float y) {
+	if (mapBoundary != null && !mapBoundary.contains(x, y)) {
 	    return true;
 	}
 
@@ -112,7 +111,7 @@ public class AIWanderSystem extends IteratingSystem implements MapListener {
 	}
 
 	for (Rectangle collisionArea : mapCollisionAreas) {
-	    if (collisionArea.contains(position)) {
+	    if (collisionArea.contains(x, y)) {
 		return true;
 	    }
 	}

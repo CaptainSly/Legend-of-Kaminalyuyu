@@ -11,6 +11,7 @@ import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
+import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 
 // replace later on with GestureAdapter
@@ -29,14 +30,14 @@ public class GameInputProcessor extends InputAdapter implements EntityListener {
 
     @Override
     public void entityAdded(Entity entity) {
-	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 	    this.player = entity;
 	}
     }
 
     @Override
     public void entityRemoved(Entity entity) {
-	if (entity.flags == EntityID.PLAYER.ordinal()) {
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 	    this.player = null;
 	}
     }

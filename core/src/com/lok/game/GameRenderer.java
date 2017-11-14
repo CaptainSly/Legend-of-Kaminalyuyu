@@ -33,7 +33,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
@@ -42,17 +45,18 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
-import com.lok.game.ecs.components.PositionComponent;
+import com.lok.game.ecs.components.IDComponent;
+import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
@@ -63,10 +67,10 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
     private final static String TAG = GameRenderer.class.getName();
 
     private static class yPositionComparator implements Comparator<Entity> {
-	private final ComponentMapper<PositionComponent> posComponentMapper;
+	private final ComponentMapper<SizeComponent> sizeComponentMapper;
 
-	private yPositionComparator(ComponentMapper<PositionComponent> posComponentMapper) {
-	    this.posComponentMapper = posComponentMapper;
+	private yPositionComparator(ComponentMapper<SizeComponent> sizeComponentMapper) {
+	    this.sizeComponentMapper = sizeComponentMapper;
 	}
 
 	@Override
@@ -79,14 +83,15 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 		return 1;
 	    }
 
-	    return posComponentMapper.get(o1).position.y > posComponentMapper.get(o2).position.y ? -1 : 1;
+	    return sizeComponentMapper.get(o1).boundingRectangle.y > sizeComponentMapper.get(o2).boundingRectangle.y ? -1 : 1;
 	}
 
     }
 
     private Map					      map;
     private final Array<Entity>			      entities;
-    private PositionComponent			      cameraLockEntityPositionComponent;
+    private SizeComponent			      cameraLockEntitySizeComponent;
+    private MapRevelationComponent		      cameraLockEntityRevelationComponent;
 
     private Array<Rectangle>			      mapCollisionAreas;
     private Array<Portal>			      mapPortals;
@@ -98,7 +103,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
     private final yPositionComparator		      entityComparator;
 
-    private final ComponentMapper<PositionComponent>  posComponentMapper;
     private final ComponentMapper<SizeComponent>      sizeComponentMapper;
     private final ComponentMapper<AnimationComponent> animationComponentMapper;
 
@@ -111,6 +115,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
     private final Rectangle			      scissors;
 
     private final ShapeRenderer			      shapeRenderer;
+
+    private FrameBuffer				      frameBuffer;
+    private final Texture			      lightTexture;
 
     public GameRenderer() {
 	super(null, MapManager.WORLD_UNITS_PER_PIXEL);
@@ -125,7 +132,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	camera = new OrthographicCamera();
 	viewport = new FitViewport(32, 18, camera);
-	viewport.apply();
 	visibleArea = new Rectangle(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 	scissors = new Rectangle();
 
@@ -133,15 +139,17 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	this.entityLayer = null;
 	this.foregroundLayers = new Array<TiledMapTileLayer>();
 
-	this.posComponentMapper = ComponentMapper.getFor(PositionComponent.class);
 	this.sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 
-	this.entityComparator = new yPositionComparator(posComponentMapper);
+	this.entityComparator = new yPositionComparator(sizeComponentMapper);
 
 	entities = new Array<Entity>(512);
 	EntityEngine.getEngine().addEntityListener(Family.one(AnimationComponent.class, SizeComponent.class).get(), this);
 	MapManager.getManager().addListener(this);
+
+	lightTexture = AssetManager.getManager().getAsset("lights/light.png", Texture.class);
+	frameBuffer = null;
     }
 
     private void updateMapRenderInformation() {
@@ -179,21 +187,51 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	Gdx.app.debug(TAG, "Resizing to " + width + " x " + height);
 	viewport.update(width, height);
 	visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
+	if (frameBuffer != null) {
+	    frameBuffer.dispose();
+	}
+
+	try {
+	    frameBuffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, viewport.getScreenWidth(), viewport.getScreenHeight(), false);
+	} catch (GdxRuntimeException e) {
+	    frameBuffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGB565, viewport.getScreenWidth(), viewport.getScreenHeight(), false);
+	}
+    }
+
+    public void lockCameraToEntity(Entity entity) {
+	if (entity == null) {
+	    cameraLockEntitySizeComponent = null;
+	    cameraLockEntityRevelationComponent = null;
+	} else {
+	    cameraLockEntityRevelationComponent = entity.getComponent(MapRevelationComponent.class);
+	    cameraLockEntitySizeComponent = entity.getComponent(SizeComponent.class);
+
+	    if (cameraLockEntitySizeComponent == null) {
+		throw new GdxRuntimeException("Trying to lock camera to an entity without size component: " + entity);
+	    }
+	}
     }
 
     public void render(float alpha) {
+	interpolateEntities(alpha);
+
+	prepareLightFrameBuffer();
+
+	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
 	Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 	viewport.calculateScissors(batch.getTransformMatrix(), visibleArea, scissors);
 	ScissorStack.pushScissors(scissors);
 
-	if (cameraLockEntityPositionComponent != null) {
-	    camera.position.set(cameraLockEntityPositionComponent.position.x, cameraLockEntityPositionComponent.position.y, 0);
-	    visibleArea.setCenter(cameraLockEntityPositionComponent.position);
+	if (cameraLockEntitySizeComponent != null) {
+	    camera.position.set(cameraLockEntitySizeComponent.previousPosition, 0);
+	    visibleArea.setCenter(cameraLockEntitySizeComponent.previousPosition);
 	}
 
-	camera.update();
+	viewport.apply();
 	AnimatedTiledMapTile.updateAnimationBaseTime();
 
 	setView(camera.combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
@@ -203,14 +241,59 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	renderEntityLayer(entities, alpha);
 	renderForegroundLayers();
 
-	batch.end();
-	batch.flush();
-
 	if (Gdx.app.getLogLevel() == Application.LOG_DEBUG) {
+	    batch.end();
 	    renderDebugInformation();
+	    batch.begin();
 	}
+	batch.end();
+
+	applyLightFrameBuffer();
 
 	ScissorStack.popScissors();
+    }
+
+    private void interpolateEntities(float alpha) {
+	for (Entity entity : entities) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+
+	    final float invAlpha = 1.0f - alpha;
+	    sizeComp.previousPosition.x = sizeComp.previousPosition.x * invAlpha + sizeComp.boundingRectangle.x * alpha;
+	    sizeComp.previousPosition.y = sizeComp.previousPosition.y * invAlpha + sizeComp.boundingRectangle.y * alpha;
+	}
+    }
+
+    private void applyLightFrameBuffer() {
+	if (cameraLockEntityRevelationComponent != null) {
+	    batch.begin();
+	    batch.setProjectionMatrix(batch.getProjectionMatrix().idt());
+	    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
+	    batch.draw(frameBuffer.getColorBufferTexture(), -1, 1, 2, -2);
+	    batch.end();
+	}
+    }
+
+    private void prepareLightFrameBuffer() {
+	if (cameraLockEntityRevelationComponent != null) {
+	    frameBuffer.begin();
+
+	    Gdx.gl.glClearColor(0, 0, 0, 1);
+	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+	    batch.setProjectionMatrix(camera.combined);
+	    batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
+	    batch.begin();
+
+	    final Rectangle boundingRectangle = cameraLockEntitySizeComponent.boundingRectangle;
+	    Rectangle.tmp.set(cameraLockEntitySizeComponent.previousPosition.x + boundingRectangle.width / 2f - cameraLockEntityRevelationComponent.revelationRadius, // x
+		    cameraLockEntitySizeComponent.previousPosition.y + boundingRectangle.height / 2f - cameraLockEntityRevelationComponent.revelationRadius, // y
+		    cameraLockEntityRevelationComponent.revelationRadius * 2f, cameraLockEntityRevelationComponent.revelationRadius * 2f); // size
+
+	    batch.draw(lightTexture, Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
+	    batch.end();
+
+	    frameBuffer.end();
+	}
     }
 
     private void renderDebugInformation() {
@@ -249,10 +332,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	shapeRenderer.end();
     }
 
-    public void setCameraLockUnit(Entity entity) {
-	cameraLockEntityPositionComponent = entity.getComponent(PositionComponent.class);
-    }
-
     private void renderBackgroundLayers() {
 	for (TiledMapTileLayer mapLayer : backgroundLayers) {
 	    renderTileLayer(mapLayer, null, 0);
@@ -266,26 +345,25 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	if (entityLayer == null) {
 	    // simply render all entities inside the viewport
-	    for (int i = 0; i < entities.size; ++i) {
-		final Entity entity = entities.get(i);
-		final AnimationComponent animationComp = animationComponentMapper.get(entity);
-
-		if (animationComp.animation != null) {
-		    final PositionComponent posComp = posComponentMapper.get(entity);
-		    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
-
-		    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
-			continue;
-		    }
-
-		    posComp.previousPosition.interpolate(posComp.position, alpha, Interpolation.smoother);
-		    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
-		    batch.draw(keyFrame, posComp.previousPosition.x, posComp.previousPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
-		}
+	    for (Entity entity : entities) {
+		renderEntity(entity, sizeComponentMapper.get(entity), alpha);
 	    }
 	} else {
 	    // render entities + cells of entity layer
 	    renderTileLayer(entityLayer, entities, alpha);
+	}
+    }
+
+    private void renderEntity(Entity entity, SizeComponent sizeComp, float alpha) {
+	final AnimationComponent animationComp = animationComponentMapper.get(entity);
+
+	if (animationComp.animation != null) {
+	    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
+	    batch.draw(keyFrame, sizeComp.previousPosition.x, sizeComp.previousPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
 	}
     }
 
@@ -341,17 +419,17 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	    for (int col = col1; col < col2; col++) {
 		while (entities != null && currentEntityIndex < entities.size) {
 		    final Entity entity = entities.get(currentEntityIndex);
-		    final PositionComponent posComp = posComponentMapper.get(entity);
-		    if (y >= posComp.position.y) {
+		    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+		    if (y >= sizeComp.boundingRectangle.y) {
 			break;
 		    }
 
-		    renderEntity(entity, posComp, alpha);
+		    renderEntity(entity, sizeComp, alpha);
 		    ++currentEntityIndex;
 		}
 
 		final TiledMapTileLayer.Cell cell = layer.getCell(col, row);
-		if (cell == null || !map.isVisible(col, row)) {
+		if (cell == null) {
 		    x += layerTileWidth;
 		    continue;
 		}
@@ -472,42 +550,26 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	// visible already inside the current viewport
 	while (entities != null && currentEntityIndex < entities.size) {
 	    final Entity entity = entities.get(currentEntityIndex);
-	    final PositionComponent posComp = posComponentMapper.get(entity);
-
-	    renderEntity(entity, posComp, alpha);
-	    ++currentEntityIndex;
-	}
-    }
-
-    private void renderEntity(Entity entity, PositionComponent posComp, float alpha) {
-	final AnimationComponent animationComp = animationComponentMapper.get(entity);
-
-	if (animationComp.animation != null) {
 	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
 
-	    if (!viewBounds.overlaps(sizeComp.boundingRectangle) || !map.isVisible(sizeComp.boundingRectangle)) {
-		return;
-	    }
-
-	    posComp.previousPosition.interpolate(posComp.position, alpha, Interpolation.smoother);
-	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
-	    batch.draw(keyFrame, posComp.previousPosition.x, posComp.previousPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
+	    renderEntity(entity, sizeComp, alpha);
+	    ++currentEntityIndex;
 	}
     }
 
     @Override
     public void entityAdded(Entity entity) {
 	entities.add(entity);
-	if (entity.flags == EntityID.PLAYER.ordinal()) {
-	    setCameraLockUnit(entity);
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+	    lockCameraToEntity(entity);
 	}
     }
 
     @Override
     public void entityRemoved(Entity entity) {
 	entities.removeValue(entity, false);
-	if (entity.flags == EntityID.PLAYER.ordinal()) {
-	    setCameraLockUnit(null);
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+	    lockCameraToEntity(null);
 	}
     }
 
@@ -517,6 +579,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	super.dispose();
 	if (shapeRenderer != null) {
 	    shapeRenderer.dispose();
+	}
+	if (frameBuffer != null) {
+	    frameBuffer.dispose();
 	}
     }
 }

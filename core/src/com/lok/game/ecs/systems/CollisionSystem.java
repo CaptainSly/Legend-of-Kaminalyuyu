@@ -6,22 +6,26 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.CollisionComponent;
-import com.lok.game.ecs.components.PositionComponent;
+import com.lok.game.ecs.components.IDComponent;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 
 public class CollisionSystem extends IteratingSystem implements MapListener {
-    private final ComponentMapper<PositionComponent>  positionComponentMapper;
+    private final ComponentMapper<SizeComponent>      sizeComponentMapper;
     private final ComponentMapper<CollisionComponent> collisionComponentMapper;
+    private final ComponentMapper<IDComponent>	      idComponentMapper;
     private Map					      map;
 
-    public CollisionSystem(ComponentMapper<PositionComponent> positionComponentMapper, ComponentMapper<CollisionComponent> collisionComponentMapper) {
-	super(Family.all(PositionComponent.class, CollisionComponent.class).get());
+    public CollisionSystem(ComponentMapper<IDComponent> idComponentMapper, ComponentMapper<SizeComponent> sizeComponentMapper,
+	    ComponentMapper<CollisionComponent> collisionComponentMapper) {
+	super(Family.all(SizeComponent.class, CollisionComponent.class).get());
 
-	this.positionComponentMapper = positionComponentMapper;
+	this.sizeComponentMapper = sizeComponentMapper;
 	this.collisionComponentMapper = collisionComponentMapper;
+	this.idComponentMapper = idComponentMapper;
 	this.map = null;
 
 	MapManager.getManager().addListener(this);
@@ -29,16 +33,16 @@ public class CollisionSystem extends IteratingSystem implements MapListener {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-	final PositionComponent positionComponent = positionComponentMapper.get(entity);
+	final SizeComponent sizeComponent = sizeComponentMapper.get(entity);
 	final CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
 
 	// TODO check for collisions and execute logic
 	if (map != null) {
 	    for (Portal portal : map.getPortals()) {
 		if (portal.isColliding(collisionComponent.collisionRectangle)) {
-		    if (entity.flags == EntityID.PLAYER.ordinal()) {
-			positionComponent.previousPosition.set(portal.getTargetPosition());
-			positionComponent.position.set(portal.getTargetPosition());
+		    if (idComponentMapper.get(entity).entityID == EntityID.PLAYER) {
+			sizeComponent.previousPosition.set(portal.getTargetPosition());
+			sizeComponent.boundingRectangle.setPosition(portal.getTargetPosition());
 		    }
 		}
 	    }

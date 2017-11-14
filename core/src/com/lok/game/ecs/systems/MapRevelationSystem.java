@@ -32,9 +32,19 @@ public class MapRevelationSystem extends IteratingSystem implements MapListener 
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+	final MapRevelationComponent mapRevelationComponent = mapRevelationComponentMapper.get(entity);
+
+	mapRevelationComponent.revelationRadius += mapRevelationComponent.incPerFrame * deltaTime;
+	if (mapRevelationComponent.revelationRadius > mapRevelationComponent.maxRevelationRadius) {
+	    mapRevelationComponent.revelationRadius = mapRevelationComponent.maxRevelationRadius;
+	    mapRevelationComponent.incPerFrame = -mapRevelationComponent.incPerFrame;
+	} else if (mapRevelationComponent.revelationRadius < mapRevelationComponent.minRevelationRadius) {
+	    mapRevelationComponent.revelationRadius = mapRevelationComponent.minRevelationRadius;
+	    mapRevelationComponent.incPerFrame = -mapRevelationComponent.incPerFrame;
+	}
+
 	if (map != null) {
 	    final SizeComponent sizeComponent = sizeComponentMapper.get(entity);
-	    final MapRevelationComponent mapRevelationComponent = mapRevelationComponentMapper.get(entity);
 
 	    map.revealArea(sizeComponent.boundingRectangle, mapRevelationComponent.revelationRadius);
 	}

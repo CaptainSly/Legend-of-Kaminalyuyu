@@ -176,24 +176,7 @@ public class Map {
 	return revealedTiles.get(tileIndexY * numTilesX + tileIndexX);
     }
 
-    public boolean isVisible(Rectangle boundingRectangle) {
-	final int startTileIndexX = (int) (boundingRectangle.x / tileWidthInWorldUnits);
-	final int startTileIndexY = (int) (boundingRectangle.y / tileHeightInWorldUnits);
-	final int endTileIndexX = (int) ((boundingRectangle.x + boundingRectangle.width) / tileWidthInWorldUnits);
-	final int endTileIndexY = (int) ((boundingRectangle.y + boundingRectangle.height) / tileHeightInWorldUnits);
-
-	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
-	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {
-		if (revealedTiles.get(y * numTilesX + x)) {
-		    return true;
-		}
-	    }
-	}
-
-	return false;
-    }
-
-    public void revealArea(Rectangle boundingRectangle, int revelationRadius) {
+    public void revealArea(Rectangle boundingRectangle, float revelationRadius) {
 	final int startTileIndexX = (int) Math.max(0, boundingRectangle.x / tileWidthInWorldUnits - revelationRadius);
 	final int startTileIndexY = (int) Math.max(0, boundingRectangle.y / tileHeightInWorldUnits - revelationRadius);
 	final int endTileIndexX = (int) Math.min(numTilesX - 1, (boundingRectangle.x + boundingRectangle.width) / tileWidthInWorldUnits + revelationRadius);

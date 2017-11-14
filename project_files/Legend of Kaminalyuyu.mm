@@ -344,8 +344,15 @@
 <icon BUILTIN="button_ok"/>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1510344729934" ID="ID_1696678718" MODIFIED="1510388444623" TEXT="remove the flag check for EntityID.Player">
+<node COLOR="#990000" CREATED="1510344729934" ID="ID_1696678718" MODIFIED="1510688739562" TEXT="remove the flag check for EntityID.Player">
 <font NAME="SansSerif" SIZE="14"/>
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#990000" CREATED="1510688760170" ID="ID_1979421550" MODIFIED="1510688765179" TEXT="MapRevelationSystem">
+<font NAME="SansSerif" SIZE="14"/>
+<node COLOR="#111111" CREATED="1510688767004" ID="ID_66004166" MODIFIED="1510688786928" TEXT="already revealed parts should not be black">
+<node COLOR="#111111" CREATED="1510688791690" ID="ID_1824672071" MODIFIED="1510688811189" TEXT="maybe add a lightgrey light of one world unit to every revealed tiled of the screen?"/>
+</node>
 </node>
 <node COLOR="#990000" CREATED="1509736250819" ID="ID_802316882" MODIFIED="1510344746437" TEXT="ECS">
 <font NAME="SansSerif" SIZE="14"/>

@@ -2,7 +2,7 @@
   "entityID" : PLAYER,
   "animationID" : HERO,
   "speed" : 5,
-  "revelationRadius" : 3,
+  "revelationRadius" : 6,
   "size" : { "x" : 1, "y" : 1.5 },
   "collisionRectangle" : { "x" : 4, "y" : 2, "width" : 26 , "height" : 9 }
 }

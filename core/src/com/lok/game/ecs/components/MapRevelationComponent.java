@@ -4,11 +4,17 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
 public class MapRevelationComponent implements Component, Poolable {
-    public int revelationRadius = 1;
+    public float minRevelationRadius = 0;
+    public float maxRevelationRadius = 0;
+    public float revelationRadius    = 0;
+    public float incPerFrame	     = 0;
 
     @Override
     public void reset() {
-	revelationRadius = 1;
+	minRevelationRadius = 0;
+	maxRevelationRadius = 0;
+	revelationRadius = 0;
+	incPerFrame = 0;
     }
 
 }

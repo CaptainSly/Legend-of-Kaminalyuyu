@@ -20,8 +20,8 @@ import com.lok.game.Utils;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
+import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
-import com.lok.game.ecs.components.PositionComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.AIWanderSystem;
@@ -41,7 +41,7 @@ public class EntityEngine {
 	private EntityID    entityID;
 	private AnimationID animationID;
 	private float	    speed;
-	private int	    revelationRadius;
+	private float	    revelationRadius;
 	private Vector2	    size;
 	private Rectangle   collisionRectangle;
     }
@@ -56,7 +56,7 @@ public class EntityEngine {
 	entityConfigurationCache = null;
 	engine = new PooledEngine(128, 512, 512, 2048);
 
-	final ComponentMapper<PositionComponent> positionComponentMapper = ComponentMapper.getFor(PositionComponent.class);
+	final ComponentMapper<IDComponent> idComponentMapper = ComponentMapper.getFor(IDComponent.class);
 	final ComponentMapper<SpeedComponent> speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
 	final ComponentMapper<AIWanderComponent> aiWanderComponentMapper = ComponentMapper.getFor(AIWanderComponent.class);
 	final ComponentMapper<AnimationComponent> animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
@@ -64,11 +64,11 @@ public class EntityEngine {
 	final ComponentMapper<CollisionComponent> collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 
-	engine.addSystem(new MovementSystem(positionComponentMapper, speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
-	engine.addSystem(new CollisionSystem(positionComponentMapper, collisionComponentMapper));
+	engine.addSystem(new MovementSystem(speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
+	engine.addSystem(new CollisionSystem(idComponentMapper, sizeComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
 	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
-	engine.addSystem(new AIWanderSystem(positionComponentMapper, aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
+	engine.addSystem(new AIWanderSystem(sizeComponentMapper, aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
 
     public static EntityEngine getEngine() {
@@ -157,12 +157,19 @@ public class EntityEngine {
 
 	final EntityConfiguration entityConfig = entityConfigurationCache.get(entityID.ordinal());
 	final Entity entity = engine.createEntity();
-	entity.flags = entityID.ordinal();
 
-	final PositionComponent positionComponent = engine.createComponent(PositionComponent.class);
-	positionComponent.position.set(x, y);
-	positionComponent.previousPosition.set(x, y);
-	entity.add(positionComponent);
+	final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
+	if (entityConfig.size != null) {
+	    sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
+	} else {
+	    sizeComponent.boundingRectangle.set(x, y, 0, 0);
+	}
+	sizeComponent.previousPosition.set(x, y);
+	entity.add(sizeComponent);
+
+	final IDComponent idComponent = engine.createComponent(IDComponent.class);
+	idComponent.entityID = entityID;
+	entity.add(idComponent);
 
 	if (entityConfig.speed != 0) {
 	    final SpeedComponent speedComponent = engine.createComponent(SpeedComponent.class);
@@ -180,13 +187,10 @@ public class EntityEngine {
 	if (entityConfig.revelationRadius > 0) {
 	    final MapRevelationComponent mapRevelationComponent = engine.createComponent(MapRevelationComponent.class);
 	    mapRevelationComponent.revelationRadius = entityConfig.revelationRadius;
+	    mapRevelationComponent.minRevelationRadius = entityConfig.revelationRadius - 0.25f;
+	    mapRevelationComponent.maxRevelationRadius = entityConfig.revelationRadius + 0.25f;
+	    mapRevelationComponent.incPerFrame = 2f;
 	    entity.add(mapRevelationComponent);
-	}
-
-	if (entityConfig.size != null) {
-	    final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
-	    sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
-	    entity.add(sizeComponent);
 	}
 
 	if (entityConfig.collisionRectangle != null) {
