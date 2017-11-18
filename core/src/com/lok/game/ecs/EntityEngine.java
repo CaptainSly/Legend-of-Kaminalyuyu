@@ -164,7 +164,7 @@ public class EntityEngine {
 	} else {
 	    sizeComponent.boundingRectangle.set(x, y, 0, 0);
 	}
-	sizeComponent.previousPosition.set(x, y);
+	sizeComponent.interpolatedPosition.set(x, y);
 	entity.add(sizeComponent);
 
 	final IDComponent idComponent = engine.createComponent(IDComponent.class);

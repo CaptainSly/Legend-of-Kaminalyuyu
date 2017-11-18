@@ -54,7 +54,6 @@ public class Map {
     private final Array<Entity>	   entities;
     private final Array<Portal>	   portals;
     private final Color		   backgroundColor;
-    private final Array<Boolean>   revealedTiles;
     private final int		   numTilesX;
     private final int		   numTilesY;
     private final float		   tileWidthInWorldUnits;
@@ -81,10 +80,6 @@ public class Map {
 	numTilesX = mapProperties.get("width", Integer.class);
 	numTilesY = mapProperties.get("height", Integer.class);
 	boundary.set(0, 0, numTilesX * tileWidthInWorldUnits, numTilesY * tileHeightInWorldUnits);
-	this.revealedTiles = new Array<Boolean>(numTilesX * numTilesY);
-	for (int i = numTilesX * numTilesY; i >= 0; --i) {
-	    revealedTiles.add(false);
-	}
 
 	for (MapLayer mapLayer : tiledMap.getLayers()) {
 	    if (mapLayer instanceof TiledMapTileLayer) {
@@ -172,31 +167,6 @@ public class Map {
 	}
     }
 
-    public boolean isVisible(int tileIndexX, int tileIndexY) {
-	return revealedTiles.get(tileIndexY * numTilesX + tileIndexX);
-    }
-
-    public void revealArea(Rectangle boundingRectangle, float revelationRadius) {
-	final int startTileIndexX = (int) Math.max(0, boundingRectangle.x / tileWidthInWorldUnits - revelationRadius);
-	final int startTileIndexY = (int) Math.max(0, boundingRectangle.y / tileHeightInWorldUnits - revelationRadius);
-	final int endTileIndexX = (int) Math.min(numTilesX - 1, (boundingRectangle.x + boundingRectangle.width) / tileWidthInWorldUnits + revelationRadius);
-	final int endTileIndexY = (int) Math.min(numTilesY - 1, (boundingRectangle.y + boundingRectangle.height) / tileHeightInWorldUnits + revelationRadius);
-
-	for (int x = startTileIndexX; x <= endTileIndexX; ++x) {
-	    for (int y = startTileIndexY; y <= endTileIndexY; ++y) {
-		// do not reveal corner areas
-		if ((x == startTileIndexX && y == startTileIndexY) || // left top
-			(x == startTileIndexX && y == endTileIndexY) || // left bottom
-			(x == endTileIndexX && y == startTileIndexY) || // right top
-			(x == endTileIndexX && y == endTileIndexY)) { // right bottom
-		    continue;
-		}
-
-		revealedTiles.set(y * numTilesX + x, true);
-	    }
-	}
-    }
-
     public TiledMap getTiledMap() {
 	return tiledMap;
     }
@@ -219,14 +189,6 @@ public class Map {
 
     public Color getBackgroundColor() {
 	return backgroundColor;
-    }
-
-    public float getTileHeightInWorldUnits() {
-	return tileHeightInWorldUnits;
-    }
-
-    public float getTileWidthInWorldUnits() {
-	return tileWidthInWorldUnits;
     }
 
     public void dispose() {

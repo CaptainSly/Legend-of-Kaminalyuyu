@@ -41,7 +41,7 @@ public class CollisionSystem extends IteratingSystem implements MapListener {
 	    for (Portal portal : map.getPortals()) {
 		if (portal.isColliding(collisionComponent.collisionRectangle)) {
 		    if (idComponentMapper.get(entity).entityID == EntityID.PLAYER) {
-			sizeComponent.previousPosition.set(portal.getTargetPosition());
+			sizeComponent.interpolatedPosition.set(portal.getTargetPosition());
 			sizeComponent.boundingRectangle.setPosition(portal.getTargetPosition());
 		    }
 		}
