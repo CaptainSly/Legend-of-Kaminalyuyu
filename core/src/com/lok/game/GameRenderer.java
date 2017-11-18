@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
@@ -76,6 +77,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
     private final Array<TiledMapTileLayer>	      backgroundLayers;
     private final Array<TiledMapTileLayer>	      foregroundLayers;
+    private TiledMapImageLayer			      lightMapLayer;
 
     private final yPositionComparator		      entityComparator;
 
@@ -134,13 +136,16 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	this.backgroundLayers.clear();
 	this.foregroundLayers.clear();
+	this.lightMapLayer = null;
 	for (MapLayer mapLayer : map.getTiledMap().getLayers()) {
 	    if (mapLayer instanceof TiledMapTileLayer) {
 		if (mapLayer.getName().startsWith("background")) {
 		    backgroundLayers.add((TiledMapTileLayer) mapLayer);
-		} else if (mapLayer.getName().startsWith("foreground")) {
+		} else {
 		    foregroundLayers.add((TiledMapTileLayer) mapLayer);
 		}
+	    } else if (mapLayer instanceof TiledMapImageLayer) {
+		lightMapLayer = (TiledMapImageLayer) mapLayer;
 	    }
 	}
     }
@@ -176,13 +181,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
     }
 
     public void render(float alpha) {
+	AnimatedTiledMapTile.updateAnimationBaseTime();
 	interpolateEntities(alpha);
 	entities.sort(entityComparator);
-
-	prepareLightFrameBuffer();
-
-	Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 	viewport.calculateScissors(batch.getTransformMatrix(), visibleArea, scissors);
 	ScissorStack.pushScissors(scissors);
@@ -193,11 +194,11 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	}
 
 	viewport.apply();
-	AnimatedTiledMapTile.updateAnimationBaseTime();
-
 	setView(camera.combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
-	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
+	prepareLightFrameBuffer();
+
+	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	batch.begin();
 
 	for (TiledMapTileLayer layer : backgroundLayers) {
@@ -250,13 +251,19 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 	    batch.setProjectionMatrix(camera.combined);
-	    batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
 
 	    batch.begin();
+	    if (lightMapLayer != null) {
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+		renderImageLayer(lightMapLayer);
+	    }
+
+	    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 	    final Rectangle boundingRectangle = cameraLockEntitySizeComponent.boundingRectangle;
 	    batch.draw(lightTexture, cameraLockEntitySizeComponent.interpolatedPosition.x + boundingRectangle.width * 0.5f - cameraLockEntityRevelationComponent.revelationRadius, // x
 		    cameraLockEntitySizeComponent.interpolatedPosition.y + boundingRectangle.height * 0.5f - cameraLockEntityRevelationComponent.revelationRadius, // y
 		    cameraLockEntityRevelationComponent.revelationRadius * 2f, cameraLockEntityRevelationComponent.revelationRadius * 2f);
+
 	    batch.end();
 
 	    frameBuffer.end();

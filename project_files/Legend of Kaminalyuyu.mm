@@ -348,8 +348,9 @@
 <font NAME="SansSerif" SIZE="14"/>
 <icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#990000" CREATED="1510688760170" ID="ID_1979421550" MODIFIED="1510688765179" TEXT="MapRevelationSystem">
+<node COLOR="#990000" CREATED="1510688760170" FOLDED="true" ID="ID_1979421550" MODIFIED="1511001840227" TEXT="MapRevelationSystem">
 <font NAME="SansSerif" SIZE="14"/>
+<icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1510688767004" ID="ID_66004166" MODIFIED="1510688786928" TEXT="already revealed parts should not be black">
 <node COLOR="#111111" CREATED="1510688791690" ID="ID_1824672071" MODIFIED="1510688811189" TEXT="maybe add a lightgrey light of one world unit to every revealed tiled of the screen?"/>
 </node>
@@ -359,7 +360,8 @@
 <node COLOR="#111111" CREATED="1510344634552" ID="ID_1717890948" MODIFIED="1510344638649" TEXT="CollisionSystem">
 <node COLOR="#111111" CREATED="1510344642965" ID="ID_1202157294" MODIFIED="1510344647705" TEXT="add entity collision logic"/>
 </node>
-<node COLOR="#111111" CREATED="1510344681514" ID="ID_1803705375" MODIFIED="1510344684774" TEXT="MovementSystem">
+<node COLOR="#111111" CREATED="1510344681514" FOLDED="true" ID="ID_1803705375" MODIFIED="1511002361872" TEXT="MovementSystem">
+<icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1510344685693" ID="ID_1252544966" MODIFIED="1510344693536" TEXT="check that movement is only possible in pathable terrain">
 <node COLOR="#111111" CREATED="1510344693923" ID="ID_627332713" MODIFIED="1510344700384" TEXT="get map collision areas to check against"/>
 </node>

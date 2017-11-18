@@ -194,4 +194,14 @@ public class Map {
     public void dispose() {
 	tiledMap.dispose();
     }
+
+    public boolean isPathable(Rectangle boundingRectangle) {
+	for (Rectangle collArea : collisionAreas) {
+	    if (collArea.overlaps(boundingRectangle)) {
+		return false;
+	    }
+	}
+
+	return true;
+    }
 }
