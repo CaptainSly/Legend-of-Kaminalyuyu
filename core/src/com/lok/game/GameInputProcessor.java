@@ -2,44 +2,25 @@ package com.lok.game;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.lok.game.AnimationManager.AnimationType;
-import com.lok.game.ecs.EntityEngine;
-import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 
 // replace later on with GestureAdapter
-public class GameInputProcessor extends InputAdapter implements EntityListener {
+public class GameInputProcessor extends InputAdapter {
     private final ComponentMapper<SpeedComponent>     speedComponentMapper;
     private final ComponentMapper<AnimationComponent> animationComponentMapper;
     private Entity				      player;
 
-    public GameInputProcessor(ComponentMapper<SpeedComponent> speedComponentMapper, ComponentMapper<AnimationComponent> animationComponentMapper) {
+    public GameInputProcessor() {
 	super();
+
 	player = null;
-	this.speedComponentMapper = speedComponentMapper;
-	this.animationComponentMapper = animationComponentMapper;
-	EntityEngine.getEngine().addEntityListener(Family.all(AnimationComponent.class).get(), this);
-    }
-
-    @Override
-    public void entityAdded(Entity entity) {
-	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
-	    this.player = entity;
-	}
-    }
-
-    @Override
-    public void entityRemoved(Entity entity) {
-	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
-	    this.player = null;
-	}
+	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
+	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
     }
 
     @Override
@@ -55,18 +36,22 @@ public class GameInputProcessor extends InputAdapter implements EntityListener {
 	    case Keys.UP:
 		speedComponent.speed.set(0, speedComponent.maxSpeed);
 		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_UP);
+		animationComponent.playAnimation = true;
 		return true;
 	    case Keys.DOWN:
 		speedComponent.speed.set(0, -speedComponent.maxSpeed);
 		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_DOWN);
+		animationComponent.playAnimation = true;
 		return true;
 	    case Keys.LEFT:
 		speedComponent.speed.set(-speedComponent.maxSpeed, 0);
 		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_LEFT);
+		animationComponent.playAnimation = true;
 		return true;
 	    case Keys.RIGHT:
 		speedComponent.speed.set(speedComponent.maxSpeed, 0);
 		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_RIGHT);
+		animationComponent.playAnimation = true;
 		return true;
 	}
 
@@ -112,11 +97,16 @@ public class GameInputProcessor extends InputAdapter implements EntityListener {
 		}
 
 		speedComponent.speed.set(0, 0);
-		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
+		animationComponent.animationTime = 0;
+		animationComponent.playAnimation = false;
 		return true;
 	}
 
 	return false;
+    }
+
+    public void setPlayer(Entity entity) {
+	this.player = entity;
     }
 
 }

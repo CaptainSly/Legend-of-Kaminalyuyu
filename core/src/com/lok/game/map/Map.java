@@ -7,8 +7,6 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -16,6 +14,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.lok.game.AssetManager;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.MapManager.MapID;
 
 public class Map {
@@ -38,12 +37,19 @@ public class Map {
 	    return area.overlaps(rectangle);
 	}
 
-	public Vector2 getTargetPosition() {
-	    return targetPosition;
-	}
+	public void activate(Entity entity) {
+	    if (targetMapID != null) {
+		MapManager.getManager().changeMap(targetMapID);
+	    }
 
-	public MapID getTargetMapID() {
-	    return targetMapID;
+	    final SizeComponent sizeComp = entity.getComponent(SizeComponent.class);
+
+	    if (sizeComp == null) {
+		return;
+	    }
+
+	    sizeComp.interpolatedPosition.set(targetPosition);
+	    sizeComp.boundingRectangle.setPosition(targetPosition);
 	}
     }
 
@@ -82,33 +88,25 @@ public class Map {
 	boundary.set(0, 0, numTilesX * tileWidthInWorldUnits, numTilesY * tileHeightInWorldUnits);
 
 	for (MapLayer mapLayer : tiledMap.getLayers()) {
-	    if (mapLayer instanceof TiledMapTileLayer) {
-		final TiledMapTileLayer tiledMapLayer = (TiledMapTileLayer) mapLayer;
-		parseCollisionAreas(tiledMapLayer, tileWidthInWorldUnits, tileHeightInWorldUnits);
-	    } else if ("Portals".equals(mapLayer.getName())) {
+	    if ("Portals".equals(mapLayer.getName())) {
 		parsePortals(mapLayer);
 	    } else if ("Entities".equals(mapLayer.getName())) {
 		parseEntities(mapLayer);
+	    } else if ("Collision".equals(mapLayer.getName())) {
+		parseCollisionAreas(mapLayer);
 	    }
 	}
     }
 
-    private void parseCollisionAreas(TiledMapTileLayer tiledMapTileLayer, float tileWidthInWorldUnits, float tileHeightInWorldUnits) {
-	for (int y = 0; y < tiledMapTileLayer.getWidth(); ++y) {
-	    for (int x = 0; x < tiledMapTileLayer.getHeight(); ++x) {
-		final Cell cell = tiledMapTileLayer.getCell(x, y);
-
-		if (cell == null) {
-		    continue;
-		}
-
-		for (MapObject mapObj : cell.getTile().getObjects()) {
-		    if (mapObj instanceof RectangleMapObject) {
-			final Rectangle collisionArea = ((RectangleMapObject) mapObj).getRectangle();
-			collisionAreas.add(new Rectangle(x * tileWidthInWorldUnits, y * tileHeightInWorldUnits, collisionArea.width * MapManager.WORLD_UNITS_PER_PIXEL,
-				collisionArea.height * MapManager.WORLD_UNITS_PER_PIXEL));
-		    }
-		}
+    private void parseCollisionAreas(MapLayer mapLayer) {
+	for (MapObject mapObj : mapLayer.getObjects()) {
+	    if (mapObj instanceof RectangleMapObject) {
+		final Rectangle collisionArea = ((RectangleMapObject) mapObj).getRectangle();
+		collisionArea.x *= MapManager.WORLD_UNITS_PER_PIXEL;
+		collisionArea.y *= MapManager.WORLD_UNITS_PER_PIXEL;
+		collisionArea.width *= MapManager.WORLD_UNITS_PER_PIXEL;
+		collisionArea.height *= MapManager.WORLD_UNITS_PER_PIXEL;
+		collisionAreas.add(collisionArea);
 	    }
 	}
     }
@@ -130,7 +128,7 @@ public class Map {
 		}
 
 		final Rectangle entityArea = ((RectangleMapObject) mapObj).getRectangle();
-		EntityEngine.getEngine().createEntity(entityID, entityArea.x * MapManager.WORLD_UNITS_PER_PIXEL, entityArea.y * MapManager.WORLD_UNITS_PER_PIXEL);
+		entities.add(EntityEngine.getEngine().createEntity(entityID, entityArea.x * MapManager.WORLD_UNITS_PER_PIXEL, entityArea.y * MapManager.WORLD_UNITS_PER_PIXEL));
 	    }
 	}
     }

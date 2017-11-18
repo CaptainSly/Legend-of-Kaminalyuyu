@@ -19,6 +19,10 @@ public class AnimationSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
 	final AnimationComponent animationComponent = animationComponentMapper.get(entity);
 
+	if (!animationComponent.playAnimation) {
+	    return;
+	}
+
 	if (animationComponent.animation != null) {
 	    animationComponent.animationTime += deltaTime;
 	}

@@ -20,7 +20,7 @@ public class MovementSystem extends IteratingSystem implements MapListener {
 
     public MovementSystem(ComponentMapper<SpeedComponent> speedComponentMapper, ComponentMapper<CollisionComponent> collisionComponentMapper,
 	    ComponentMapper<SizeComponent> sizeComponentMapper) {
-	super(Family.all(SizeComponent.class, SpeedComponent.class).get());
+	super(Family.all(SizeComponent.class, SpeedComponent.class, CollisionComponent.class).get());
 
 	this.speedComponentMapper = speedComponentMapper;
 	this.collisionComponentMapper = collisionComponentMapper;

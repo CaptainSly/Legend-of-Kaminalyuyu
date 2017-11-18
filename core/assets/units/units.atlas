@@ -4,6 +4,20 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+boss01
+  rotate: false
+  xy: 384, 640
+  size: 320, 384
+  orig: 320, 384
+  offset: 0, 0
+  index: -1
+boss02
+  rotate: false
+  xy: 384, 320
+  size: 256, 320
+  orig: 256, 320
+  offset: 0, 0
+  index: -1
 boss03
   rotate: false
   xy: 0, 640
@@ -13,7 +27,7 @@ boss03
   index: -1
 boss04
   rotate: false
-  xy: 704, 832
+  xy: 448, 128
   size: 192, 192
   orig: 192, 192
   offset: 0, 0
@@ -27,7 +41,7 @@ boss05
   index: -1
 demon01
   rotate: false
-  xy: 896, 832
+  xy: 640, 448
   size: 128, 192
   orig: 128, 192
   offset: 0, 0
@@ -41,7 +55,7 @@ demon02
   index: -1
 demon03
   rotate: false
-  xy: 384, 704
+  xy: 704, 704
   size: 320, 320
   orig: 320, 320
   offset: 0, 0
@@ -55,21 +69,21 @@ demon04
   index: -1
 hero
   rotate: false
-  xy: 384, 512
+  xy: 640, 256
   size: 128, 192
   orig: 128, 192
   offset: 0, 0
   index: -1
 monster01
   rotate: false
-  xy: 384, 320
+  xy: 768, 512
   size: 128, 192
   orig: 128, 192
   offset: 0, 0
   index: -1
 monster02
   rotate: false
-  xy: 512, 512
+  xy: 896, 512
   size: 128, 192
   orig: 128, 192
   offset: 0, 0

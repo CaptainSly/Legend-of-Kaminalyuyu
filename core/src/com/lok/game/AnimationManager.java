@@ -14,7 +14,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class AnimationManager {
     public enum AnimationID {
 	HERO,
-	DEMON_01;
+	DEMON_01,
+	BOSS_01;
 
 	private final int cacheIndex;
 

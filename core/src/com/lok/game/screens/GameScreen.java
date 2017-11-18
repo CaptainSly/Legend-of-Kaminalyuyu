@@ -1,42 +1,29 @@
 package com.lok.game.screens;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.lok.game.GameInputProcessor;
+import com.lok.game.GameLogic;
 import com.lok.game.GameRenderer;
 import com.lok.game.ecs.EntityEngine;
-import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.ecs.components.SpeedComponent;
-import com.lok.game.map.MapManager;
-import com.lok.game.map.MapManager.MapID;
 
 public class GameScreen implements Screen {
-    private float		 accumulator;
-    private final float		 fixedPhysicsStep;
-    private final GameRenderer	 renderer;
-    private final EntityEngine	 entityEngine;
-    private final InputProcessor inputProcessor;
+    private float	       accumulator;
+    private final float	       fixedPhysicsStep;
+    private final GameLogic    gameLogic;
+    private final GameRenderer renderer;
+    private final EntityEngine entityEngine;
 
     public GameScreen() {
-	fixedPhysicsStep = 1.0f / 60.0f;
+	fixedPhysicsStep = 1.0f / 30.0f;
 	accumulator = 0.0f;
-
-	final ComponentMapper<SpeedComponent> speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
-	final ComponentMapper<AnimationComponent> animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
-	inputProcessor = new GameInputProcessor(speedComponentMapper, animationComponentMapper);
 
 	this.entityEngine = EntityEngine.getEngine();
 	this.renderer = new GameRenderer();
-
-	MapManager.getManager().changeMap(MapID.DEMON_LAIR_01);
+	this.gameLogic = new GameLogic(renderer);
     }
 
     @Override
     public void show() {
-	// TODO Auto-generated method stub
-	Gdx.input.setInputProcessor(inputProcessor);
+	gameLogic.show();
     }
 
     @Override
@@ -61,20 +48,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-	// TODO Auto-generated method stub
-
+	gameLogic.pause();
     }
 
     @Override
     public void resume() {
-	// TODO Auto-generated method stub
-
+	gameLogic.resume();
     }
 
     @Override
     public void hide() {
-	// TODO Auto-generated method stub
-	Gdx.input.setInputProcessor(null);
+	gameLogic.hide();
     }
 
     @Override

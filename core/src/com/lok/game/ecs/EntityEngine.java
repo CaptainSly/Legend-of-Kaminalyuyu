@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
@@ -34,16 +36,18 @@ import com.lok.game.map.MapManager;
 public class EntityEngine {
     public enum EntityID {
 	PLAYER,
-	DEMON_01
+	DEMON_01,
+	BOSS_01
     }
 
     private static class EntityConfiguration {
-	private EntityID    entityID;
-	private AnimationID animationID;
-	private float	    speed;
-	private float	    revelationRadius;
-	private Vector2	    size;
-	private Rectangle   collisionRectangle;
+	private EntityID      entityID;
+	private AnimationID   animationID;
+	private float	      speed;
+	private float	      revelationRadius;
+	private Vector2	      size;
+	private Rectangle     collisionRectangle;
+	private Array<String> additionalComponents;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();
@@ -65,10 +69,10 @@ public class EntityEngine {
 	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 
 	engine.addSystem(new MovementSystem(speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
-	engine.addSystem(new CollisionSystem(idComponentMapper, sizeComponentMapper, collisionComponentMapper));
+	engine.addSystem(new CollisionSystem(idComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
 	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
-	engine.addSystem(new AIWanderSystem(sizeComponentMapper, aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
+	engine.addSystem(new AIWanderSystem(aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
 
     public static EntityEngine getEngine() {
@@ -142,6 +146,10 @@ public class EntityEngine {
 	return engine.createComponent(componentType);
     }
 
+    public <T extends EntitySystem> T getSystem(Class<T> systemType) {
+	return engine.getSystem(systemType);
+    }
+
     public void clear() {
 	Gdx.app.debug(TAG, "Clearing entity engine pools");
 
@@ -203,6 +211,16 @@ public class EntityEngine {
 		    entityConfig.collisionRectangle.height * MapManager.WORLD_UNITS_PER_PIXEL); // height
 
 	    entity.add(collisionComponent);
+	}
+
+	if (entityConfig.additionalComponents != null) {
+	    for (String additionalComponent : entityConfig.additionalComponents) {
+		try {
+		    entity.add((Component) ClassReflection.forName(additionalComponent).newInstance());
+		} catch (Exception e) {
+		    throw new GdxRuntimeException("Could not create additional component for entity " + entityID, e);
+		}
+	    }
 	}
 
 	engine.addEntity(entity);

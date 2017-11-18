@@ -4,8 +4,6 @@ import java.util.Comparator;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -30,19 +28,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.lok.game.ecs.EntityEngine;
-import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
-import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
-import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 
-public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListener, EntityListener {
+public class GameRenderer extends OrthogonalTiledMapRenderer {
     private final static String TAG = GameRenderer.class.getName();
 
     private static class yPositionComparator implements Comparator<Entity> {
@@ -67,14 +61,10 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
     }
 
-    private final Array<Entity>			      entities;
     private SizeComponent			      cameraLockEntitySizeComponent;
     private MapRevelationComponent		      cameraLockEntityRevelationComponent;
 
-    private Array<Rectangle>			      mapCollisionAreas;
-    private Array<Portal>			      mapPortals;
-    private Color				      mapBackgroundColor;
-
+    private Map					      map;
     private final Array<TiledMapTileLayer>	      backgroundLayers;
     private final Array<TiledMapTileLayer>	      foregroundLayers;
     private TiledMapImageLayer			      lightMapLayer;
@@ -118,21 +108,13 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	this.entityComparator = new yPositionComparator(sizeComponentMapper);
 
-	entities = new Array<Entity>(512);
-	EntityEngine.getEngine().addEntityListener(Family.one(AnimationComponent.class, SizeComponent.class).get(), this);
-	MapManager.getManager().addListener(this);
-
 	lightTexture = AssetManager.getManager().getAsset("lights/light.png", Texture.class);
 	frameBuffer = null;
     }
 
-    @Override
-    public void onMapChange(MapManager manager, Map map) {
+    public void setMap(Map map) {
+	this.map = map;
 	super.setMap(map.getTiledMap());
-
-	mapCollisionAreas = map.getCollisionAreas();
-	mapBackgroundColor = map.getBackgroundColor();
-	mapPortals = map.getPortals();
 
 	this.backgroundLayers.clear();
 	this.foregroundLayers.clear();
@@ -183,7 +165,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
     public void render(float alpha) {
 	AnimatedTiledMapTile.updateAnimationBaseTime();
 	interpolateEntities(alpha);
-	entities.sort(entityComparator);
+	map.getEntities().sort(entityComparator);
 
 	viewport.calculateScissors(batch.getTransformMatrix(), visibleArea, scissors);
 	ScissorStack.pushScissors(scissors);
@@ -198,33 +180,34 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	prepareLightFrameBuffer();
 
+	final Color mapBackgroundColor = map.getBackgroundColor();
+	Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-	batch.begin();
 
+	batch.begin();
 	for (TiledMapTileLayer layer : backgroundLayers) {
 	    renderTileLayer(layer);
 	}
-	for (Entity entity : entities) {
+	for (Entity entity : map.getEntities()) {
 	    renderEntity(entity);
 	}
 	for (TiledMapTileLayer layer : foregroundLayers) {
 	    renderTileLayer(layer);
 	}
-
-	if (Gdx.app.getLogLevel() == Application.LOG_DEBUG) {
-	    batch.end();
-	    renderDebugInformation();
-	    batch.begin();
-	}
 	batch.end();
 
 	applyLightFrameBuffer();
+
+	if (Gdx.app.getLogLevel() == Application.LOG_DEBUG) {
+	    renderDebugInformation();
+	}
 
 	ScissorStack.popScissors();
     }
 
     private void interpolateEntities(float alpha) {
-	for (Entity entity : entities) {
+	for (Entity entity : map.getEntities()) {
 	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
 
 	    final float invAlpha = 1.0f - alpha;
@@ -247,6 +230,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	if (cameraLockEntityRevelationComponent != null) {
 	    frameBuffer.begin();
 
+	    final Color mapBackgroundColor = map.getBackgroundColor();
 	    Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -275,11 +259,11 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	shapeRenderer.begin(ShapeType.Line);
 
 	shapeRenderer.setColor(Color.RED);
-	for (Rectangle rect : mapCollisionAreas) {
+	for (Rectangle rect : map.getCollisionAreas()) {
 	    shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
 	}
 
-	for (Entity entity : entities) {
+	for (Entity entity : map.getEntities()) {
 	    final CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
 	    if (collisionComponent == null) {
 		continue;
@@ -290,11 +274,11 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 	}
 
 	shapeRenderer.setColor(Color.BLUE);
-	for (Portal portal : mapPortals) {
+	for (Portal portal : map.getPortals()) {
 	    shapeRenderer.rect(portal.getArea().x, portal.getArea().y, portal.getArea().width, portal.getArea().height);
 	}
 
-	for (Entity entity : entities) {
+	for (Entity entity : map.getEntities()) {
 	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
 	    if (sizeComp == null) {
 		continue;
@@ -327,22 +311,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer implements MapListe
 
 	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
 	    batch.draw(keyFrame, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
-	}
-    }
-
-    @Override
-    public void entityAdded(Entity entity) {
-	entities.add(entity);
-	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
-	    lockCameraToEntity(entity);
-	}
-    }
-
-    @Override
-    public void entityRemoved(Entity entity) {
-	entities.removeValue(entity, false);
-	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
-	    lockCameraToEntity(null);
 	}
     }
 
