@@ -32,8 +32,8 @@ public class MapRevelationSystem extends IteratingSystem {
 	    mapRevelationComponent.incPerFrame = -mapRevelationComponent.incPerFrame;
 	}
 
-	mapRevelationComponent.revelationCircle.set(sizeComponent.interpolatedPosition.x + sizeComponent.boundingRectangle.width * 0.5f,
-		sizeComponent.interpolatedPosition.y + sizeComponent.boundingRectangle.height * 0.5f, mapRevelationComponent.revelationRadius);
+	mapRevelationComponent.revelationCircle.set(sizeComponent.boundingRectangle.x + sizeComponent.boundingRectangle.width * 0.5f,
+		sizeComponent.boundingRectangle.y + sizeComponent.boundingRectangle.height * 0.5f, mapRevelationComponent.revelationRadius);
     }
 
 }

@@ -11,7 +11,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -82,7 +83,8 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     private final ShapeRenderer			      shapeRenderer;
 
     private FrameBuffer				      frameBuffer;
-    private final Texture			      lightTexture;
+    private final AtlasRegion			      lightTexture;
+    private final AtlasRegion			      shadowTexture;
 
     public GameRenderer() {
 	super(null, MapManager.WORLD_UNITS_PER_PIXEL);
@@ -108,7 +110,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 
 	this.entityComparator = new yPositionComparator(sizeComponentMapper);
 
-	lightTexture = AssetManager.getManager().getAsset("lights/light.png", Texture.class);
+	final TextureAtlas textureAtlas = AssetManager.getManager().getAsset("lights/lights.atlas", TextureAtlas.class);
+	lightTexture = textureAtlas.findRegion("light");
+	shadowTexture = textureAtlas.findRegion("shadow");
 	frameBuffer = null;
     }
 
@@ -180,8 +184,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 
 	prepareLightFrameBuffer();
 
-	final Color mapBackgroundColor = map.getBackgroundColor();
-	Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -265,12 +267,18 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 
 	for (Entity entity : map.getEntities()) {
 	    final CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
-	    if (collisionComponent == null) {
-		continue;
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+	    if (collisionComponent != null) {
+		shapeRenderer.setColor(Color.RED);
+		shapeRenderer.rect(sizeComp.interpolatedPosition.x + collisionComponent.rectOffset.x, sizeComp.interpolatedPosition.y + collisionComponent.rectOffset.y,
+			collisionComponent.collisionRectangle.width, collisionComponent.collisionRectangle.height);
 	    }
 
-	    shapeRenderer.rect(collisionComponent.collisionRectangle.x, collisionComponent.collisionRectangle.y, collisionComponent.collisionRectangle.width,
-		    collisionComponent.collisionRectangle.height);
+	    if (sizeComp != null) {
+		shapeRenderer.setColor(Color.BLUE);
+		shapeRenderer.rect(sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
+	    }
+
 	}
 
 	shapeRenderer.setColor(Color.BLUE);
@@ -278,18 +286,10 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    shapeRenderer.rect(portal.getArea().x, portal.getArea().y, portal.getArea().width, portal.getArea().height);
 	}
 
-	for (Entity entity : map.getEntities()) {
-	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
-	    if (sizeComp == null) {
-		continue;
-	    }
-
-	    shapeRenderer.rect(sizeComp.boundingRectangle.x, sizeComp.boundingRectangle.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
-	}
-
 	if (cameraLockEntityRevelationComponent != null) {
 	    shapeRenderer.setColor(Color.WHITE);
-	    shapeRenderer.circle(cameraLockEntityRevelationComponent.revelationCircle.x, cameraLockEntityRevelationComponent.revelationCircle.y,
+	    shapeRenderer.circle(cameraLockEntitySizeComponent.interpolatedPosition.x + cameraLockEntitySizeComponent.boundingRectangle.width * 0.5f,
+		    cameraLockEntitySizeComponent.interpolatedPosition.y + cameraLockEntitySizeComponent.boundingRectangle.height * 0.5f,
 		    cameraLockEntityRevelationComponent.revelationCircle.radius, 64);
 	}
 
@@ -309,6 +309,8 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 		return;
 	    }
 
+	    batch.draw(shadowTexture, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y - sizeComp.boundingRectangle.height * 0.2f, sizeComp.boundingRectangle.width,
+		    sizeComp.boundingRectangle.height * 0.5f);
 	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
 	    batch.draw(keyFrame, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
 	}

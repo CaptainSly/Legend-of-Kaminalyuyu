@@ -66,8 +66,16 @@ task buildTilesetTextureAtlas(dependsOn: classes, type: JavaExec, description: "
     args = ['../core/assets/maps/tilesets/input', '../core/assets/maps/tilesets', 'tilesets.atlas']
 }
 
+task buildLightsTextureAtlas(dependsOn: classes, type: JavaExec, description: "Rebuilds the lights texture atlas", group: "LegendOfKaminalyuyu") {
+    main = 'com.badlogic.gdx.tools.texturepacker.TexturePacker'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['../core/assets/lights/input', '../core/assets/lights', 'lights.atlas']
+}
+
 task buildAllTextureAtlas(description: "Rebuilds all texture atlas", group: "LegendOfKaminalyuyu") {
 	dependsOn 'buildUnitTextureAtlas'
 	dependsOn 'buildTilesetTextureAtlas'
 	tasks.findByName('buildTilesetTextureAtlas').mustRunAfter 'buildUnitTextureAtlas'
+	dependsOn 'buildLightsTextureAtlas'
+	tasks.findByName('buildLightsTextureAtlas').mustRunAfter 'buildTilesetTextureAtlas'
 }

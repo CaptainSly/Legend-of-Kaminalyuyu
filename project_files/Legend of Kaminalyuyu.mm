@@ -389,8 +389,9 @@
 </node>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1511031033574" ID="ID_474879131" MODIFIED="1511031036943" TEXT="add shadows to units">
+<node COLOR="#990000" CREATED="1511031033574" ID="ID_474879131" MODIFIED="1511081758157" TEXT="add shadows to units">
 <font NAME="SansSerif" SIZE="14"/>
+<icon BUILTIN="button_ok"/>
 </node>
 <node COLOR="#990000" CREATED="1511031038662" ID="ID_1819300248" MODIFIED="1511031046882" TEXT="add a second map and check if everything is working">
 <font NAME="SansSerif" SIZE="14"/>
