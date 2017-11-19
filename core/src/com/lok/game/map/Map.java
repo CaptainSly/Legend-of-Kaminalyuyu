@@ -1,6 +1,7 @@
 package com.lok.game.map;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -18,6 +19,8 @@ import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.MapManager.MapID;
 
 public class Map {
+    private static final String TAG = Map.class.getName();
+
     public static class Portal {
 	private final Rectangle	area;
 	private final Vector2	targetPosition;
@@ -38,6 +41,8 @@ public class Map {
 	}
 
 	public void activate(Entity entity) {
+	    Gdx.app.debug(TAG, "Entity " + entity + " activated portal with target map " + targetMapID + " and position " + targetPosition);
+
 	    if (targetMapID != null) {
 		MapManager.getManager().changeMap(targetMapID);
 	    }
@@ -190,6 +195,7 @@ public class Map {
     }
 
     public void dispose() {
+	Gdx.app.debug(TAG, "Disposing map " + mapID);
 	tiledMap.dispose();
     }
 

@@ -24,7 +24,7 @@ public class LegendOfKaminalyuyu extends Game {
 
     @Override
     public void create() {
-	Gdx.app.setLogLevel(Application.LOG_DEBUG);
+	Gdx.app.setLogLevel(Application.LOG_INFO);
 
 	Gdx.graphics.setTitle(Utils.getLabel("GameWindow.Title"));
 
@@ -44,7 +44,9 @@ public class LegendOfKaminalyuyu extends Game {
     public void dispose() {
 	MapManager.getManager().dispose();
 	AssetManager.getManager().dispose();
-
-	super.dispose();
+	if (screen != null) {
+	    screen.hide();
+	    screen.dispose();
+	}
     }
 }

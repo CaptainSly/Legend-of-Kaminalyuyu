@@ -26,14 +26,18 @@ public class AssetManager {
 	assetManager.setLoader(type, loader);
     }
 
-    public <T> T getAsset(String fileName, Class<T> type) {
+    public <T> T getAsset(String fileName, Class<T> type, AssetLoaderParameters<T> parameter) {
 	if (!assetManager.isLoaded(fileName, type)) {
 	    Gdx.app.debug(TAG, "Loading asset " + fileName + " of type " + type);
-	    assetManager.load(fileName, type);
+	    assetManager.load(fileName, type, parameter);
 	    assetManager.finishLoading();
 	}
 
 	return assetManager.get(fileName, type);
+    }
+
+    public <T> T getAsset(String fileName, Class<T> type) {
+	return getAsset(fileName, type, null);
     }
 
     public void dispose() {

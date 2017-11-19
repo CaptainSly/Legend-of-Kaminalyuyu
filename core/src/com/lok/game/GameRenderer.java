@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -97,9 +96,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    shapeRenderer = null;
 	}
 
-	camera = new OrthographicCamera();
-	viewport = new FitViewport(32, 18, camera);
-	visibleArea = new Rectangle(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+	viewport = new FitViewport(32, 18);
+	camera = viewport.getCamera();
+	visibleArea = new Rectangle(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
 	scissors = new Rectangle();
 
 	this.backgroundLayers = new Array<TiledMapTileLayer>();
@@ -139,7 +138,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     public void resize(int width, int height) {
 	Gdx.app.debug(TAG, "Resizing to " + width + " x " + height);
 	viewport.update(width, height);
-	visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+	visibleArea.set(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
 
 	if (frameBuffer != null) {
 	    frameBuffer.dispose();
@@ -163,6 +162,16 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    if (cameraLockEntitySizeComponent == null) {
 		throw new GdxRuntimeException("Trying to lock camera to an entity without size component: " + entity);
 	    }
+	}
+    }
+
+    private void interpolateEntities(float alpha) {
+	for (Entity entity : map.getEntities()) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+
+	    final float invAlpha = 1.0f - alpha;
+	    sizeComp.interpolatedPosition.x = sizeComp.interpolatedPosition.x * invAlpha + sizeComp.boundingRectangle.x * alpha;
+	    sizeComp.interpolatedPosition.y = sizeComp.interpolatedPosition.y * invAlpha + sizeComp.boundingRectangle.y * alpha;
 	}
     }
 
@@ -192,6 +201,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    renderTileLayer(layer);
 	}
 	for (Entity entity : map.getEntities()) {
+	    renderEntityShadow(entity);
+	}
+	for (Entity entity : map.getEntities()) {
 	    renderEntity(entity);
 	}
 	for (TiledMapTileLayer layer : foregroundLayers) {
@@ -208,23 +220,39 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	ScissorStack.popScissors();
     }
 
-    private void interpolateEntities(float alpha) {
-	for (Entity entity : map.getEntities()) {
-	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+    private void renderEntityShadow(Entity entity) {
+	final AnimationComponent animationComp = animationComponentMapper.get(entity);
 
-	    final float invAlpha = 1.0f - alpha;
-	    sizeComp.interpolatedPosition.x = sizeComp.interpolatedPosition.x * invAlpha + sizeComp.boundingRectangle.x * alpha;
-	    sizeComp.interpolatedPosition.y = sizeComp.interpolatedPosition.y * invAlpha + sizeComp.boundingRectangle.y * alpha;
+	if (animationComp.animation != null) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+	    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    if (cameraLockEntityRevelationComponent != null && !Intersector.overlaps(cameraLockEntityRevelationComponent.revelationCircle, sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    batch.draw(shadowTexture, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y - sizeComp.boundingRectangle.height * 0.2f, sizeComp.boundingRectangle.width,
+		    sizeComp.boundingRectangle.height * 0.5f);
 	}
     }
 
-    private void applyLightFrameBuffer() {
-	if (cameraLockEntityRevelationComponent != null) {
-	    batch.setProjectionMatrix(batch.getProjectionMatrix().idt());
-	    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
-	    batch.begin();
-	    batch.draw(frameBuffer.getColorBufferTexture(), -1, 1, 2, -2);
-	    batch.end();
+    private void renderEntity(Entity entity) {
+	final AnimationComponent animationComp = animationComponentMapper.get(entity);
+
+	if (animationComp.animation != null) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+	    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    if (cameraLockEntityRevelationComponent != null && !Intersector.overlaps(cameraLockEntityRevelationComponent.revelationCircle, sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
+	    batch.draw(keyFrame, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
 	}
     }
 
@@ -253,6 +281,16 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    batch.end();
 
 	    frameBuffer.end();
+	}
+    }
+
+    private void applyLightFrameBuffer() {
+	if (cameraLockEntityRevelationComponent != null) {
+	    batch.setProjectionMatrix(batch.getProjectionMatrix().idt());
+	    batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
+	    batch.begin();
+	    batch.draw(frameBuffer.getColorBufferTexture(), -1, 1, 2, -2);
+	    batch.end();
 	}
     }
 
@@ -294,26 +332,6 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	}
 
 	shapeRenderer.end();
-    }
-
-    private void renderEntity(Entity entity) {
-	final AnimationComponent animationComp = animationComponentMapper.get(entity);
-
-	if (animationComp.animation != null) {
-	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
-	    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
-		return;
-	    }
-
-	    if (cameraLockEntityRevelationComponent != null && !Intersector.overlaps(cameraLockEntityRevelationComponent.revelationCircle, sizeComp.boundingRectangle)) {
-		return;
-	    }
-
-	    batch.draw(shadowTexture, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y - sizeComp.boundingRectangle.height * 0.2f, sizeComp.boundingRectangle.width,
-		    sizeComp.boundingRectangle.height * 0.5f);
-	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
-	    batch.draw(keyFrame, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
-	}
     }
 
     @Override

@@ -1,0 +1,9 @@
+{
+  com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle : {
+    "move_up" : { "imageUp" : "btn_move_up", "imageChecked" : "btn_move_up_pressed" },
+    "move_down" : { "imageUp" : "btn_move_down", "imageChecked" : "btn_move_down_pressed" },
+    "move_left" : { "imageUp" : "btn_move_left", "imageChecked" : "btn_move_left_pressed" },
+    "move_right" : { "imageUp" : "btn_move_right", "imageChecked" : "btn_move_right_pressed" },
+  	"back-to-town" : { "imageUp" : "btn_back_to_town", "imageChecked" : "btn_back_to_town_pressed" },
+  }
+}
