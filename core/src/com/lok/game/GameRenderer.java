@@ -65,6 +65,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     private MapRevelationComponent		      cameraLockEntityRevelationComponent;
 
     private Map					      map;
+    private TiledMapTileLayer			      groundLayer;
     private final Array<TiledMapTileLayer>	      backgroundLayers;
     private final Array<TiledMapTileLayer>	      foregroundLayers;
     private TiledMapImageLayer			      lightMapLayer;
@@ -98,7 +99,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 
 	viewport = new FitViewport(32, 18);
 	camera = viewport.getCamera();
-	visibleArea = new Rectangle(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
+	visibleArea = new Rectangle();
 	scissors = new Rectangle();
 
 	this.backgroundLayers = new Array<TiledMapTileLayer>();
@@ -124,7 +125,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	this.lightMapLayer = null;
 	for (MapLayer mapLayer : map.getTiledMap().getLayers()) {
 	    if (mapLayer instanceof TiledMapTileLayer) {
-		if (mapLayer.getName().startsWith("background")) {
+		if ("ground".equals(mapLayer.getName())) {
+		    groundLayer = (TiledMapTileLayer) mapLayer;
+		} else if (mapLayer.getName().startsWith("background")) {
 		    backgroundLayers.add((TiledMapTileLayer) mapLayer);
 		} else {
 		    foregroundLayers.add((TiledMapTileLayer) mapLayer);
@@ -136,9 +139,10 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     }
 
     public void resize(int width, int height) {
-	Gdx.app.debug(TAG, "Resizing to " + width + " x " + height);
-	viewport.update(width, height);
-	visibleArea.set(0, 0, viewport.getScreenWidth(), viewport.getScreenHeight());
+	Gdx.app.debug(TAG, "Resizing with " + width + "x" + height + " from viewport " + viewport.getScreenWidth() + "x" + viewport.getScreenHeight());
+	viewport.update(width, height, false);
+	visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+	Gdx.app.debug(TAG, "To viewport " + viewport.getScreenWidth() + "x" + viewport.getScreenHeight());
 
 	if (frameBuffer != null) {
 	    frameBuffer.dispose();
@@ -180,28 +184,29 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	interpolateEntities(alpha);
 	map.getEntities().sort(entityComparator);
 
-	viewport.calculateScissors(batch.getTransformMatrix(), visibleArea, scissors);
-	ScissorStack.pushScissors(scissors);
-
 	if (cameraLockEntitySizeComponent != null) {
 	    camera.position.set(cameraLockEntitySizeComponent.interpolatedPosition, 0);
 	    visibleArea.setCenter(cameraLockEntitySizeComponent.interpolatedPosition);
 	}
-
-	viewport.apply();
-	setView(camera.combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
 
 	prepareLightFrameBuffer();
 
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
+	viewport.apply();
+	setView(camera.combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
 	batch.begin();
-	for (TiledMapTileLayer layer : backgroundLayers) {
-	    renderTileLayer(layer);
+	viewport.calculateScissors(batch.getTransformMatrix(), visibleArea, scissors);
+	ScissorStack.pushScissors(scissors);
+	if (groundLayer != null) {
+	    renderTileLayer(groundLayer);
 	}
 	for (Entity entity : map.getEntities()) {
 	    renderEntityShadow(entity);
+	}
+	for (TiledMapTileLayer layer : backgroundLayers) {
+	    renderTileLayer(layer);
 	}
 	for (Entity entity : map.getEntities()) {
 	    renderEntity(entity);
@@ -264,8 +269,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    Gdx.gl.glClearColor(mapBackgroundColor.r, mapBackgroundColor.g, mapBackgroundColor.b, mapBackgroundColor.a);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-	    batch.setProjectionMatrix(camera.combined);
-
+	    setView(camera.combined, visibleArea.x, visibleArea.y, visibleArea.width, visibleArea.height);
 	    batch.begin();
 	    if (lightMapLayer != null) {
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);

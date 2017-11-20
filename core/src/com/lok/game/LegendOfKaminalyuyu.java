@@ -24,7 +24,7 @@ public class LegendOfKaminalyuyu extends Game {
 
     @Override
     public void create() {
-	Gdx.app.setLogLevel(Application.LOG_INFO);
+	Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
 	Gdx.graphics.setTitle(Utils.getLabel("GameWindow.Title"));
 

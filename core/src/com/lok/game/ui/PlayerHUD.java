@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.AssetManager;
 
 public class PlayerHUD extends InputAdapter implements EventListener {
@@ -34,7 +35,7 @@ public class PlayerHUD extends InputAdapter implements EventListener {
     public PlayerHUD() {
 	this.listeners = new Array<HUDEventListener>();
 
-	this.stage = new Stage();
+	this.stage = new Stage(new FitViewport(1280,720));
 
 	Gdx.input.setInputProcessor(new InputMultiplexer(stage, this));
 
@@ -63,6 +64,7 @@ public class PlayerHUD extends InputAdapter implements EventListener {
 
     public void render(float deltaTime) {
 	stage.act(deltaTime);
+	stage.getViewport().apply();
 	stage.draw();
     }
 
