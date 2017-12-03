@@ -1,12 +1,10 @@
 package com.lok.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.lok.game.LegendOfKaminalyuyu.ScreenID;
 
 public final class Utils {
     private static final String	TAG  = Utils.class.getName();
@@ -18,11 +16,6 @@ public final class Utils {
     public static String getLabel(String labelKey) {
 	Gdx.app.debug(TAG, "Get localized label for key " + labelKey);
 	return AssetManager.getManager().getAsset("localization/Labels", I18NBundle.class).get(labelKey);
-    }
-
-    public static void changeScreen(ScreenID screenID) {
-	Gdx.app.debug(TAG, "Changing to screen " + screenID);
-	((Game) Gdx.app.getApplicationListener()).setScreen(screenID.getScreen());
     }
 
     public static <T> T fromJson(FileHandle file) {

@@ -40,7 +40,6 @@ public class GameUI {
 
 	this.table.add(movementGroup).bottom().left().padLeft(20).padBottom(20);
 	btn_BackToDown = new ImageButton(skin, "back-to-town");
-	btn_BackToDown.setName("port");
 	this.table.add(btn_BackToDown).expand().bottom().right().padRight(20).padBottom(20);
 
 	this.table.setDebug(Gdx.app.getLogLevel() == Application.LOG_DEBUG);

@@ -18,6 +18,8 @@ import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 import com.lok.game.map.MapManager.MapID;
+import com.lok.game.screens.ScreenManager;
+import com.lok.game.screens.TownScreen;
 import com.lok.game.ui.PlayerHUD.HUDEvent;
 import com.lok.game.ui.PlayerHUD.HUDEventListener;
 
@@ -130,7 +132,7 @@ public class GameLogic implements EntityListener, CollisionListener, MapListener
 		animationComponent.playAnimation = false;
 		break;
 	    case PORT_TO_TOWN:
-		// TODO
+		ScreenManager.getManager().setScreen(TownScreen.class);
 		break;
 	}
     }

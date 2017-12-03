@@ -27,6 +27,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+	playerHUD.show();
 	gameLogic.show();
     }
 
@@ -64,6 +65,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+	playerHUD.hide();
 	gameLogic.hide();
     }
 

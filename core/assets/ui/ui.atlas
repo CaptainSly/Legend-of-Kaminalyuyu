@@ -1,118 +1,153 @@
 
 ui.png
-size: 512,128
+size: 1024,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 btn
   rotate: false
-  xy: 76, 0
+  xy: 0, 8
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_back_to_town
   rotate: false
-  xy: 124, 0
+  xy: 800, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_back_to_town_pressed
   rotate: false
-  xy: 172, 0
+  xy: 48, 8
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_move_down
   rotate: false
-  xy: 198, 49
+  xy: 528, 181
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_down_pressed
   rotate: false
-  xy: 259, 49
+  xy: 589, 181
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_left
   rotate: false
-  xy: 0, 63
+  xy: 391, 170
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_left_pressed
   rotate: false
-  xy: 0, 2
+  xy: 391, 109
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_right
   rotate: false
-  xy: 320, 63
+  xy: 650, 195
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_right_pressed
   rotate: false
-  xy: 395, 63
+  xy: 725, 195
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_up
   rotate: false
-  xy: 76, 48
+  xy: 391, 33
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_move_up_pressed
   rotate: false
-  xy: 137, 48
+  xy: 467, 155
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_music_off
   rotate: false
-  xy: 220, 1
+  xy: 848, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_music_on
   rotate: false
-  xy: 268, 1
+  xy: 96, 8
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pause
   rotate: false
-  xy: 320, 15
+  xy: 896, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_play
   rotate: false
-  xy: 368, 15
+  xy: 144, 8
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pressed
   rotate: false
-  xy: 416, 15
+  xy: 944, 208
   size: 48, 48
   orig: 48, 48
+  offset: 0, 0
+  index: -1
+btn_townlocation
+  rotate: false
+  xy: 0, 118
+  size: 246, 138
+  orig: 246, 138
+  offset: 0, 0
+  index: -1
+dialog
+  rotate: false
+  xy: 0, 56
+  size: 240, 62
+  orig: 240, 62
+  offset: 0, 0
+  index: -1
+img_elder
+  rotate: false
+  xy: 246, 128
+  size: 145, 128
+  orig: 145, 128
+  offset: 0, 0
+  index: -1
+img_portal
+  rotate: false
+  xy: 246, 0
+  size: 145, 128
+  orig: 145, 128
+  offset: 0, 0
+  index: -1
+selection_sphere
+  rotate: false
+  xy: 391, 231
+  size: 129, 25
+  orig: 129, 25
   offset: 0, 0
   index: -1

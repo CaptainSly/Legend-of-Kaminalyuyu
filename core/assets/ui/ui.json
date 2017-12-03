@@ -1,9 +1,42 @@
 {
+  com.badlogic.gdx.graphics.g2d.BitmapFont : {
+  	"default" : { "file" : "ui/ferrum_18.fnt" },
+    "large" : { "file" : "ui/ferrum_32.fnt" },
+    "title" : { "file" : "ui/ferrum_blue_outline_48.fnt" }
+  },
+
+  com.badlogic.gdx.graphics.Color : {
+  	"white" : { "r" : 1, "g" : 1, "b" : 1, "a" : 1 }
+  },
+
   com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle : {
     "move_up" : { "imageUp" : "btn_move_up", "imageChecked" : "btn_move_up_pressed" },
     "move_down" : { "imageUp" : "btn_move_down", "imageChecked" : "btn_move_down_pressed" },
     "move_left" : { "imageUp" : "btn_move_left", "imageChecked" : "btn_move_left_pressed" },
     "move_right" : { "imageUp" : "btn_move_right", "imageChecked" : "btn_move_right_pressed" },
   	"back-to-town" : { "imageUp" : "btn_back_to_town", "imageChecked" : "btn_back_to_town_pressed" },
+    "town-location" : { "imageUp" : "btn_townlocation", "imageChecked" : "btn_townlocation" }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle : {
+    "default" : { "font" : "default", "fontColor" : "white" }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle : {
+    "town-tooltip" : { "label" : { "font" : "default", "fontColor" : "white" }, "background" : "btn", "wrapWidth" : 400 }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle : {
+    "title" : { "font" : "title", "fontColor" : "white" },
+    "normal" : { "font" : "default", "fontColor" : "white" }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle : {
+    "dialog" : { "background" : "dialog", "titleFont" : "large", "titleFontColor" : "white" }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.Image : {
+    "elder" : { "drawable" : "img_elder" },
+    "portal" : { "drawable" : "img_portal" }
   }
 }

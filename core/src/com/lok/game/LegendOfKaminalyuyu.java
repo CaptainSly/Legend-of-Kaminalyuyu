@@ -3,32 +3,18 @@ package com.lok.game;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.lok.game.map.MapManager;
-import com.lok.game.screens.GameScreen;
+import com.lok.game.screens.ScreenManager;
+import com.lok.game.screens.TownScreen;
 
 public class LegendOfKaminalyuyu extends Game {
-    public enum ScreenID {
-	GameScreen(new GameScreen());
-
-	private final Screen screen;
-
-	private ScreenID(Screen screen) {
-	    this.screen = screen;
-	}
-
-	public Screen getScreen() {
-	    return screen;
-	}
-    }
-
     @Override
     public void create() {
-	Gdx.app.setLogLevel(Application.LOG_DEBUG);
+	Gdx.app.setLogLevel(Application.LOG_INFO);
 
 	Gdx.graphics.setTitle(Utils.getLabel("GameWindow.Title"));
 
-	Utils.changeScreen(ScreenID.GameScreen);
+	ScreenManager.getManager().setScreen(TownScreen.class);
     }
 
     @Override
@@ -44,9 +30,23 @@ public class LegendOfKaminalyuyu extends Game {
     public void dispose() {
 	MapManager.getManager().dispose();
 	AssetManager.getManager().dispose();
-	if (screen != null) {
-	    screen.hide();
-	    screen.dispose();
-	}
+	ScreenManager.getManager().dispose();
     }
+
+    /*
+     * GDX lifecycle
+     * 1) create
+     * 2) resize
+     * 3) render in endless loop
+     * 
+     * pause -> lose focus
+     * resume -> gained focus back
+     * 
+     * 4) pause
+     * 5) dispose
+     * 
+     * hide -> screen is no longer current one
+     * show -> screen becomes the current one
+     * 
+     */
 }

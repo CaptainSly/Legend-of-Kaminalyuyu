@@ -76,8 +76,10 @@ public class MapManager {
 
     public void dispose() {
 	Gdx.app.debug(TAG, "Disposing mapmanager");
-	for (Map map : mapCache) {
-	    map.dispose();
+	if (mapCache != null) {
+	    for (Map map : mapCache) {
+		map.dispose();
+	    }
 	}
     }
 }
