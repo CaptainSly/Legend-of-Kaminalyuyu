@@ -1,88 +1,61 @@
 package com.lok.game.screens;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.loaders.SkinLoader;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.lok.game.Utils;
+import com.lok.game.conversation.Conversation;
+import com.lok.game.conversation.ConversationChoice;
+import com.lok.game.conversation.ConversationListener;
+import com.lok.game.conversation.ConversationNode;
+import com.lok.game.ecs.EntityEngine;
+import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ecs.components.ConversationComponent;
+import com.lok.game.ui.TownUI;
+import com.lok.game.ui.UIEventListener;
 
-public class TownScreen extends Stage implements Screen, EventListener {
-    private final Skin	      skin;
+public class TownScreen implements Screen, ConversationListener, UIEventListener {
+    private final TownUI				 townUI;
 
-    private final ImageButton btnElder;
-    private final ImageButton btnBlacksmith;
-    private final ImageButton btnShaman;
-    private final ImageButton btnPortal;
+    private Conversation				 currentConversation;
+    private final ComponentMapper<ConversationComponent> convCompMapper;
+
+    private final IntMap<Entity>			 entityMap;
 
     public TownScreen() {
-	super(new FitViewport(1280, 720));
+	this.townUI = new TownUI();
+	this.townUI.addUIEventListener(this);
+	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
+	this.entityMap = new IntMap<Entity>();
 
-	skin = AssetManager.getManager().getAsset("ui/ui.json", Skin.class, new SkinLoader.SkinParameter("ui/ui.atlas"));
-	final Table table = new Table(skin);
-	table.setFillParent(true);
-	table.setBackground(new TextureRegionDrawable(new TextureRegion(AssetManager.getManager().getAsset("ui/village.jpg", Texture.class))));
-	addActor(table);
+	/*
+	 * btnElder = addTownLocation("Elder", skin, 537, 570);
+	 * btnBlacksmith = addTownLocation("Blacksmith", skin, 430, 295);
+	 * btnShaman = addTownLocation("Shaman", skin, 105, 235);
+	 * btnPortal = addTownLocation("Portal", skin, 837, 145);
+	 */
+	this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
 
-	btnElder = addTownLocation("Elder", skin, 537, 570);
-	btnBlacksmith = addTownLocation("Blacksmith", skin, 430, 295);
-	btnShaman = addTownLocation("Shaman", skin, 105, 235);
-	btnPortal = addTownLocation("Portal", skin, 837, 145);
-    }
-
-    private ImageButton addTownLocation(String tooltipKey, Skin skin, int x, int y) {
-	final ImageButton locationButton = new ImageButton(skin, "town-location");
-	locationButton.setSize(64, 64);
-	locationButton.setPosition(x, y);
-	locationButton.getImage().setOrigin(locationButton.getWidth() * 0.5f, locationButton.getHeight() * 0.5f);
-	locationButton.getImage().addAction(Actions.forever(Actions.rotateBy(7.5f)));
-	locationButton.addListener(this);
-
-	final Label label = new Label(tooltipKey, skin, "title");
-	label.setPosition(x + 50, y + 20);
-
-	addActor(locationButton);
-	addActor(label);
-
-	return locationButton;
+	this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
+	townUI.addTownLocation(EntityID.ELDER, 537, 570);
     }
 
     @Override
     public void show() {
-	btnElder.setChecked(false);
-	btnBlacksmith.setChecked(false);
-	btnShaman.setChecked(false);
-	btnPortal.setChecked(false);
-	Gdx.input.setInputProcessor(this);
+	townUI.show();
     }
 
     @Override
     public void render(float delta) {
-	Gdx.gl.glClearColor(0, 0, 0, 1);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-	act(delta);
-	getViewport().apply();
-	draw();
+	townUI.render(delta);
     }
 
     @Override
     public void resize(int width, int height) {
-	getViewport().update(width, height, true);
+	townUI.resize(width, height);
     }
 
     @Override
@@ -99,56 +72,71 @@ public class TownScreen extends Stage implements Screen, EventListener {
 
     @Override
     public void hide() {
-	Gdx.input.setInputProcessor(null);
+	townUI.hide();
     }
 
     @Override
     public void dispose() {
-	super.dispose();
-	AssetManager.getManager().dispose();
+	townUI.dispose();
     }
 
     @Override
-    public boolean handle(Event event) {
-	if (btnPortal.equals(event.getTarget()) && btnPortal.isChecked()) {
-	    btnPortal.setChecked(false);
+    public void onUIEvent(Actor triggerActor, UIEvent event) {
+	switch (event) {
+	    case SELECT_ENTITY:
+		final EntityID entityID = (EntityID) triggerActor.getUserObject();
 
-	    Dialog dia = new Dialog("Portal", skin, "dialog") {
-		protected void result(Object object) {
-		    if (Boolean.TRUE.equals(object)) {
-			ScreenManager.getManager().setScreen(GameScreen.class);
-		    }
+		if (currentConversation != null) {
+		    currentConversation.removeConversationListener(this);
 		}
-	    };
-	    dia.getTitleTable().bottom().right().pad(0, 30, 0, 30);
+		currentConversation = Conversation.load(convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID);
+		currentConversation.addConversationListener(this);
+		currentConversation.startConversation();
 
-	    dia.getContentTable().add(skin.get("portal", Image.class));
-	    dia.text("Do you really want to enter the portal to the demon lair?", skin.get("normal", LabelStyle.class));
-	    dia.getContentTable().pad(30, 30, 0, 30);
+		break;
+	    case CONVERSATION_CHOICE_SELECTED:
+		final int choiceIndex = (int) triggerActor.getUserObject();
 
-	    dia.button("Yes", true, skin.get("default", TextButtonStyle.class));
-	    dia.button("No", false, skin.get("default", TextButtonStyle.class));
-	    dia.getButtonTable().right().pad(0, 0, 25, 25);
+		currentConversation.triggerConversationChoice(choiceIndex);
 
-	    dia.show(this).setPosition(dia.getX(), 20);
-
-	    return true;
-	} else if (btnElder.equals(event.getTarget()) && btnElder.isChecked()) {
-	    btnElder.setChecked(false);
-	    Dialog dia = new Dialog("Elder", skin, "dialog");
-	    dia.getTitleTable().bottom().right().pad(0, 30, 0, 30);
-
-	    dia.getContentTable().add(skin.get("elder", Image.class));
-	    dia.text("You need to enter the demon lair to be an awesome hero!\nGo now!!!", skin.get("normal", LabelStyle.class));
-	    dia.getContentTable().pad(30, 30, 0, 30);
-
-	    dia.button("Next", null, skin.get("default", TextButtonStyle.class));
-	    dia.getButtonTable().right().pad(0, 0, 25, 25);
-
-	    dia.show(this).setPosition(dia.getX(), 20);
+		break;
+	    default:
+		break;
 	}
+    }
 
-	return false;
+    @Override
+    public void onStartConversation(ConversationNode startNode) {
+	// TODO Auto-generated method stub
+	final Array<String> choices = new Array<String>();
+	for (ConversationChoice choice : startNode.getChoices()) {
+	    choices.add(Utils.getLabel(choice.getTextID()));
+	}
+	townUI.updateConversationDialog( // params
+		Utils.getLabel("Entity." + startNode.getEntityID() + ".name"), // title
+		convCompMapper.get(entityMap.get(startNode.getEntityID().ordinal())).conversationImage, // image
+		Utils.getLabel(startNode.getTextID()), // text
+		choices); // choices
+	townUI.showConversationDialog();
+    }
+
+    @Override
+    public void onTriggerConversationChoice(ConversationChoice choice, ConversationNode nextNode) {
+	// TODO Auto-generated method stub
+	final Array<String> choices = new Array<String>();
+	for (ConversationChoice cc : nextNode.getChoices()) {
+	    choices.add(Utils.getLabel(cc.getTextID()));
+	}
+	townUI.updateConversationDialog( // params
+		Utils.getLabel("Entity." + nextNode.getEntityID() + ".name"), // title
+		convCompMapper.get(entityMap.get(nextNode.getEntityID().ordinal())).conversationImage, // image
+		Utils.getLabel(nextNode.getTextID()), // text
+		choices); // choices
+    }
+
+    @Override
+    public void onEndConversation(ConversationChoice choice, ConversationNode currentNode) {
+	townUI.hideConversationDialog();
     }
 
 }

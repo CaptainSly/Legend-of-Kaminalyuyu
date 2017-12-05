@@ -1,0 +1,12 @@
+[
+  { "nodeID" : 0, "entityID" : ELDER, "textID" : "Dialog.text.elder000",
+    "choices" : [
+      { "textID" : "Dialog.choice.next", "targetNodeID" : 1 }
+    ]
+  },
+  { "nodeID" : 1, "entityID" : PLAYER, "textID" : "Dialog.text.elder001",
+    "choices" : [
+      { "textID" : "Dialog.choice.ok", "action" : { "actionID" : EndConversation} }
+    ]
+  }
+]

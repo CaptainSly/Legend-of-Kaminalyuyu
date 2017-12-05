@@ -6,114 +6,118 @@ filter: Nearest,Nearest
 repeat: none
 btn
   rotate: false
-  xy: 0, 8
-  size: 48, 48
-  orig: 48, 48
+  xy: 769, 172
+  size: 36, 36
+  split: 12, 12, 12, 12
+  pad: 0, 0, 0, 0
+  orig: 36, 36
   offset: 0, 0
   index: -1
 btn_back_to_town
   rotate: false
-  xy: 800, 208
+  xy: 180, 70
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_back_to_town_pressed
   rotate: false
-  xy: 48, 8
+  xy: 673, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_move_down
   rotate: false
-  xy: 528, 181
+  xy: 612, 156
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_down_pressed
   rotate: false
-  xy: 589, 181
+  xy: 597, 81
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_left
   rotate: false
-  xy: 391, 170
+  xy: 0, 10
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_left_pressed
   rotate: false
-  xy: 391, 109
+  xy: 536, 170
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_right
   rotate: false
-  xy: 650, 195
+  xy: 76, 10
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_right_pressed
   rotate: false
-  xy: 725, 195
+  xy: 597, 20
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_up
   rotate: false
-  xy: 391, 33
+  xy: 536, 94
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_move_up_pressed
   rotate: false
-  xy: 467, 155
+  xy: 536, 18
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_music_off
   rotate: false
-  xy: 848, 208
+  xy: 673, 160
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_music_on
   rotate: false
-  xy: 96, 8
+  xy: 721, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pause
   rotate: false
-  xy: 896, 208
+  xy: 721, 160
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_play
   rotate: false
-  xy: 144, 8
+  xy: 769, 208
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pressed
   rotate: false
-  xy: 944, 208
-  size: 48, 48
-  orig: 48, 48
+  xy: 817, 220
+  size: 36, 36
+  split: 12, 12, 12, 12
+  pad: 0, 0, 0, 0
+  orig: 36, 36
   offset: 0, 0
   index: -1
 btn_townlocation
@@ -125,9 +129,11 @@ btn_townlocation
   index: -1
 dialog
   rotate: false
-  xy: 0, 56
-  size: 240, 62
-  orig: 240, 62
+  xy: 0, 71
+  size: 180, 47
+  split: 60, 60, 15, 16
+  pad: 0, 0, 0, 0
+  orig: 180, 47
   offset: 0, 0
   index: -1
 img_elder
@@ -137,16 +143,30 @@ img_elder
   orig: 145, 128
   offset: 0, 0
   index: -1
-img_portal
+img_missing
   rotate: false
   xy: 246, 0
   size: 145, 128
   orig: 145, 128
   offset: 0, 0
   index: -1
+img_player
+  rotate: false
+  xy: 391, 128
+  size: 145, 128
+  orig: 145, 128
+  offset: 0, 0
+  index: -1
+img_portal
+  rotate: false
+  xy: 391, 0
+  size: 145, 128
+  orig: 145, 128
+  offset: 0, 0
+  index: -1
 selection_sphere
   rotate: false
-  xy: 391, 231
+  xy: 536, 231
   size: 129, 25
   orig: 129, 25
   offset: 0, 0

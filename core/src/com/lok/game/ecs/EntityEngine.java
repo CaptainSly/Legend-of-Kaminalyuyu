@@ -22,6 +22,7 @@ import com.lok.game.Utils;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
+import com.lok.game.ecs.components.ConversationComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
@@ -34,10 +35,15 @@ import com.lok.game.ecs.systems.MovementSystem;
 import com.lok.game.map.MapManager;
 
 public class EntityEngine {
-    public enum EntityID {
+    public static enum EntityID {
 	PLAYER,
 	DEMON_01,
-	BOSS_01
+	BOSS_01,
+	ELDER,
+	/*
+	 * BLACKSMITH,
+	 * SHAMAN
+	 */
     }
 
     private static class EntityConfiguration {
@@ -48,6 +54,8 @@ public class EntityEngine {
 	private Vector2	      size;
 	private Rectangle     collisionRectangle;
 	private Array<String> additionalComponents;
+	private String	      conversationID;
+	private String	      conversationImage;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();
@@ -100,7 +108,19 @@ public class EntityEngine {
 	    configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) fromJson));
 	}
 
-	// parse remaining entities
+	// parse townfolk entities
+	fromJson = Utils.fromJson(Gdx.files.internal("json/townfolk.json"));
+	if (fromJson instanceof Array<?>) {
+	    // multiple entity types defined within file
+	    for (Object val : (Array<?>) fromJson) {
+		configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) val));
+	    }
+	} else {
+	    // only one entity type defined -> load it
+	    configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) fromJson));
+	}
+
+	// parse monster entities
 	fromJson = Utils.fromJson(Gdx.files.internal("json/monsters.json"));
 	if (fromJson instanceof Array<?>) {
 	    // multiple entity types defined within file
@@ -166,18 +186,20 @@ public class EntityEngine {
 	final EntityConfiguration entityConfig = entityConfigurationCache.get(entityID.ordinal());
 	final Entity entity = engine.createEntity();
 
-	final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
-	if (entityConfig.size != null) {
-	    sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
-	} else {
-	    sizeComponent.boundingRectangle.set(x, y, 0, 0);
-	}
-	sizeComponent.interpolatedPosition.set(x, y);
-	entity.add(sizeComponent);
-
 	final IDComponent idComponent = engine.createComponent(IDComponent.class);
 	idComponent.entityID = entityID;
 	entity.add(idComponent);
+
+	if (entityConfig.size != null) {
+	    final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
+	    if (entityConfig.size != null) {
+		sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
+	    } else {
+		sizeComponent.boundingRectangle.set(x, y, 0, 0);
+	    }
+	    sizeComponent.interpolatedPosition.set(x, y);
+	    entity.add(sizeComponent);
+	}
 
 	if (entityConfig.speed != 0) {
 	    final SpeedComponent speedComponent = engine.createComponent(SpeedComponent.class);
@@ -211,6 +233,13 @@ public class EntityEngine {
 		    entityConfig.collisionRectangle.height * MapManager.WORLD_UNITS_PER_PIXEL); // height
 
 	    entity.add(collisionComponent);
+	}
+
+	if (entityConfig.conversationImage != null || entityConfig.conversationID != null) {
+	    final ConversationComponent convComponent = engine.createComponent(ConversationComponent.class);
+	    convComponent.currentConversationID = entityConfig.conversationID;
+	    convComponent.conversationImage = entityConfig.conversationImage;
+	    entity.add(convComponent);
 	}
 
 	if (entityConfig.additionalComponents != null) {

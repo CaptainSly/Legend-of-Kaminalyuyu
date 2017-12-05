@@ -3,7 +3,7 @@
 <node COLOR="#000000" CREATED="1509272497976" ID="ID_628190084" MODIFIED="1509272566226" TEXT="Legend of Kaminalyuyu">
 <font NAME="SansSerif" SIZE="20"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties"/>
-<node COLOR="#0033ff" CREATED="1509272569614" FOLDED="true" ID="ID_1357354299" MODIFIED="1509645344824" POSITION="right" TEXT="Story">
+<node COLOR="#0033ff" CREATED="1509272569614" FOLDED="true" ID="ID_1357354299" MODIFIED="1512910608600" POSITION="right" TEXT="Story">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <font NAME="SansSerif" SIZE="18"/>
 <node COLOR="#00b439" CREATED="1509272573340" ID="ID_313733560" MODIFIED="1509272583374" TEXT="name of town means &apos;Hill of the Dead&apos;">
@@ -45,7 +45,7 @@
 <font NAME="SansSerif" SIZE="16"/>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1509272939940" ID="ID_135190415" MODIFIED="1509645406209" POSITION="right" TEXT="Game Screens">
+<node COLOR="#0033ff" CREATED="1509272939940" FOLDED="true" ID="ID_135190415" MODIFIED="1512910612501" POSITION="right" TEXT="Game Screens">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <font NAME="SansSerif" SIZE="18"/>
 <node COLOR="#00b439" CREATED="1509274084558" ID="ID_1533168700" MODIFIED="1509274086976" TEXT="Intro">
@@ -261,142 +261,47 @@
 <node COLOR="#0033ff" CREATED="1509645347023" ID="ID_131954209" MODIFIED="1509645365513" POSITION="left" TEXT="Implementation">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <font NAME="SansSerif" SIZE="18"/>
-<node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1511030930037" TEXT="todo">
+<node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#990000" CREATED="1509646024953" FOLDED="true" ID="ID_1024760013" MODIFIED="1509650300492" TEXT="AnimationManager">
+<node COLOR="#990000" CREATED="1512846053584" ID="ID_283078495" MODIFIED="1512846059061" TEXT="TownScreen">
 <font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509646029571" ID="ID_532064778" MODIFIED="1509650292485" TEXT="use array instead of objectmap">
+<node COLOR="#111111" CREATED="1512846144746" ID="ID_1517298948" MODIFIED="1512846149934" TEXT="implement logic for dialog actions">
+<node COLOR="#111111" CREATED="1512846150271" ID="ID_237958256" MODIFIED="1512846152099" TEXT="setscreen"/>
+<node COLOR="#111111" CREATED="1512846153049" ID="ID_1803234454" MODIFIED="1512910482179" TEXT="end conversation">
 <icon BUILTIN="button_ok"/>
 </node>
+<node COLOR="#111111" CREATED="1512910483723" ID="ID_1340915479" MODIFIED="1512910486747" TEXT="addTownLocation"/>
 </node>
-<node COLOR="#990000" CREATED="1509646105515" FOLDED="true" ID="ID_1936702826" MODIFIED="1509651074520" TEXT="EntityEngine">
+<node COLOR="#111111" CREATED="1512846157698" ID="ID_337743108" MODIFIED="1512846160395" TEXT="add dialog cache"/>
+<node COLOR="#111111" CREATED="1512910500402" ID="ID_1920823395" MODIFIED="1512910513894" TEXT="use StringBuilder for choices instead of creating new string all the time"/>
+<node COLOR="#111111" CREATED="1512910520150" ID="ID_1427980543" MODIFIED="1512910528939" TEXT="remove Colors test stuff from Conversationdialog">
+<node COLOR="#111111" CREATED="1512910530261" ID="ID_709054760" MODIFIED="1512910537659" TEXT="add Color to Labels localization"/>
+<node COLOR="#111111" CREATED="1512910539707" ID="ID_1657780415" MODIFIED="1512910556567" TEXT="init Colors when retrieving first localized label">
+<node COLOR="#111111" CREATED="1512910558381" ID="ID_811751085" MODIFIED="1512910561030" TEXT="Util.getLabel"/>
+</node>
+</node>
+</node>
+<node COLOR="#990000" CREATED="1512508251287" ID="ID_190571831" MODIFIED="1512508262162" TEXT="add selection_sphere to townscreen">
 <font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509651067948" ID="ID_1906521577" MODIFIED="1509651073520" TEXT="change objectmap cache to array"/>
+<node COLOR="#111111" CREATED="1512508264328" ID="ID_1516673091" MODIFIED="1512508270601" TEXT="vertical for location selection"/>
+<node COLOR="#111111" CREATED="1512508272196" ID="ID_1954265338" MODIFIED="1512508275472" TEXT="horizontal for dialog"/>
 </node>
-<node COLOR="#990000" CREATED="1509646111927" FOLDED="true" ID="ID_301321201" MODIFIED="1510344511503" TEXT="MapManager">
+<node COLOR="#990000" CREATED="1512508343077" ID="ID_127794338" MODIFIED="1512508348715" TEXT="add Touchpad class">
 <font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509646115160" FOLDED="true" ID="ID_112676706" MODIFIED="1509909446960" TEXT="add Map class">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509646345988" ID="ID_1231333005" MODIFIED="1509821765480" TEXT="getCollisionAreas">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509646457096" ID="ID_1168237394" MODIFIED="1509646467657" TEXT="reuse rectangle of rectanglemapobject instead of creating a new one"/>
+<node COLOR="#111111" CREATED="1512508349395" ID="ID_340217846" MODIFIED="1512508353383" TEXT="extends WidgetGroup"/>
 </node>
-<node COLOR="#111111" CREATED="1509646375226" ID="ID_288607644" MODIFIED="1509821769833" TEXT="getBoundary">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1509646357208" ID="ID_1243600198" MODIFIED="1509909440269" TEXT="getPortals">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1509646351076" ID="ID_644367943" MODIFIED="1509871113733" TEXT="getEntities">
-<icon BUILTIN="button_ok"/>
-</node>
-</node>
-<node COLOR="#111111" CREATED="1509646390507" FOLDED="true" ID="ID_736650274" MODIFIED="1509879831480" TEXT="add Tile class">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509646400236" ID="ID_1205796321" MODIFIED="1509646416722" TEXT="isVisible=false == no rendering"/>
-<node COLOR="#111111" CREATED="1509646418555" ID="ID_685358555" MODIFIED="1509646425302" TEXT="when player revelas it then it becomes visible"/>
-</node>
-<node COLOR="#111111" CREATED="1509646432914" ID="ID_225360898" MODIFIED="1509879834625" TEXT="new MapRenderer to render tile per tile">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1509821732082" FOLDED="true" ID="ID_919556593" MODIFIED="1509827174248" TEXT="gameworld auf units &#xe4;ndern statt pixel">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509821743133" ID="ID_1606236569" MODIFIED="1509821749387" TEXT="32 einheiten breite"/>
-<node COLOR="#111111" CREATED="1509821750478" ID="ID_1233130372" MODIFIED="1509821754270" TEXT="18 einheiten h&#xf6;he"/>
-<node COLOR="#111111" CREATED="1509825300103" ID="ID_742293690" MODIFIED="1509825324697" TEXT="units.json erweitern mit gr&#xf6;&#xdf;e der einheit"/>
-<node COLOR="#111111" CREATED="1509825326000" ID="ID_426181683" MODIFIED="1509825332742" TEXT="speed um&#xe4;ndern auf worldunits"/>
-<node COLOR="#111111" CREATED="1509825334338" ID="ID_1445443463" MODIFIED="1509825343925" TEXT="portals/collisionareas richtig auf weltkoordinaten umrechne"/>
-</node>
-<node COLOR="#111111" CREATED="1509822108961" ID="ID_992681932" MODIFIED="1509823333674" TEXT="dispose method for map">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1509825356848" FOLDED="true" ID="ID_1213550293" MODIFIED="1510081797790" TEXT="portal logik implementieren">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509825363469" ID="ID_982571437" MODIFIED="1509825366428" TEXT="auf worldunits achten"/>
-</node>
-<node COLOR="#111111" CREATED="1509909453500" ID="ID_1897887739" MODIFIED="1510344504831" TEXT="renderer updaten um hintergrund zu malen, dann entities und dann vordegrund">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1509909523031" ID="ID_1520358002" MODIFIED="1510344507935" TEXT="nur entities rendern, die auf sichtbaren zellen sind">
-<icon BUILTIN="button_ok"/>
-</node>
-</node>
-<node COLOR="#990000" CREATED="1509645977781" FOLDED="true" ID="ID_437202698" MODIFIED="1510388439395" TEXT="GameRendererr">
+<node COLOR="#990000" CREATED="1512508359618" ID="ID_538750191" MODIFIED="1512508370690" TEXT="add GameInputHandler class">
 <font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1510344519017" ID="ID_1945600192" MODIFIED="1510388121075" TEXT="alles zu MapRenderer migrieren">
-<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1512508371710" ID="ID_165065846" MODIFIED="1512508377590" TEXT="implements InputListener"/>
+<node COLOR="#111111" CREATED="1512508401637" ID="ID_1559958786" MODIFIED="1512508408868" TEXT="forwards keyCalls to current stage"/>
 </node>
-<node COLOR="#111111" CREATED="1510344528714" ID="ID_674658758" MODIFIED="1510388123832" TEXT="MapRenderer zu GameRenderer umbenennen und in allgemeines package schieben">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1510344544906" ID="ID_980450705" MODIFIED="1510388126251" TEXT="code optimieren in Renderer">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1510344561441" ID="ID_55653685" MODIFIED="1510388429618" TEXT="debugmsgs hinzuf&#xfc;gen">
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#111111" CREATED="1510344565645" ID="ID_519075728" MODIFIED="1510388130991" TEXT="shapeRenderer nur in debugmodus">
-<icon BUILTIN="button_ok"/>
-</node>
-</node>
-<node COLOR="#990000" CREATED="1510344729934" ID="ID_1696678718" MODIFIED="1510688739562" TEXT="remove the flag check for EntityID.Player">
+<node COLOR="#990000" CREATED="1512508328742" ID="ID_575828932" MODIFIED="1512910581916" TEXT="remove &quot;extends stage&quot; from playerhud">
 <font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1512910583196" ID="ID_1549238467" MODIFIED="1512910589421" TEXT="remove PlayerHUD">
+<node COLOR="#111111" CREATED="1512910590574" ID="ID_1395165436" MODIFIED="1512910595484" TEXT="refer to TownScreen implementation"/>
+<node COLOR="#111111" CREATED="1512910596413" ID="ID_1312654169" MODIFIED="1512910600883" TEXT="maybe also remove GameLogic?"/>
 </node>
-<node COLOR="#990000" CREATED="1510688760170" FOLDED="true" ID="ID_1979421550" MODIFIED="1511001840227" TEXT="MapRevelationSystem">
-<font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1510688767004" ID="ID_66004166" MODIFIED="1510688786928" TEXT="already revealed parts should not be black">
-<node COLOR="#111111" CREATED="1510688791690" ID="ID_1824672071" MODIFIED="1510688811189" TEXT="maybe add a lightgrey light of one world unit to every revealed tiled of the screen?"/>
-</node>
-</node>
-<node COLOR="#990000" CREATED="1509736250819" FOLDED="true" ID="ID_802316882" MODIFIED="1511030365279" TEXT="ECS">
-<font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1510344634552" ID="ID_1717890948" MODIFIED="1511030360612" TEXT="CollisionSystem">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1510344642965" ID="ID_1202157294" MODIFIED="1510344647705" TEXT="add entity collision logic"/>
-</node>
-<node COLOR="#111111" CREATED="1510344681514" FOLDED="true" ID="ID_1803705375" MODIFIED="1511002361872" TEXT="MovementSystem">
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1510344685693" ID="ID_1252544966" MODIFIED="1510344693536" TEXT="check that movement is only possible in pathable terrain">
-<node COLOR="#111111" CREATED="1510344693923" ID="ID_627332713" MODIFIED="1510344700384" TEXT="get map collision areas to check against"/>
-</node>
-</node>
-<node COLOR="#111111" CREATED="1510344718082" ID="ID_1434409378" MODIFIED="1511030362601" TEXT="add AIWanderSystem to Entities">
-<icon BUILTIN="button_ok"/>
-</node>
-</node>
-<node COLOR="#990000" CREATED="1509646060018" ID="ID_1638665422" MODIFIED="1511030923031" TEXT="GameScreen">
-<font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#990000" CREATED="1509651995427" FOLDED="true" ID="ID_901105873" MODIFIED="1509735198297" TEXT="LegendOfKaminalyuyu">
-<font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1509652007784" ID="ID_1799306636" MODIFIED="1509652013672" TEXT="add ScreenManager class">
-<node COLOR="#111111" CREATED="1509652016922" ID="ID_1670876869" MODIFIED="1509652028033" TEXT="screen cache"/>
-<node COLOR="#111111" CREATED="1509652028998" ID="ID_688214400" MODIFIED="1509652040496" TEXT="create screen when first needed and store it in cache for later reusage"/>
-<node COLOR="#111111" CREATED="1509652041862" ID="ID_1258060071" MODIFIED="1509652044242" TEXT="screenid enum"/>
-<node COLOR="#111111" CREATED="1509652045598" ID="ID_14626233" MODIFIED="1509652056527" TEXT="change screen helper method">
-<node COLOR="#111111" CREATED="1509652059079" ID="ID_1249731983" MODIFIED="1509652061429" TEXT="remove from Utils"/>
-</node>
-</node>
-</node>
-<node COLOR="#990000" CREATED="1511031033574" ID="ID_474879131" MODIFIED="1511081758157" TEXT="add shadows to units">
-<font NAME="SansSerif" SIZE="14"/>
-<icon BUILTIN="button_ok"/>
-</node>
-<node COLOR="#990000" CREATED="1511031038662" ID="ID_1819300248" MODIFIED="1511031046882" TEXT="add a second map and check if everything is working">
-<font NAME="SansSerif" SIZE="14"/>
-<node COLOR="#111111" CREATED="1511031047218" ID="ID_1033314949" MODIFIED="1511031052794" TEXT="player entity moved to new map"/>
-<node COLOR="#111111" CREATED="1511031054214" ID="ID_8596072" MODIFIED="1511031061905" TEXT="entities of previous map removed from entity engine"/>
 </node>
 </node>
 </node>

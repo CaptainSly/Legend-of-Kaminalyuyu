@@ -1,12 +1,12 @@
 {
   com.badlogic.gdx.graphics.g2d.BitmapFont : {
-  	"default" : { "file" : "ui/ferrum_18.fnt" },
-    "large" : { "file" : "ui/ferrum_32.fnt" },
+  	"default" : { "file" : "ui/ferrum_32.fnt" },
     "title" : { "file" : "ui/ferrum_blue_outline_48.fnt" }
   },
 
   com.badlogic.gdx.graphics.Color : {
-  	"white" : { "r" : 1, "g" : 1, "b" : 1, "a" : 1 }
+  	"white" : { "r" : 1, "g" : 1, "b" : 1, "a" : 1 },
+    "goldenrod" : {  "r" : 1, "g" : 0.25, "b" : 0, "a" : 1 }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle : {
@@ -27,16 +27,16 @@
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle : {
-    "title" : { "font" : "title", "fontColor" : "white" },
+    "dialog-title" : { "font" : "title", "fontColor" : "goldenrod" },
+    "townlocation" : { "font" : "title", "fontColor" : "white" },
     "normal" : { "font" : "default", "fontColor" : "white" }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle : {
-    "dialog" : { "background" : "dialog", "titleFont" : "large", "titleFontColor" : "white" }
+    "dialog" : { "background" : "dialog", "titleFont" : "title", "titleFontColor" : "white" }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Image : {
-    "elder" : { "drawable" : "img_elder" },
-    "portal" : { "drawable" : "img_portal" }
+    "missing" : { "drawable" : "img_missing" }
   }
 }
