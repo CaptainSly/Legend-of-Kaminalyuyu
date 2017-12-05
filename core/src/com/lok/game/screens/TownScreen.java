@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.AssetManager;
 
@@ -53,7 +54,7 @@ public class TownScreen extends Stage implements Screen, EventListener {
 	locationButton.getImage().addAction(Actions.forever(Actions.rotateBy(7.5f)));
 	locationButton.addListener(this);
 
-	final Label label = new Label(tooltipKey, skin, "title");
+	final Label label = new Label(tooltipKey, skin, "townlocation");
 	label.setPosition(x + 50, y + 20);
 
 	addActor(locationButton);
@@ -113,37 +114,52 @@ public class TownScreen extends Stage implements Screen, EventListener {
 	if (btnPortal.equals(event.getTarget()) && btnPortal.isChecked()) {
 	    btnPortal.setChecked(false);
 
-	    Dialog dia = new Dialog("Portal", skin, "dialog") {
+	    Dialog dia = new Dialog("", skin, "dialog") {
 		protected void result(Object object) {
 		    if (Boolean.TRUE.equals(object)) {
 			ScreenManager.getManager().setScreen(GameScreen.class);
 		    }
 		}
 	    };
-	    dia.getTitleTable().bottom().right().pad(0, 30, 0, 30);
 
-	    dia.getContentTable().add(skin.get("portal", Image.class));
-	    dia.text("Do you really want to enter the portal to the demon lair?", skin.get("normal", LabelStyle.class));
-	    dia.getContentTable().pad(30, 30, 0, 30);
+	    // title + image
+	    Table leftContent = new Table(skin);
+	    leftContent.add(new Label("Portal", skin.get("dialog-title", LabelStyle.class))).row();
+	    leftContent.add(skin.get("portal", Image.class)).expand().fill().bottom().padBottom(0);
+	    dia.getContentTable().add(leftContent).expand().fill();
 
-	    dia.button("Yes", true, skin.get("default", TextButtonStyle.class));
-	    dia.button("No", false, skin.get("default", TextButtonStyle.class));
-	    dia.getButtonTable().right().pad(0, 0, 25, 25);
+	    // text + buttons
+	    Table t = new Table(skin);
+	    Label lbl = new Label("Do you really want to enter the portal to the demon lair?", skin.get("normal", LabelStyle.class));
+	    lbl.setAlignment(Align.top, Align.left);
+	    t.add(lbl).expand().fill().top().padTop(15).row();
+	    dia.button("   Yes", true, skin.get("default", TextButtonStyle.class));
+	    dia.button("   No", false, skin.get("default", TextButtonStyle.class));
+	    t.add(dia.getButtonTable()).right().bottom();
+	    dia.getContentTable().add(t).expand().fill().padRight(10);
 
 	    dia.show(this).setPosition(dia.getX(), 20);
 
 	    return true;
 	} else if (btnElder.equals(event.getTarget()) && btnElder.isChecked()) {
 	    btnElder.setChecked(false);
-	    Dialog dia = new Dialog("Elder", skin, "dialog");
-	    dia.getTitleTable().bottom().right().pad(0, 30, 0, 30);
 
-	    dia.getContentTable().add(skin.get("elder", Image.class));
-	    dia.text("You need to enter the demon lair to be an awesome hero!\nGo now!!!", skin.get("normal", LabelStyle.class));
-	    dia.getContentTable().pad(30, 30, 0, 30);
+	    Dialog dia = new Dialog("", skin, "dialog");
 
-	    dia.button("Next", null, skin.get("default", TextButtonStyle.class));
-	    dia.getButtonTable().right().pad(0, 0, 25, 25);
+	    // title + image
+	    Table leftContent = new Table(skin);
+	    leftContent.add(new Label("Elder", skin.get("dialog-title", LabelStyle.class))).row();
+	    leftContent.add(skin.get("elder", Image.class)).expand().fill().bottom().padBottom(0);
+	    dia.getContentTable().add(leftContent).expand().fill();
+
+	    // text + buttons
+	    Table t = new Table(skin);
+	    Label lbl = new Label("You need to enter the demon lair to be an awesome hero!\nGo now!!!\n.\n.", skin.get("normal", LabelStyle.class));
+	    lbl.setAlignment(Align.top, Align.left);
+	    t.add(lbl).expand().fill().top().padTop(15).row();
+	    dia.button("Next", skin.get("default", TextButtonStyle.class));
+	    t.add(dia.getButtonTable()).right().bottom();
+	    dia.getContentTable().add(t).expand().fill().padRight(10);
 
 	    dia.show(this).setPosition(dia.getX(), 20);
 	}
