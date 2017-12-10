@@ -1,0 +1,7 @@
+[
+  { "nodeID" : 0, "entityID" : SHAMAN, "textID" : "Dialog.text.shaman.000",
+    "choices" : [
+      { "textID" : "Dialog.choice.ok", "actions" : [ { "actionID" : EndConversation } ]  }
+    ]
+  }
+]

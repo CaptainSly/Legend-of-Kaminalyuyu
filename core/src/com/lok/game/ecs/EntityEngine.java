@@ -40,10 +40,9 @@ public class EntityEngine {
 	DEMON_01,
 	BOSS_01,
 	ELDER,
-	/*
-	 * BLACKSMITH,
-	 * SHAMAN
-	 */
+	BLACKSMITH,
+	SHAMAN,
+	PORTAL
     }
 
     private static class EntityConfiguration {

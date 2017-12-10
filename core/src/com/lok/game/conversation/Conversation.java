@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.lok.game.Utils;
+import com.lok.game.conversation.ConversationChoice.ConversationAction;
 import com.lok.game.conversation.ConversationChoice.ConversationActionID;
 
 public class Conversation {
@@ -50,7 +51,7 @@ public class Conversation {
 	Gdx.app.debug(TAG, "Starting conversation " + conversationID);
 	currentNode = startNode;
 	for (ConversationListener listener : listeners) {
-	    listener.onStartConversation(startNode);
+	    listener.onStartConversation(this, startNode);
 	}
     }
 
@@ -66,20 +67,33 @@ public class Conversation {
 		    + " links to an invalid node " + targetNodeID);
 	}
 
-	if (choice.getAction() != null) {
-	    if (choice.getAction().getActionID().equals(ConversationActionID.EndConversation)) {
+	if (choice.getActions() != null) {
+	    boolean endConversation = false;
+	    for (ConversationAction action : choice.getActions()) {
+		if (action.getActionID().equals(ConversationActionID.EndConversation)) {
+		    endConversation = true;
+		    continue;
+		}
+
 		for (ConversationListener listener : listeners) {
-		    listener.onEndConversation(choice, currentNode);
+		    listener.onConversationAction(this, currentNode, choice, action);
+		}
+	    }
+
+	    if (endConversation) {
+		for (ConversationListener listener : listeners) {
+		    listener.onEndConversation(this, currentNode, choice);
 		}
 		return;
 	    }
 	}
 
 	Gdx.app.debug(TAG, "Trigger conversation choice of conversation " + conversationID + " to node " + targetNodeID);
-	currentNode = nodes.get(targetNodeID);
+	final ConversationNode nextNode = nodes.get(targetNodeID);
 	for (ConversationListener listener : listeners) {
-	    listener.onTriggerConversationChoice(choice, currentNode);
+	    listener.onConversationChoiceSelected(this, currentNode, nextNode, choice);
 	}
+	currentNode = nextNode;
     }
 
     public static Conversation load(String conversationPath) {

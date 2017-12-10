@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -47,18 +48,19 @@ public class TownUI implements EventListener {
 	this.uiEventListeners.removeValue(listener, false);
     }
 
-    public void addTownLocation(EntityID entityID, int x, int y) {
+    public void addTownLocation(EntityID entityID, float x, float y) {
 	final ImageButton locationButton = new ImageButton(skin, "town-location");
 
 	locationButton.setUserObject(entityID);
 	locationButton.setSize(64, 64);
 	locationButton.setPosition(x, y);
 	locationButton.getImage().setOrigin(locationButton.getWidth() * 0.5f, locationButton.getHeight() * 0.5f);
-	locationButton.getImage().addAction(Actions.forever(Actions.rotateBy(7.5f)));
+	locationButton.getImage().addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade), Actions.forever(Actions.rotateBy(7.5f))));
 	locationButton.addListener(this);
 
 	final Label label = new Label(Utils.getLabel("Entity." + entityID + ".name"), skin, "townlocation");
 	label.setPosition(x + 50, y + 20);
+	label.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
 
 	stage.addActor(locationButton);
 	stage.addActor(label);
@@ -82,10 +84,14 @@ public class TownUI implements EventListener {
 	    final TextButton txtButton = (TextButton) event.getTarget();
 
 	    if (txtButton.isChecked()) {
+		txtButton.setChecked(false);
+
 		for (UIEventListener listener : uiEventListeners) {
 		    listener.onUIEvent(txtButton, UIEvent.CONVERSATION_CHOICE_SELECTED);
 		}
 	    }
+
+	    return true;
 	}
 
 	return false;
@@ -108,6 +114,7 @@ public class TownUI implements EventListener {
     }
 
     public void hide() {
+	convDialog.hide(Actions.fadeOut(0));
 	Gdx.input.setInputProcessor(null);
     }
 
@@ -118,11 +125,15 @@ public class TownUI implements EventListener {
     }
 
     public void showConversationDialog() {
-	convDialog.show(stage);
+	convDialog.show(stage).setY(20);
     }
 
-    public void updateConversationDialog(String title, String conversationImage, String text, Array<String> choices) {
-	convDialog.update(title, conversationImage, text, choices);
+    public void updateConversationDialog(String title, String conversationImage, String text) {
+	convDialog.update(title, conversationImage, text);
+    }
+
+    public void addConversationDialogChoice(String choiceText, int choiceIndex) {
+	convDialog.addChoice(choiceText, choiceIndex);
     }
 
     public void hideConversationDialog() {

@@ -1,9 +1,13 @@
 package com.lok.game.conversation;
 
+import com.badlogic.gdx.utils.Array;
+
 public class ConversationChoice {
     public static enum ConversationActionID {
 	EndConversation,
-	SetScreen
+	SetScreen,
+	ActivateTownLocation,
+	SetConversation
     }
 
     public static class ConversationAction {
@@ -19,9 +23,9 @@ public class ConversationChoice {
 	}
     }
 
-    private String	       textID;
-    private int		       targetNodeID;
-    private ConversationAction action;
+    private String		      textID;
+    private int			      targetNodeID;
+    private Array<ConversationAction> actions;
 
     public String getTextID() {
 	return textID;
@@ -31,7 +35,7 @@ public class ConversationChoice {
 	return targetNodeID;
     }
 
-    public ConversationAction getAction() {
-	return action;
+    public Array<ConversationAction> getActions() {
+	return actions;
     }
 }

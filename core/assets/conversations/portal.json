@@ -1,0 +1,10 @@
+[
+  { "nodeID" : 0, "entityID" : PORTAL, "textID" : "Dialog.text.portal",
+    "choices" : [
+      { "textID" : "Dialog.choice.yes", "actions" : [
+        { "actionID" : SetScreen, "param" : [ "com.lok.game.screens.GameScreen" ] },
+        { "actionID" : EndConversation } ] },
+      { "textID" : "Dialog.choice.no", "actions" : [ { "actionID" : EndConversation } ] }
+    ]
+  }
+]

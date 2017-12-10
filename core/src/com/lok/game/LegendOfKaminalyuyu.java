@@ -14,6 +14,7 @@ public class LegendOfKaminalyuyu extends Game {
 
 	Gdx.graphics.setTitle(Utils.getLabel("GameWindow.Title"));
 
+	Utils.initializeCustomColors();
 	ScreenManager.getManager().setScreen(TownScreen.class);
     }
 

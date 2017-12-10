@@ -3,6 +3,8 @@ package com.lok.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Json;
@@ -15,9 +17,15 @@ public final class Utils {
     private Utils() {
     }
 
+    public static void initializeCustomColors() {
+	// rgba
+	Colors.put("Highlight", new Color(0x4250f4ff));
+	Colors.put("Thought", new Color(0x9fa2a3ff));
+    }
+
     public static String getLabel(String labelKey) {
 	Gdx.app.debug(TAG, "Get localized label for key " + labelKey);
-	return AssetManager.getManager().getAsset("localization/Labels", I18NBundle.class).get(labelKey);
+	return AssetManager.getManager().getAsset("localization/Labels", I18NBundle.class).format(labelKey);
     }
 
     public static <T> T fromJson(FileHandle file) {

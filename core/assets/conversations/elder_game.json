@@ -1,0 +1,7 @@
+[
+  { "nodeID" : 0, "entityID" : ELDER, "textID" : "Dialog.text.elder.003",
+    "choices" : [
+      { "textID" : "Dialog.choice.ok", "actions" : [ { "actionID" : EndConversation } ]  }
+    ]
+  }
+]

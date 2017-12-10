@@ -1,0 +1,7 @@
+[
+  { "nodeID" : 0, "entityID" : BLACKSMITH, "textID" : "Dialog.text.blacksmith.000",
+    "choices" : [
+      { "textID" : "Dialog.choice.ok", "actions" : [ { "actionID" : EndConversation } ]  }
+    ]
+  }
+]

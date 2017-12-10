@@ -1,0 +1,23 @@
+[
+  { "nodeID" : 0, "entityID" : ELDER, "textID" : "Dialog.text.elder.000",
+    "choices" : [
+      { "textID" : "Dialog.choice.next", "targetNodeID" : 1 }
+    ]
+  },
+  { "nodeID" : 1, "entityID" : PLAYER, "textID" : "Dialog.text.elder.001",
+    "choices" : [
+      { "textID" : "Dialog.choice.next", "targetNodeID" : 2 }
+    ]
+  },
+  { "nodeID" : 2, "entityID" : ELDER, "textID" : "Dialog.text.elder.002",
+    "choices" : [
+      { "textID" : "Dialog.choice.ok", "actions" : [
+        { "actionID" : ActivateTownLocation, "param" : [BLACKSMITH, 430, 295] },
+        { "actionID" : ActivateTownLocation, "param" : [SHAMAN, 105, 235] },
+        { "actionID" : ActivateTownLocation, "param" : [PORTAL, 837, 145] },
+        { "actionID" : SetConversation, "param" : [ELDER, "conversations/elder_game.json"] },
+        { "actionID" : EndConversation },
+        ] }
+    ]
+  }
+]

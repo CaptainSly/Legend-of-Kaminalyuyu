@@ -5,10 +5,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.ConversationChoice;
+import com.lok.game.conversation.ConversationChoice.ConversationAction;
 import com.lok.game.conversation.ConversationListener;
 import com.lok.game.conversation.ConversationNode;
 import com.lok.game.ecs.EntityEngine;
@@ -31,12 +35,6 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
 
-	/*
-	 * btnElder = addTownLocation("Elder", skin, 537, 570);
-	 * btnBlacksmith = addTownLocation("Blacksmith", skin, 430, 295);
-	 * btnShaman = addTownLocation("Shaman", skin, 105, 235);
-	 * btnPortal = addTownLocation("Portal", skin, 837, 145);
-	 */
 	this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
 
 	this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
@@ -105,38 +103,68 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	}
     }
 
-    @Override
-    public void onStartConversation(ConversationNode startNode) {
-	// TODO Auto-generated method stub
-	final Array<String> choices = new Array<String>();
-	for (ConversationChoice choice : startNode.getChoices()) {
-	    choices.add(Utils.getLabel(choice.getTextID()));
-	}
+    private void updateConversationDialog(ConversationNode node) {
 	townUI.updateConversationDialog( // params
-		Utils.getLabel("Entity." + startNode.getEntityID() + ".name"), // title
-		convCompMapper.get(entityMap.get(startNode.getEntityID().ordinal())).conversationImage, // image
-		Utils.getLabel(startNode.getTextID()), // text
-		choices); // choices
+		Utils.getLabel("Entity." + node.getEntityID() + ".name"), // title
+		convCompMapper.get(entityMap.get(node.getEntityID().ordinal())).conversationImage, // image
+		Utils.getLabel(node.getTextID())); // text
+
+	final int max = node.getChoices().size;
+	for (int i = 0; i < max; ++i) {
+	    townUI.addConversationDialogChoice(Utils.getLabel(node.getChoices().get(i).getTextID()), i);
+	}
+    }
+
+    @Override
+    public void onStartConversation(Conversation conversation, ConversationNode startNode) {
+	updateConversationDialog(startNode);
 	townUI.showConversationDialog();
     }
 
     @Override
-    public void onTriggerConversationChoice(ConversationChoice choice, ConversationNode nextNode) {
-	// TODO Auto-generated method stub
-	final Array<String> choices = new Array<String>();
-	for (ConversationChoice cc : nextNode.getChoices()) {
-	    choices.add(Utils.getLabel(cc.getTextID()));
-	}
-	townUI.updateConversationDialog( // params
-		Utils.getLabel("Entity." + nextNode.getEntityID() + ".name"), // title
-		convCompMapper.get(entityMap.get(nextNode.getEntityID().ordinal())).conversationImage, // image
-		Utils.getLabel(nextNode.getTextID()), // text
-		choices); // choices
-    }
-
-    @Override
-    public void onEndConversation(ConversationChoice choice, ConversationNode currentNode) {
+    public void onEndConversation(Conversation conversation, ConversationNode currentNode, ConversationChoice selectedChoice) {
 	townUI.hideConversationDialog();
     }
 
+    @Override
+    public void onConversationChoiceSelected(Conversation conversation, ConversationNode currentNode, ConversationNode nextNode, ConversationChoice selectedChoice) {
+	updateConversationDialog(nextNode);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onConversationAction(Conversation conversation, ConversationNode currentNode, ConversationChoice selectedChoice, ConversationAction action) {
+	switch (action.getActionID()) {
+	    case ActivateTownLocation: {
+		final Array<?> param = (Array<?>) action.getParam();
+		final EntityID entityID = EntityID.valueOf((String) param.get(0));
+		final Float x = (Float) param.get(1);
+		final Float y = (Float) param.get(2);
+
+		this.entityMap.put(entityID.ordinal(), EntityEngine.getEngine().createEntity(entityID, x, y));
+		townUI.addTownLocation(entityID, x, y);
+
+		break;
+	    }
+	    case SetConversation: {
+		final Array<?> param = (Array<?>) action.getParam();
+		final EntityID entityID = EntityID.valueOf((String) param.get(0));
+		final String conversationPath = (String) param.get(1);
+
+		convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID = conversationPath;
+
+		break;
+	    }
+	    case SetScreen:
+		try {
+		    final Array<?> param = (Array<?>) action.getParam();
+		    ScreenManager.getManager().setScreen(ClassReflection.forName((String) param.get(0)));
+		} catch (ReflectionException e) {
+		    throw new GdxRuntimeException("Invalid screen class for setScreen", e);
+		}
+		break;
+	    default:
+		break;
+	}
+    }
 }
