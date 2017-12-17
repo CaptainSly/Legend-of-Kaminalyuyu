@@ -1,6 +1,9 @@
 package com.lok.game.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -21,12 +25,21 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.AssetManager;
 import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 
-public class TownUI implements EventListener {
+public class TownUI extends InputAdapter implements EventListener {
     private final Stage			 stage;
     private final Skin			 skin;
     private final ConversationDialog	 convDialog;
+    private final InputMultiplexer	 inputMultiplexer;
+
+    private final Array<ImageButton>	 btn_townLocations;
+    private ImageButton			 btn_currentSelectedLocation;
+
+    private final Touchpad		 touchpad;
+    private final TextButton		 btn_Select;
+    private final AnimationActor	 selectionActor;
 
     private final Array<UIEventListener> uiEventListeners;
 
@@ -36,10 +49,30 @@ public class TownUI implements EventListener {
 	this.convDialog = new ConversationDialog(skin);
 	this.convDialog.addListener(this);
 	this.uiEventListeners = new Array<UIEventListener>();
+	this.btn_townLocations = new Array<ImageButton>();
+	this.btn_currentSelectedLocation = null;
 
 	// background
 	stage.addActor(new Image(new TextureRegionDrawable(new TextureRegion(AssetManager.getManager().getAsset("ui/village.jpg", Texture.class)))));
-	stage.setKeyboardFocus(convDialog);
+
+	// input handling actors
+	this.touchpad = new Touchpad(skin);
+	touchpad.setPosition(15, 15);
+	touchpad.addListener(this);
+	stage.addActor(touchpad);
+
+	this.btn_Select = new TextButton(Utils.getLabel("Button.ok"), skin, "default");
+	btn_Select.setPosition(1280 - 15 - btn_Select.getWidth(), 15);
+	btn_Select.addListener(this);
+	stage.addActor(btn_Select);
+
+	this.selectionActor = new AnimationActor("ui/ui.atlas", "selection_sphere", 8, 1, 0.05f);
+	selectionActor.setPosition(0, 0);
+	selectionActor.scaleBy(0.75f);
+	selectionActor.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
+	stage.addActor(selectionActor);
+
+	this.inputMultiplexer = new InputMultiplexer(this, stage);
     }
 
     public void addUIEventListener(UIEventListener listener) {
@@ -64,44 +97,109 @@ public class TownUI implements EventListener {
 	label.setPosition(x + 50, y + 20);
 	label.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
 
+	btn_townLocations.add(locationButton);
+
 	stage.addActor(locationButton);
 	stage.addActor(label);
+    }
+
+    public void selectLocation(EntityID entityID) {
+	for (ImageButton btn : btn_townLocations) {
+	    if (entityID.equals(btn.getUserObject())) {
+		selectionActor.setPosition(btn.getX() + 23, btn.getY() + 60);
+		btn_currentSelectedLocation = btn;
+		return;
+	    }
+	}
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+	switch (keycode) {
+	    case Keys.UP:
+		touchpad.setChecked(TouchpadDirection.UP, true);
+		return true;
+	    case Keys.DOWN:
+		touchpad.setChecked(TouchpadDirection.DOWN, true);
+		return true;
+	    case Keys.LEFT:
+		touchpad.setChecked(TouchpadDirection.LEFT, true);
+		return true;
+	    case Keys.RIGHT:
+		touchpad.setChecked(TouchpadDirection.RIGHT, true);
+		return true;
+	    case Keys.ENTER:
+		btn_Select.setChecked(true);
+		return true;
+	    default:
+		return false;
+	}
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+	switch (keycode) {
+	    case Keys.UP:
+		touchpad.setChecked(TouchpadDirection.UP, false);
+		return true;
+	    case Keys.DOWN:
+		touchpad.setChecked(TouchpadDirection.DOWN, false);
+		return true;
+	    case Keys.LEFT:
+		touchpad.setChecked(TouchpadDirection.LEFT, false);
+		return true;
+	    case Keys.RIGHT:
+		touchpad.setChecked(TouchpadDirection.RIGHT, false);
+		return true;
+	    case Keys.ENTER:
+		btn_Select.setChecked(false);
+		return true;
+	    default:
+		return false;
+	}
     }
 
     @Override
     public boolean handle(Event event) {
 	if (event instanceof InputEvent) {
-	    // TODO
-	    final InputEvent inputevent = (InputEvent) event;
-
-	    switch (inputevent.getKeyCode()) {
-		default:
-		    return false;
+	    final InputEvent inputEvent = (InputEvent) event;
+	    if (InputEvent.Type.exit.equals(inputEvent.getType()) || InputEvent.Type.touchUp.equals(inputEvent.getType())) {
+		if (touchpad.contains(event.getTarget())) {
+		    ((Button) event.getTarget()).setChecked(false);
+		    return true;
+		} else if (btn_Select.getLabel().equals(event.getTarget())) {
+		    btn_Select.setChecked(false);
+		    return true;
+		}
 	    }
 
-	    // return true;
+	    return false;
 	}
 
-	if (event.getTarget() instanceof ImageButton) {
-	    final ImageButton imgButton = (ImageButton) event.getTarget();
-
-	    if (imgButton.isChecked()) {
-		imgButton.setChecked(false);
-
+	if (touchpad.contains(event.getTarget())) {
+	    final Button button = (Button) event.getTarget();
+	    if (button.isChecked()) {
+		// change selection
+		final TouchpadDirection direction = (TouchpadDirection) button.getUserObject();
 		for (UIEventListener listener : uiEventListeners) {
-		    listener.onUIEvent(imgButton, UIEvent.SELECT_ENTITY);
+		    listener.onUIEvent(button, direction.getUIEvent());
 		}
 	    }
 
 	    return true;
-	} else if (event.getTarget() instanceof TextButton) {
-	    final TextButton txtButton = (TextButton) event.getTarget();
+	}
 
-	    if (txtButton.isChecked()) {
-		txtButton.setChecked(false);
-
-		for (UIEventListener listener : uiEventListeners) {
-		    listener.onUIEvent(txtButton, UIEvent.CONVERSATION_CHOICE_SELECTED);
+	if (btn_Select.equals(event.getTarget())) {
+	    if (btn_Select.isChecked()) {
+		if (convDialog.isShown()) {
+		    final TextButton btn = convDialog.getCurrentSelectedChoice();
+		    for (UIEventListener listener : uiEventListeners) {
+			listener.onUIEvent(btn, UIEvent.CONVERSATION_CHOICE_SELECTED);
+		    }
+		} else {
+		    for (UIEventListener listener : uiEventListeners) {
+			listener.onUIEvent(btn_currentSelectedLocation, UIEvent.SELECT_ENTITY);
+		    }
 		}
 	    }
 
@@ -112,7 +210,7 @@ public class TownUI implements EventListener {
     }
 
     public void show() {
-	Gdx.input.setInputProcessor(stage);
+	Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     public void render(float delta) {
@@ -139,7 +237,9 @@ public class TownUI implements EventListener {
     }
 
     public void showConversationDialog() {
-	convDialog.show(stage).setY(20);
+	convDialog.show(stage).setPosition(convDialog.getX() + 30, 20);
+	touchpad.toFront();
+	btn_Select.toFront();
     }
 
     public void updateConversationDialog(String title, String conversationImage, String text) {
@@ -152,5 +252,17 @@ public class TownUI implements EventListener {
 
     public void hideConversationDialog() {
 	convDialog.hide();
+    }
+
+    public void selectConversationChoice(int index) {
+	convDialog.selectChoice(index);
+    }
+
+    public void nextConversationChoice() {
+	convDialog.selectNextChoice();
+    }
+
+    public void previousConversationChoice() {
+	convDialog.selectPreviousChoice();
     }
 }

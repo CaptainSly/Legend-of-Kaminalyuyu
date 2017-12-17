@@ -264,10 +264,8 @@
 <node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1512508251287" ID="ID_190571831" MODIFIED="1512508262162" TEXT="add selection_sphere to townscreen">
+<node COLOR="#990000" CREATED="1513525891086" ID="ID_362825105" MODIFIED="1513525901724" TEXT="make text appear letter by letter in dialog">
 <font NAME="SansSerif" SIZE="14"/>
-<node COLOR="#111111" CREATED="1512508264328" ID="ID_1516673091" MODIFIED="1512508270601" TEXT="vertical for location selection"/>
-<node COLOR="#111111" CREATED="1512508272196" ID="ID_1954265338" MODIFIED="1512508275472" TEXT="horizontal for dialog"/>
 </node>
 </node>
 </node>

@@ -10,16 +10,20 @@
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle : {
-    "move_up" : { "imageUp" : "btn_move_up", "imageChecked" : "btn_move_up_pressed" },
-    "move_down" : { "imageUp" : "btn_move_down", "imageChecked" : "btn_move_down_pressed" },
-    "move_left" : { "imageUp" : "btn_move_left", "imageChecked" : "btn_move_left_pressed" },
-    "move_right" : { "imageUp" : "btn_move_right", "imageChecked" : "btn_move_right_pressed" },
-  	"back-to-town" : { "imageUp" : "btn_back_to_town", "imageChecked" : "btn_back_to_town_pressed" },
     "town-location" : { "imageUp" : "btn_townlocation", "imageChecked" : "btn_townlocation" }
   },
 
+  com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle : {
+    "move_up" : { "up" : "btn_move_up", "down" : "btn_move_up_pressed", "checked" : "btn_move_up_pressed" },
+    "move_down" : { "up" : "btn_move_down", "down" : "btn_move_down_pressed", "checked" : "btn_move_down_pressed" },
+    "move_left" : { "up" : "btn_move_left", "down" : "btn_move_left_pressed", "checked" : "btn_move_left_pressed" },
+    "move_right" : { "up" : "btn_move_right", "down" : "btn_move_right_pressed", "checked" : "btn_move_right_pressed" },
+    "back-to-town" : { "up" : "btn_back_to_town", "down" : "btn_back_to_town_pressed", "checked" : "btn_back_to_town_pressed" }
+  },
+
   com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle : {
-    "default" : { "font" : "default", "fontColor" : "white" }
+    "default" : { "font" : "default", "fontColor" : "white", "up" : "btn", "down" : "btn_pressed", "checked" : "btn_pressed" },
+    "dialog-btn" : { "font" : "default", "fontColor" : "white" }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle : {

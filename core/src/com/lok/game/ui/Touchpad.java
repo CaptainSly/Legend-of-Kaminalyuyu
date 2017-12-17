@@ -1,6 +1,7 @@
 package com.lok.game.ui;
 
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.Array;
@@ -24,14 +25,14 @@ public class Touchpad extends WidgetGroup {
 	}
     }
 
-    private final Array<ImageButton> btn_directions;
+    private final Array<Button> btn_directions;
 
     public Touchpad(Skin skin) {
 	super();
 
-	btn_directions = new Array<ImageButton>(TouchpadDirection.values().length);
+	btn_directions = new Array<Button>(TouchpadDirection.values().length);
 	for (TouchpadDirection direction : TouchpadDirection.values()) {
-	    final ImageButton btn = new ImageButton(skin, "move_" + direction.name().toLowerCase());
+	    final Button btn = new Button(skin, "move_" + direction.name().toLowerCase());
 	    btn.setUserObject(direction);
 	    btn_directions.add(btn);
 	    addActor(btn);
@@ -44,7 +45,7 @@ public class Touchpad extends WidgetGroup {
     }
 
     public void uncheckAll() {
-	for (ImageButton btn : btn_directions) {
+	for (Button btn : btn_directions) {
 	    btn.setChecked(false);
 	}
     }
@@ -53,9 +54,9 @@ public class Touchpad extends WidgetGroup {
 	btn_directions.get(direction.ordinal()).setChecked(checked);
     }
 
-    public boolean contains(ImageButton imgButton) {
-	for (ImageButton btn : btn_directions) {
-	    if (btn.equals(imgButton)) {
+    public boolean contains(Actor actor) {
+	for (Button btn : btn_directions) {
+	    if (btn.equals(actor)) {
 		return true;
 	    }
 	}

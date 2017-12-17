@@ -25,21 +25,26 @@ import com.lok.game.ui.UIEventListener;
 public class TownScreen implements Screen, ConversationListener, UIEventListener {
     private final TownUI				 townUI;
 
+    private boolean					 conversationInProgress;
     private Conversation				 currentConversation;
     private final ComponentMapper<ConversationComponent> convCompMapper;
 
     private final IntMap<Entity>			 entityMap;
+    private EntityID					 currentSelection;
 
     public TownScreen() {
 	this.townUI = new TownUI();
 	this.townUI.addUIEventListener(this);
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
+	this.conversationInProgress = false;
 
 	this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
 
 	this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
 	townUI.addTownLocation(EntityID.ELDER, 537, 570);
+	this.currentSelection = EntityID.ELDER;
+	townUI.selectLocation(currentSelection);
     }
 
     @Override
@@ -82,6 +87,40 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     @Override
     public void onUIEvent(Actor triggerActor, UIEvent event) {
 	switch (event) {
+	    case RIGHT:
+	    case UP:
+		if (!conversationInProgress) {
+		    if (EntityID.ELDER.equals(currentSelection)) {
+			currentSelection = EntityID.PORTAL;
+		    } else if (EntityID.BLACKSMITH.equals(currentSelection)) {
+			currentSelection = EntityID.ELDER;
+		    } else if (EntityID.SHAMAN.equals(currentSelection)) {
+			currentSelection = EntityID.BLACKSMITH;
+		    } else if (EntityID.PORTAL.equals(currentSelection)) {
+			currentSelection = EntityID.SHAMAN;
+		    }
+		    townUI.selectLocation(currentSelection);
+		} else {
+		    townUI.nextConversationChoice();
+		}
+		break;
+	    case LEFT:
+	    case DOWN:
+		if (!conversationInProgress) {
+		    if (EntityID.ELDER.equals(currentSelection)) {
+			currentSelection = EntityID.BLACKSMITH;
+		    } else if (EntityID.BLACKSMITH.equals(currentSelection)) {
+			currentSelection = EntityID.SHAMAN;
+		    } else if (EntityID.SHAMAN.equals(currentSelection)) {
+			currentSelection = EntityID.PORTAL;
+		    } else if (EntityID.PORTAL.equals(currentSelection)) {
+			currentSelection = EntityID.ELDER;
+		    }
+		    townUI.selectLocation(currentSelection);
+		} else {
+		    townUI.previousConversationChoice();
+		}
+		break;
 	    case SELECT_ENTITY:
 		final EntityID entityID = (EntityID) triggerActor.getUserObject();
 
@@ -114,16 +153,21 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	for (int i = 0; i < max; ++i) {
 	    townUI.addConversationDialogChoice(Utils.getLabel(node.getChoices().get(i).getTextID()), i);
 	}
+
+	townUI.selectConversationChoice(0);
     }
 
     @Override
     public void onStartConversation(Conversation conversation, ConversationNode startNode) {
+	conversationInProgress = true;
 	updateConversationDialog(startNode);
 	townUI.showConversationDialog();
+	townUI.selectConversationChoice(0);
     }
 
     @Override
     public void onEndConversation(Conversation conversation, ConversationNode currentNode, ConversationChoice selectedChoice) {
+	conversationInProgress = false;
 	townUI.hideConversationDialog();
     }
 

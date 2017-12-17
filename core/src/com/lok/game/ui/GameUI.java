@@ -2,11 +2,13 @@ package com.lok.game.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -15,12 +17,13 @@ import com.lok.game.Utils;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 
-public class GameUI implements EventListener {
+public class GameUI extends InputAdapter implements EventListener {
     private final Stage			 stage;
     private final Skin			 skin;
+    private final InputMultiplexer	 inputMultiplexer;
 
     private final Touchpad		 touchpad;
-    private final ImageButton		 btn_townPortal;
+    private final Button		 btn_townPortal;
 
     private final Array<UIEventListener> uiEventListeners;
 
@@ -34,12 +37,12 @@ public class GameUI implements EventListener {
 	touchpad.addListener(this);
 	stage.addActor(touchpad);
 
-	btn_townPortal = new ImageButton(skin, "back-to-town");
-	btn_townPortal.setPosition(1217, 15);
+	btn_townPortal = new Button(skin, "back-to-town");
+	btn_townPortal.setPosition(1280 - 15 - btn_townPortal.getWidth(), 15);
 	btn_townPortal.addListener(this);
 	stage.addActor(btn_townPortal);
 
-	stage.setKeyboardFocus(touchpad);
+	this.inputMultiplexer = new InputMultiplexer(this, stage);
     }
 
     public void addUIEventListener(UIEventListener listener) {
@@ -51,9 +54,7 @@ public class GameUI implements EventListener {
     }
 
     public void show() {
-	Gdx.input.setInputProcessor(stage);
-	touchpad.uncheckAll();
-	btn_townPortal.setChecked(false);
+	Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     public void render(float delta) {
@@ -77,68 +78,100 @@ public class GameUI implements EventListener {
     }
 
     @Override
+    public boolean keyDown(int keycode) {
+	switch (keycode) {
+	    case Keys.UP:
+		touchpad.setChecked(TouchpadDirection.UP, true);
+		return true;
+	    case Keys.DOWN:
+		touchpad.setChecked(TouchpadDirection.DOWN, true);
+		return true;
+	    case Keys.LEFT:
+		touchpad.setChecked(TouchpadDirection.LEFT, true);
+		return true;
+	    case Keys.RIGHT:
+		touchpad.setChecked(TouchpadDirection.RIGHT, true);
+		return true;
+	    case Keys.T:
+		btn_townPortal.setChecked(true);
+		return true;
+	    default:
+		return false;
+	}
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+	switch (keycode) {
+	    case Keys.UP:
+		touchpad.setChecked(TouchpadDirection.UP, false);
+		return true;
+	    case Keys.DOWN:
+		touchpad.setChecked(TouchpadDirection.DOWN, false);
+		return true;
+	    case Keys.LEFT:
+		touchpad.setChecked(TouchpadDirection.LEFT, false);
+		return true;
+	    case Keys.RIGHT:
+		touchpad.setChecked(TouchpadDirection.RIGHT, false);
+		return true;
+	    case Keys.T:
+		btn_townPortal.setChecked(false);
+		return true;
+	    default:
+		return false;
+	}
+    }
+
+    @Override
     public boolean handle(Event event) {
 	if (event instanceof InputEvent) {
-	    final InputEvent inputevent = (InputEvent) event;
+	    final InputEvent inputEvent = (InputEvent) event;
+	    if (InputEvent.Type.exit.equals(inputEvent.getType()) || InputEvent.Type.touchUp.equals(inputEvent.getType())) {
+		if (touchpad.contains(event.getTarget())) {
+		    ((Button) event.getTarget()).setChecked(false);
+		    return true;
+		} else if (btn_townPortal.equals(event.getTarget())) {
+		    btn_townPortal.setChecked(false);
+		    return true;
+		}
+	    }
+	}
 
-	    switch (inputevent.getKeyCode()) {
-		case Keys.UP:
-		    touchpad.setChecked(TouchpadDirection.UP, Gdx.input.isKeyJustPressed(Keys.UP));
-		    break;
-		case Keys.DOWN:
-		    touchpad.setChecked(TouchpadDirection.DOWN, Gdx.input.isKeyJustPressed(Keys.DOWN));
-		    break;
-		case Keys.LEFT:
-		    touchpad.setChecked(TouchpadDirection.LEFT, Gdx.input.isKeyJustPressed(Keys.LEFT));
-		    break;
-		case Keys.RIGHT:
-		    touchpad.setChecked(TouchpadDirection.RIGHT, Gdx.input.isKeyJustPressed(Keys.RIGHT));
-		    break;
-		case Keys.T:
-		    btn_townPortal.setChecked(Gdx.input.isKeyJustPressed(Keys.T));
-		    break;
-		default:
-		    return false;
+	if (touchpad.contains(event.getTarget())) {
+	    final Button button = (Button) event.getTarget();
+	    if (button.isChecked() || button.isPressed()) {
+		// change movement
+		final TouchpadDirection direction = (TouchpadDirection) button.getUserObject();
+		for (UIEventListener listener : uiEventListeners) {
+		    listener.onUIEvent(button, direction.getUIEvent());
+		}
+	    } else {
+		// go to previous movement
+		final TouchpadDirection direction = touchpad.getCurrentDirection();
+		if (direction == null) {
+		    for (UIEventListener listener : uiEventListeners) {
+			listener.onUIEvent(button, UIEvent.STOP_MOVEMENT);
+		    }
+		} else {
+		    for (UIEventListener listener : uiEventListeners) {
+			listener.onUIEvent(button, direction.getUIEvent());
+		    }
+		}
 	    }
 
 	    return true;
 	}
 
-	if (event.getTarget() instanceof ImageButton) {
-	    final ImageButton imgButton = (ImageButton) event.getTarget();
-
-	    if (touchpad.contains(imgButton)) {
-		if (imgButton.isChecked()) {
-		    // change movement
-		    final TouchpadDirection direction = (TouchpadDirection) imgButton.getUserObject();
-		    for (UIEventListener listener : uiEventListeners) {
-			listener.onUIEvent(imgButton, direction.getUIEvent());
-		    }
-		} else {
-		    // go to previous movement
-		    final TouchpadDirection direction = touchpad.getCurrentDirection();
-		    if (direction == null) {
-			for (UIEventListener listener : uiEventListeners) {
-			    listener.onUIEvent(imgButton, UIEvent.STOP_MOVEMENT);
-			}
-		    } else {
-			for (UIEventListener listener : uiEventListeners) {
-			    listener.onUIEvent(imgButton, direction.getUIEvent());
-			}
-		    }
-		}
-
-		return true;
-	    }
-
+	if (btn_townPortal.equals(event.getTarget())) {
 	    // townportal
-	    if (imgButton.isChecked()) {
+	    if (btn_townPortal.isChecked() || btn_townPortal.isPressed()) {
 		for (UIEventListener listener : uiEventListeners) {
-		    listener.onUIEvent(imgButton, UIEvent.CAST);
+		    listener.onUIEvent(btn_townPortal, UIEvent.CAST);
 		}
 	    } else {
 		for (UIEventListener listener : uiEventListeners) {
-		    listener.onUIEvent(imgButton, UIEvent.STOP_CAST);
+		    listener.onUIEvent(btn_townPortal, UIEvent.STOP_CAST);
 		}
 	    }
 
