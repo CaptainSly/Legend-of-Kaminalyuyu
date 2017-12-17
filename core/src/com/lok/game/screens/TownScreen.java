@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
+import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.conversation.ConversationChoice;
 import com.lok.game.conversation.ConversationChoice.ConversationAction;
 import com.lok.game.conversation.ConversationListener;
@@ -149,9 +150,9 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	    case SetConversation: {
 		final Array<?> param = (Array<?>) action.getParam();
 		final EntityID entityID = EntityID.valueOf((String) param.get(0));
-		final String conversationPath = (String) param.get(1);
+		final ConversationID conversationID = ConversationID.valueOf((String) param.get(1));
 
-		convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID = conversationPath;
+		convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID = conversationID;
 
 		break;
 	    }

@@ -19,6 +19,7 @@ import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.Utils;
+import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
@@ -46,15 +47,15 @@ public class EntityEngine {
     }
 
     private static class EntityConfiguration {
-	private EntityID      entityID;
-	private AnimationID   animationID;
-	private float	      speed;
-	private float	      revelationRadius;
-	private Vector2	      size;
-	private Rectangle     collisionRectangle;
-	private Array<String> additionalComponents;
-	private String	      conversationID;
-	private String	      conversationImage;
+	private EntityID       entityID;
+	private AnimationID    animationID;
+	private float	       speed;
+	private float	       revelationRadius;
+	private Vector2	       size;
+	private Rectangle      collisionRectangle;
+	private Array<String>  additionalComponents;
+	private ConversationID conversationID;
+	private String	       conversationImage;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();

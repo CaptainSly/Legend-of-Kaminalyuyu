@@ -1,34 +1,63 @@
 package com.lok.game.screens;
 
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.lok.game.GameLogic;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.lok.game.AnimationManager;
+import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.GameRenderer;
 import com.lok.game.ecs.EntityEngine;
-import com.lok.game.ui.PlayerHUD;
+import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ecs.components.AnimationComponent;
+import com.lok.game.ecs.components.IDComponent;
+import com.lok.game.ecs.components.SpeedComponent;
+import com.lok.game.ecs.systems.CollisionSystem;
+import com.lok.game.ecs.systems.CollisionSystem.CollisionListener;
+import com.lok.game.map.Map;
+import com.lok.game.map.Map.Portal;
+import com.lok.game.map.MapListener;
+import com.lok.game.map.MapManager;
+import com.lok.game.map.MapManager.MapID;
+import com.lok.game.ui.GameUI;
+import com.lok.game.ui.UIEventListener;
 
-public class GameScreen implements Screen {
-    private float	       accumulator;
-    private final float	       fixedPhysicsStep;
-    private final GameLogic    gameLogic;
-    private final GameRenderer renderer;
-    private final EntityEngine entityEngine;
-    private final PlayerHUD    playerHUD;
+public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener {
+    private float				      accumulator;
+    private final float				      fixedPhysicsStep;
+
+    private final GameRenderer			      renderer;
+    private final EntityEngine			      entityEngine;
+    private final GameUI			      gameUI;
+
+    private final ComponentMapper<SpeedComponent>     speedComponentMapper;
+    private final ComponentMapper<AnimationComponent> animationComponentMapper;
+    private Entity				      player;
 
     public GameScreen() {
 	fixedPhysicsStep = 1.0f / 30.0f;
 	accumulator = 0.0f;
 
-	this.playerHUD = new PlayerHUD();
+	this.gameUI = new GameUI();
+	this.gameUI.addUIEventListener(this);
 	this.entityEngine = EntityEngine.getEngine();
 	this.renderer = new GameRenderer();
-	this.gameLogic = new GameLogic(renderer);
-	playerHUD.addPlayerHUDListener(gameLogic);
+	this.player = null;
+	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
+	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
+
+	EntityEngine.getEngine().addEntityListener(Family.all(IDComponent.class).get(), this);
+	EntityEngine.getEngine().getSystem(CollisionSystem.class).addCollisionListener(this);
+	MapManager.getManager().addListener(this);
     }
 
     @Override
     public void show() {
-	playerHUD.show();
-	gameLogic.show();
+	MapManager.getManager().changeMap(MapID.DEMON_LAIR_01);
+	gameUI.show();
     }
 
     @Override
@@ -44,35 +73,115 @@ public class GameScreen implements Screen {
 	}
 
 	renderer.render(accumulator / fixedPhysicsStep);
-	playerHUD.render(delta);
+	gameUI.render(delta);
     }
 
     @Override
     public void resize(int width, int height) {
-	playerHUD.resize(width, height);
+	gameUI.resize(width, height);
 	renderer.resize(width, height);
     }
 
     @Override
     public void pause() {
-	gameLogic.pause();
+	// TODO
     }
 
     @Override
     public void resume() {
-	gameLogic.resume();
+	// TODO
     }
 
     @Override
     public void hide() {
-	playerHUD.hide();
-	gameLogic.hide();
+	gameUI.hide();
     }
 
     @Override
     public void dispose() {
-	playerHUD.dispose();
+	gameUI.dispose();
 	renderer.dispose();
+    }
+
+    @Override
+    public void onUIEvent(Actor triggerActor, UIEvent event) {
+	if (player == null) {
+	    return;
+	}
+
+	final SpeedComponent speedComponent = speedComponentMapper.get(player);
+	final AnimationComponent animationComponent = animationComponentMapper.get(player);
+	switch (event) {
+	    case DOWN:
+		speedComponent.speed.set(0, -speedComponent.maxSpeed);
+		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_DOWN);
+		animationComponent.playAnimation = true;
+		break;
+	    case LEFT:
+		speedComponent.speed.set(-speedComponent.maxSpeed, 0);
+		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_LEFT);
+		animationComponent.playAnimation = true;
+		break;
+	    case RIGHT:
+		speedComponent.speed.set(speedComponent.maxSpeed, 0);
+		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_RIGHT);
+		animationComponent.playAnimation = true;
+		break;
+	    case UP:
+		speedComponent.speed.set(0, speedComponent.maxSpeed);
+		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_UP);
+		animationComponent.playAnimation = true;
+		break;
+	    case STOP_MOVEMENT:
+		speedComponent.speed.set(0, 0);
+		animationComponent.animationTime = 0;
+		animationComponent.playAnimation = false;
+		break;
+	    case CAST:
+		ScreenManager.getManager().setScreen(TownScreen.class);
+		break;
+	    default:
+		break;
+	}
+    }
+
+    @Override
+    public void onEntityCollision(EntityID entityIDA, Entity entityA, EntityID entityIDB, Entity entityB) {
+	if (entityIDA == EntityID.PLAYER || entityIDB == EntityID.PLAYER) {
+	    Gdx.app.log("DEBUG", "Combat between " + entityIDA + " and " + entityIDB);
+	}
+    }
+
+    @Override
+    public void onPortalCollision(EntityID entityID, Entity entity, Portal portal) {
+	if (entityID == EntityID.PLAYER) {
+	    portal.activate(entity);
+	}
+    }
+
+    @Override
+    public void entityAdded(Entity entity) {
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+	    if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+		this.player = entity;
+		renderer.lockCameraToEntity(entity);
+	    }
+	}
+    }
+
+    @Override
+    public void entityRemoved(Entity entity) {
+	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+	    if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
+		this.player = null;
+		renderer.lockCameraToEntity(null);
+	    }
+	}
+    }
+
+    @Override
+    public void onMapChange(MapManager manager, Map map) {
+	renderer.setMap(map);
     }
 
 }

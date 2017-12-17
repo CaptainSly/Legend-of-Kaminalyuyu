@@ -15,7 +15,7 @@
         { "actionID" : ActivateTownLocation, "param" : [BLACKSMITH, 430, 295] },
         { "actionID" : ActivateTownLocation, "param" : [SHAMAN, 105, 235] },
         { "actionID" : ActivateTownLocation, "param" : [PORTAL, 837, 145] },
-        { "actionID" : SetConversation, "param" : [ELDER, "conversations/elder_game.json"] },
+        { "actionID" : SetConversation, "param" : [ELDER, ElderGame] },
         { "actionID" : EndConversation },
         ] }
     ]

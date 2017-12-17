@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -38,6 +39,7 @@ public class TownUI implements EventListener {
 
 	// background
 	stage.addActor(new Image(new TextureRegionDrawable(new TextureRegion(AssetManager.getManager().getAsset("ui/village.jpg", Texture.class)))));
+	stage.setKeyboardFocus(convDialog);
     }
 
     public void addUIEventListener(UIEventListener listener) {
@@ -68,6 +70,18 @@ public class TownUI implements EventListener {
 
     @Override
     public boolean handle(Event event) {
+	if (event instanceof InputEvent) {
+	    // TODO
+	    final InputEvent inputevent = (InputEvent) event;
+
+	    switch (inputevent.getKeyCode()) {
+		default:
+		    return false;
+	    }
+
+	    // return true;
+	}
+
 	if (event.getTarget() instanceof ImageButton) {
 	    final ImageButton imgButton = (ImageButton) event.getTarget();
 

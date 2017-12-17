@@ -8,8 +8,9 @@ public interface UIEventListener {
 	LEFT,
 	RIGHT,
 	DOWN,
-	STOP, // no directional button pressed
+	STOP_MOVEMENT,
 	CAST,
+	STOP_CAST,
 	SELECT_ENTITY,
 	CONVERSATION_CHOICE_SELECTED
     }
