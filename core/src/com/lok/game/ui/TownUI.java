@@ -216,6 +216,8 @@ public class TownUI extends InputAdapter implements EventListener {
     public void render(float delta) {
 	Gdx.gl.glClearColor(0, 0, 0, 1);
 	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+	convDialog.update(delta);
 	stage.act(delta);
 	stage.getViewport().apply();
 	stage.draw();
@@ -243,7 +245,7 @@ public class TownUI extends InputAdapter implements EventListener {
     }
 
     public void updateConversationDialog(String title, String conversationImage, String text) {
-	convDialog.update(title, conversationImage, text);
+	convDialog.updateContent(title, conversationImage, text);
     }
 
     public void addConversationDialogChoice(String choiceText, int choiceIndex) {

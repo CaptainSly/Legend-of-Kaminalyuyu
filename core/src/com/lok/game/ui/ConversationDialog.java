@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.StringBuilder;
 
 public class ConversationDialog extends Dialog {
     private final Table		 leftContent;
@@ -24,6 +25,9 @@ public class ConversationDialog extends Dialog {
     private int			 currentSelection;
 
     private final Table		 rightContent;
+    private float		 timeForNextChar;
+    private int			 charsToDisplay;
+    private StringBuilder	 textStrBuilder;
     private final Label		 textLabel;
 
     private boolean		 isShown;
@@ -40,10 +44,13 @@ public class ConversationDialog extends Dialog {
 
 	rightContent = new Table(skin);
 	textLabel = new Label("", skin.get("normal", LabelStyle.class));
-	textLabel.setAlignment(Align.top, Align.left);
+	textLabel.setAlignment(Align.topLeft, Align.left);
 	textLabel.getStyle().font.getData().markupEnabled = true;
-	textLabel.setWrap(true);
-	rightContent.add(textLabel).expand().fill().top().padTop(15).width(800).row();
+	this.charsToDisplay = -1;
+	this.timeForNextChar = 0;
+	this.textStrBuilder = new StringBuilder();
+
+	rightContent.add(textLabel).expand().fill().top().padTop(15).width(800).height(140).row();
 	rightContent.add(getButtonTable()).right().bottom();
 	getContentTable().add(rightContent).expand().fill().padRight(10);
 
@@ -57,10 +64,57 @@ public class ConversationDialog extends Dialog {
 	this.isShown = false;
     }
 
-    public void update(String title, String entityImgID, String text) {
+    public void update(float deltaTime) {
+	if (charsToDisplay >= textStrBuilder.length) {
+	    return;
+	}
+
+	timeForNextChar += deltaTime;
+	if (timeForNextChar >= 0.05) {
+	    timeForNextChar = 0;
+	    ++charsToDisplay;
+	    if (charsToDisplay >= textStrBuilder.length) {
+		return;
+	    }
+	    if (textStrBuilder.charAt(charsToDisplay) == '[') {
+		textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
+		++charsToDisplay;
+		if (charsToDisplay >= textStrBuilder.length) {
+		    textLabel.invalidateHierarchy();
+		    return;
+		}
+
+		while (textStrBuilder.charAt(charsToDisplay) != ']') {
+		    textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
+		    ++charsToDisplay;
+		    if (charsToDisplay >= textStrBuilder.length) {
+			textLabel.invalidateHierarchy();
+			return;
+		    }
+		}
+
+		textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
+		++charsToDisplay;
+		if (charsToDisplay >= textStrBuilder.length) {
+		    textLabel.invalidateHierarchy();
+		    return;
+		}
+	    }
+
+	    textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
+	    textLabel.invalidateHierarchy();
+	}
+    }
+
+    public void updateContent(String title, String entityImgID, String text) {
 	titleLabel.setText(title);
 	this.entityImg.setDrawable(getSkin(), entityImgID);
-	textLabel.setText(text);
+
+	charsToDisplay = -1;
+	timeForNextChar = 0;
+	textStrBuilder.setLength(0);
+	textStrBuilder.append(text);
+	textLabel.setText("");
 
 	getButtonTable().clearChildren();
 	currentSelection = 0;

@@ -90,13 +90,13 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	    case RIGHT:
 	    case UP:
 		if (!conversationInProgress) {
-		    if (EntityID.ELDER.equals(currentSelection)) {
+		    if (EntityID.ELDER.equals(currentSelection) && entityMap.containsKey(EntityID.PORTAL.ordinal())) {
 			currentSelection = EntityID.PORTAL;
-		    } else if (EntityID.BLACKSMITH.equals(currentSelection)) {
+		    } else if (EntityID.BLACKSMITH.equals(currentSelection) && entityMap.containsKey(EntityID.ELDER.ordinal())) {
 			currentSelection = EntityID.ELDER;
-		    } else if (EntityID.SHAMAN.equals(currentSelection)) {
+		    } else if (EntityID.SHAMAN.equals(currentSelection) && entityMap.containsKey(EntityID.BLACKSMITH.ordinal())) {
 			currentSelection = EntityID.BLACKSMITH;
-		    } else if (EntityID.PORTAL.equals(currentSelection)) {
+		    } else if (EntityID.PORTAL.equals(currentSelection) && entityMap.containsKey(EntityID.SHAMAN.ordinal())) {
 			currentSelection = EntityID.SHAMAN;
 		    }
 		    townUI.selectLocation(currentSelection);
@@ -107,13 +107,13 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	    case LEFT:
 	    case DOWN:
 		if (!conversationInProgress) {
-		    if (EntityID.ELDER.equals(currentSelection)) {
+		    if (EntityID.ELDER.equals(currentSelection) && entityMap.containsKey(EntityID.BLACKSMITH.ordinal())) {
 			currentSelection = EntityID.BLACKSMITH;
-		    } else if (EntityID.BLACKSMITH.equals(currentSelection)) {
+		    } else if (EntityID.BLACKSMITH.equals(currentSelection) && entityMap.containsKey(EntityID.SHAMAN.ordinal())) {
 			currentSelection = EntityID.SHAMAN;
-		    } else if (EntityID.SHAMAN.equals(currentSelection)) {
+		    } else if (EntityID.SHAMAN.equals(currentSelection) && entityMap.containsKey(EntityID.PORTAL.ordinal())) {
 			currentSelection = EntityID.PORTAL;
-		    } else if (EntityID.PORTAL.equals(currentSelection)) {
+		    } else if (EntityID.PORTAL.equals(currentSelection) && entityMap.containsKey(EntityID.ELDER.ordinal())) {
 			currentSelection = EntityID.ELDER;
 		    }
 		    townUI.selectLocation(currentSelection);
