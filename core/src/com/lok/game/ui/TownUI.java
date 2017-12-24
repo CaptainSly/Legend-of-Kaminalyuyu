@@ -210,6 +210,8 @@ public class TownUI extends InputAdapter implements EventListener {
     }
 
     public void show() {
+	touchpad.uncheckAll();
+	btn_Select.setChecked(false);
 	Gdx.input.setInputProcessor(inputMultiplexer);
     }
 

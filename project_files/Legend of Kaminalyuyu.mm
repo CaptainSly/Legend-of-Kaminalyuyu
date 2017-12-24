@@ -264,7 +264,19 @@
 <node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1513525891086" ID="ID_362825105" MODIFIED="1513525901724" TEXT="make text appear letter by letter in dialog">
+<node COLOR="#990000" CREATED="1513709951003" ID="ID_1837400115" MODIFIED="1513709954261" TEXT="add spell component">
+<font NAME="SansSerif" SIZE="14"/>
+</node>
+<node COLOR="#990000" CREATED="1513709955628" ID="ID_1891171421" MODIFIED="1513709962437" TEXT="add cast system for townportal with channeling bar">
+<font NAME="SansSerif" SIZE="14"/>
+</node>
+<node COLOR="#990000" CREATED="1513709963494" ID="ID_263642998" MODIFIED="1513709974324" TEXT="add some graphical effect to the townportal">
+<font NAME="SansSerif" SIZE="14"/>
+</node>
+<node COLOR="#990000" CREATED="1513709977342" ID="ID_632509596" MODIFIED="1513709983069" TEXT="profile manager">
+<font NAME="SansSerif" SIZE="14"/>
+</node>
+<node COLOR="#990000" CREATED="1513709984579" ID="ID_920320975" MODIFIED="1513709986842" TEXT="sound manager">
 <font NAME="SansSerif" SIZE="14"/>
 </node>
 </node>

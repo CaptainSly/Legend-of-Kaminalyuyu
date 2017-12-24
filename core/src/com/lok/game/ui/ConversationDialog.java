@@ -26,7 +26,6 @@ public class ConversationDialog extends Dialog {
 
     private final Table		 rightContent;
     private float		 timeForNextChar;
-    private int			 charsToDisplay;
     private StringBuilder	 textStrBuilder;
     private final Label		 textLabel;
 
@@ -46,7 +45,6 @@ public class ConversationDialog extends Dialog {
 	textLabel = new Label("", skin.get("normal", LabelStyle.class));
 	textLabel.setAlignment(Align.topLeft, Align.left);
 	textLabel.getStyle().font.getData().markupEnabled = true;
-	this.charsToDisplay = -1;
 	this.timeForNextChar = 0;
 	this.textStrBuilder = new StringBuilder();
 
@@ -65,43 +63,30 @@ public class ConversationDialog extends Dialog {
     }
 
     public void update(float deltaTime) {
-	if (charsToDisplay >= textStrBuilder.length) {
+	if (textStrBuilder.length == textLabel.getText().length) {
 	    return;
 	}
 
 	timeForNextChar += deltaTime;
 	if (timeForNextChar >= 0.05) {
 	    timeForNextChar = 0;
-	    ++charsToDisplay;
-	    if (charsToDisplay >= textStrBuilder.length) {
-		return;
-	    }
-	    if (textStrBuilder.charAt(charsToDisplay) == '[') {
-		textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
-		++charsToDisplay;
-		if (charsToDisplay >= textStrBuilder.length) {
-		    textLabel.invalidateHierarchy();
-		    return;
-		}
+	    char charToAdd = textStrBuilder.charAt(textLabel.getText().length);
+	    textLabel.getText().append(charToAdd);
 
-		while (textStrBuilder.charAt(charsToDisplay) != ']') {
-		    textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
-		    ++charsToDisplay;
-		    if (charsToDisplay >= textStrBuilder.length) {
-			textLabel.invalidateHierarchy();
-			return;
+	    if (charToAdd == '[') {
+		// parse markup color
+		while (textStrBuilder.length != textLabel.getText().length) {
+		    charToAdd = textStrBuilder.charAt(textLabel.getText().length);
+		    textLabel.getText().append(charToAdd);
+		    if (charToAdd == ']') {
+			if (textStrBuilder.length != textLabel.getText().length) {
+			    textLabel.getText().append(textStrBuilder.charAt(textLabel.getText().length));
+			}
+			break;
 		    }
 		}
-
-		textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
-		++charsToDisplay;
-		if (charsToDisplay >= textStrBuilder.length) {
-		    textLabel.invalidateHierarchy();
-		    return;
-		}
 	    }
 
-	    textLabel.getText().append(textStrBuilder.charAt(charsToDisplay));
 	    textLabel.invalidateHierarchy();
 	}
     }
@@ -110,7 +95,6 @@ public class ConversationDialog extends Dialog {
 	titleLabel.setText(title);
 	this.entityImg.setDrawable(getSkin(), entityImgID);
 
-	charsToDisplay = -1;
 	timeForNextChar = 0;
 	textStrBuilder.setLength(0);
 	textStrBuilder.append(text);
