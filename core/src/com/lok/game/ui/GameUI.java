@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.AssetManager;
 import com.lok.game.Utils;
+import com.lok.game.ability.Ability.AbilityID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 
@@ -40,6 +41,7 @@ public class GameUI extends InputAdapter implements EventListener {
 
 	btn_townPortal = new Button(skin, "back-to-town");
 	btn_townPortal.setPosition(1280 - 15 - btn_townPortal.getWidth(), 15);
+	btn_townPortal.setUserObject(AbilityID.TOWNPORTAL);
 	btn_townPortal.addListener(this);
 	stage.addActor(btn_townPortal);
 
@@ -89,18 +91,25 @@ public class GameUI extends InputAdapter implements EventListener {
 	switch (keycode) {
 	    case Keys.UP:
 		touchpad.setChecked(TouchpadDirection.UP, true);
+		btn_townPortal.setChecked(false);
 		return true;
 	    case Keys.DOWN:
 		touchpad.setChecked(TouchpadDirection.DOWN, true);
+		btn_townPortal.setChecked(false);
 		return true;
 	    case Keys.LEFT:
 		touchpad.setChecked(TouchpadDirection.LEFT, true);
+		btn_townPortal.setChecked(false);
 		return true;
 	    case Keys.RIGHT:
 		touchpad.setChecked(TouchpadDirection.RIGHT, true);
+		btn_townPortal.setChecked(false);
 		return true;
-	    case Keys.T:
-		btn_townPortal.setChecked(true);
+	    case Keys.ENTER:
+		if (touchpad.getCurrentDirection() == null) {
+		    // only cast when there is no movement
+		    btn_townPortal.setChecked(true);
+		}
 		return true;
 	    default:
 		return false;
@@ -134,7 +143,7 @@ public class GameUI extends InputAdapter implements EventListener {
 	    case Keys.RIGHT:
 		touchpad.setChecked(TouchpadDirection.RIGHT, false);
 		return true;
-	    case Keys.T:
+	    case Keys.ENTER:
 		btn_townPortal.setChecked(false);
 		return true;
 	    default:

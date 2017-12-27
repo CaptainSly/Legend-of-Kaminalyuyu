@@ -19,10 +19,11 @@ import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.Utils;
-import com.lok.game.ability.Ability;
+import com.lok.game.ability.Ability.AbilityID;
+import com.lok.game.ability.AbilityEffectSystem;
 import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.components.AIWanderComponent;
-import com.lok.game.ecs.components.AbilityComponent;
+import com.lok.game.ecs.components.CastComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.ConversationComponent;
@@ -31,7 +32,7 @@ import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.AIWanderSystem;
-import com.lok.game.ecs.systems.AbilitySystem;
+import com.lok.game.ecs.systems.CastSystem;
 import com.lok.game.ecs.systems.AnimationSystem;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.MapRevelationSystem;
@@ -50,16 +51,16 @@ public class EntityEngine {
     }
 
     private static class EntityConfiguration {
-	private EntityID       entityID;
-	private AnimationID    animationID;
-	private float	       speed;
-	private float	       revelationRadius;
-	private Vector2	       size;
-	private Rectangle      collisionRectangle;
-	private Array<String>  additionalComponents;
-	private ConversationID conversationID;
-	private String	       conversationImage;
-	private Array<String>  abilities;
+	private EntityID	 entityID;
+	private AnimationID	 animationID;
+	private float		 speed;
+	private float		 revelationRadius;
+	private Vector2		 size;
+	private Rectangle	 collisionRectangle;
+	private Array<String>	 additionalComponents;
+	private ConversationID	 conversationID;
+	private String		 conversationImage;
+	private Array<AbilityID> abilities;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();
@@ -67,6 +68,7 @@ public class EntityEngine {
 
     private final PooledEngine	       engine;
     private Array<EntityConfiguration> entityConfigurationCache;
+    private final AbilityEffectSystem  abilityEffectSystem;
 
     private EntityEngine() {
 	entityConfigurationCache = null;
@@ -79,12 +81,13 @@ public class EntityEngine {
 	final ComponentMapper<MapRevelationComponent> mapRevelationComponentMapper = ComponentMapper.getFor(MapRevelationComponent.class);
 	final ComponentMapper<CollisionComponent> collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
-	final ComponentMapper<AbilityComponent> abilityComponentMapper = ComponentMapper.getFor(AbilityComponent.class);
+	final ComponentMapper<CastComponent> abilityComponentMapper = ComponentMapper.getFor(CastComponent.class);
 
 	engine.addSystem(new MovementSystem(speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
 	engine.addSystem(new CollisionSystem(idComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
-	engine.addSystem(new AbilitySystem(abilityComponentMapper));
+	this.abilityEffectSystem = new AbilityEffectSystem(abilityComponentMapper);
+	engine.addSystem(new CastSystem(abilityComponentMapper, abilityEffectSystem));
 	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
 	engine.addSystem(new AIWanderSystem(aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
@@ -159,6 +162,7 @@ public class EntityEngine {
     }
 
     public void update(float deltaTime) {
+	abilityEffectSystem.update(deltaTime);
 	engine.update(deltaTime);
     }
 
@@ -273,29 +277,24 @@ public class EntityEngine {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     private void createAbilityComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
 	if (entityConfig.abilities != null) {
-	    final AbilityComponent abilityComponent = engine.createComponent(AbilityComponent.class);
-	    for (String ability : entityConfig.abilities) {
-		try {
-		    abilityComponent.abilities.add((Ability) ClassReflection.forName(ability).getConstructor(Entity.class).newInstance(entity));
-		} catch (Exception e) {
-		    throw new GdxRuntimeException("Could not create ability " + ability + " for entity " + entity.getComponent(IDComponent.class).entityID, e);
-		}
+	    final CastComponent abilityComponent = engine.createComponent(CastComponent.class);
+	    for (AbilityID ability : entityConfig.abilities) {
+		abilityComponent.abilities.add(ability);
 	    }
 	    entity.add(abilityComponent);
 	}
     }
 
+    @SuppressWarnings("unchecked")
     private void createAdditionalComponentsIfNeeded(EntityConfiguration entityConfig, Entity entity) {
 	if (entityConfig.additionalComponents != null) {
 	    for (String additionalComponent : entityConfig.additionalComponents) {
 		try {
-		    entity.add((Component) ClassReflection.forName(additionalComponent).newInstance());
+		    entity.add(engine.createComponent(ClassReflection.forName(additionalComponent)));
 		} catch (Exception e) {
-		    throw new GdxRuntimeException("Could not create additional component " + additionalComponent + " for entity " + entity.getComponent(IDComponent.class).entityID,
-			    e);
+		    throw new GdxRuntimeException("Could not create component " + additionalComponent + " for entity " + entity.getComponent(IDComponent.class).entityID, e);
 		}
 	    }
 	}

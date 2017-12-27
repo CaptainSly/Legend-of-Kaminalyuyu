@@ -1,14 +1,9 @@
 package com.lok.game.ability;
 
-import com.badlogic.ashley.core.Entity;
 import com.lok.game.screen.ScreenManager;
 import com.lok.game.screen.TownScreen;
 
 public class TownPortal extends Ability {
-
-    public TownPortal(Entity owner) {
-	super(owner);
-    }
 
     @Override
     public TargetType getTargetType() {
@@ -16,24 +11,25 @@ public class TownPortal extends Ability {
     }
 
     @Override
-    public float getMaxChannelTime() {
+    public float getEffectDelayTime() {
 	return 2.5f;
     }
 
     @Override
     public void startCast() {
-	// TODO Auto-generated method stub
+	// TODO create effect
 
     }
 
     @Override
-    public void doEffect() {
+    public boolean onEffect() {
 	ScreenManager.getManager().setScreen(TownScreen.class);
+	return true;
     }
 
     @Override
     public void stopCast() {
-	channelTime = 0;
+	// TODO remove effect
     }
 
 }

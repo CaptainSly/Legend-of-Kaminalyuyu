@@ -4,11 +4,12 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.lok.game.ability.Ability;
+import com.lok.game.ability.Ability.AbilityID;
 
-public class AbilityComponent implements Component, Poolable {
-    public final Array<Ability>	abilities	      = new Array<Ability>();
-    public Ability		abilityToCast	      = null;
-    public Ability		currentCastingAbility = null;
+public class CastComponent implements Component, Poolable {
+    public final Array<AbilityID> abilities		= new Array<AbilityID>();
+    public AbilityID		  abilityToCast		= null;
+    public Ability		  currentCastingAbility	= null;
 
     @Override
     public void reset() {
