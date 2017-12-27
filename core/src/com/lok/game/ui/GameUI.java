@@ -24,6 +24,7 @@ public class GameUI extends InputAdapter implements EventListener {
 
     private final Touchpad		 touchpad;
     private final Button		 btn_townPortal;
+    private final Bar			 abilityChannelBar;
 
     private final Array<UIEventListener> uiEventListeners;
 
@@ -41,6 +42,11 @@ public class GameUI extends InputAdapter implements EventListener {
 	btn_townPortal.setPosition(1280 - 15 - btn_townPortal.getWidth(), 15);
 	btn_townPortal.addListener(this);
 	stage.addActor(btn_townPortal);
+
+	abilityChannelBar = new Bar(skin, "", 300, false);
+	abilityChannelBar.setPosition(500, 20);
+	abilityChannelBar.setVisible(false);
+	stage.addActor(abilityChannelBar);
 
 	this.inputMultiplexer = new InputMultiplexer(this, stage);
     }
@@ -68,6 +74,7 @@ public class GameUI extends InputAdapter implements EventListener {
     }
 
     public void hide() {
+	btn_townPortal.setChecked(false);
 	Gdx.input.setInputProcessor(null);
     }
 
@@ -98,6 +105,18 @@ public class GameUI extends InputAdapter implements EventListener {
 	    default:
 		return false;
 	}
+    }
+
+    public void showAbilityChannelBar(String text, float channelTime) {
+	abilityChannelBar.setValue(0, 0);
+	abilityChannelBar.setValue(1, channelTime);
+	abilityChannelBar.setText(text);
+	abilityChannelBar.setVisible(true);
+    }
+
+    public void hideAbilityChannelBar() {
+	abilityChannelBar.setVisible(false);
+	abilityChannelBar.setValue(0, 0);
     }
 
     @Override
@@ -164,7 +183,6 @@ public class GameUI extends InputAdapter implements EventListener {
 	}
 
 	if (btn_townPortal.equals(event.getTarget())) {
-	    // townportal
 	    if (btn_townPortal.isChecked() || btn_townPortal.isPressed()) {
 		for (UIEventListener listener : uiEventListeners) {
 		    listener.onUIEvent(btn_townPortal, UIEvent.CAST);

@@ -6,7 +6,7 @@ filter: Nearest,Nearest
 repeat: none
 btn
   rotate: false
-  xy: 832, 11
+  xy: 825, 2
   size: 36, 36
   split: 12, 12, 12, 12
   pad: 0, 0, 0, 0
@@ -15,105 +15,105 @@ btn
   index: -1
 btn_back_to_town
   rotate: false
-  xy: 467, 18
+  xy: 681, 18
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_back_to_town_pressed
   rotate: false
-  xy: 832, 47
+  xy: 729, 18
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_move_down
   rotate: false
-  xy: 832, 156
+  xy: 391, 28
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_down_pressed
   rotate: false
-  xy: 771, 4
+  xy: 452, 28
   size: 61, 75
   orig: 61, 75
   offset: 0, 0
   index: -1
 btn_move_left
   rotate: false
-  xy: 391, 5
+  xy: 926, 195
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_left_pressed
   rotate: false
-  xy: 0, 10
+  xy: 926, 134
   size: 76, 61
   orig: 76, 61
   offset: 0, 0
   index: -1
 btn_move_right
   rotate: false
-  xy: 76, 10
+  xy: 241, 42
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_right_pressed
   rotate: false
-  xy: 832, 95
+  xy: 316, 42
   size: 75, 61
   orig: 75, 61
   offset: 0, 0
   index: -1
 btn_move_up
   rotate: false
-  xy: 771, 155
+  xy: 180, 42
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_move_up_pressed
   rotate: false
-  xy: 771, 79
+  xy: 926, 58
   size: 61, 76
   orig: 61, 76
   offset: 0, 0
   index: -1
 btn_music_off
   rotate: false
-  xy: 180, 70
+  xy: 777, 18
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_music_on
   rotate: false
-  xy: 880, 47
+  xy: 825, 38
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pause
   rotate: false
-  xy: 900, 208
+  xy: 873, 38
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_play
   rotate: false
-  xy: 948, 208
+  xy: 921, 10
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 btn_pressed
   rotate: false
-  xy: 868, 11
+  xy: 861, 2
   size: 36, 36
   split: 12, 12, 12, 12
   pad: 0, 0, 0, 0
@@ -138,49 +138,72 @@ dialog
   index: -1
 img_blacksmith
   rotate: false
-  xy: 391, 66
+  xy: 691, 66
   size: 125, 190
   orig: 125, 190
   offset: 0, 0
   index: -1
 img_elder
   rotate: false
-  xy: 246, 128
+  xy: 246, 103
   size: 145, 128
   orig: 145, 128
   offset: 0, 0
   index: -1
 img_missing
   rotate: false
-  xy: 246, 0
+  xy: 391, 103
   size: 145, 128
   orig: 145, 128
   offset: 0, 0
   index: -1
 img_player
   rotate: false
-  xy: 626, 128
+  xy: 546, 128
   size: 145, 128
   orig: 145, 128
   offset: 0, 0
   index: -1
 img_portal
   rotate: false
-  xy: 626, 0
+  xy: 536, 0
   size: 145, 128
   orig: 145, 128
   offset: 0, 0
   index: -1
 img_shaman
   rotate: false
-  xy: 516, 86
+  xy: 816, 86
   size: 110, 170
   orig: 110, 170
   offset: 0, 0
   index: -1
+progressbar_frame
+  rotate: false
+  xy: 0, 34
+  size: 180, 37
+  split: 27, 27, 16, 16
+  pad: 0, 0, 0, 0
+  orig: 180, 37
+  offset: 0, 0
+  index: -1
+progressbar_knob
+  rotate: false
+  xy: 536, 206
+  size: 1, 25
+  orig: 1, 25
+  offset: 0, 0
+  index: -1
+progressbar_progress
+  rotate: false
+  xy: 246, 231
+  size: 300, 25
+  orig: 300, 25
+  offset: 0, 0
+  index: -1
 selection_sphere
   rotate: false
-  xy: 771, 231
+  xy: 0, 9
   size: 129, 25
   orig: 129, 25
   offset: 0, 0

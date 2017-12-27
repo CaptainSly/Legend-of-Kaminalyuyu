@@ -1,4 +1,4 @@
-package com.lok.game.screens;
+package com.lok.game.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;

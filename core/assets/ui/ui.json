@@ -1,6 +1,7 @@
 {
   com.badlogic.gdx.graphics.g2d.BitmapFont : {
   	"default" : { "file" : "ui/ferrum_32.fnt" },
+    "small" : { "file" : "ui/ferrum_20.fnt" },
     "title" : { "file" : "ui/ferrum_blue_outline_48.fnt" }
   },
 
@@ -23,7 +24,8 @@
 
   com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle : {
     "default" : { "font" : "default", "fontColor" : "white", "up" : "btn", "down" : "btn_pressed", "checked" : "btn_pressed" },
-    "dialog-btn" : { "font" : "default", "fontColor" : "white" }
+    "dialog-btn" : { "font" : "default", "fontColor" : "white" },
+    "progressBar" : { "font" : "small", "fontColor" : "white" }
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle : {
@@ -33,7 +35,7 @@
   com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle : {
     "dialog-title" : { "font" : "title", "fontColor" : "goldenrod" },
     "townlocation" : { "font" : "title", "fontColor" : "white" },
-    "normal" : { "font" : "default", "fontColor" : "white" }
+    "normal" : { "font" : "default", "fontColor" : "white" },
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle : {
@@ -41,6 +43,11 @@
   },
 
   com.badlogic.gdx.scenes.scene2d.ui.Image : {
-    "missing" : { "drawable" : "img_missing" }
+    "missing" : { "drawable" : "img_missing" },
+    "progressbar_frame" : { "drawable" : "progressbar_frame" }
+  },
+
+  com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle : {
+    "default" : { "knob" : "progressbar_knob", "knobBefore" : "progressbar_progress" }
   }
 }

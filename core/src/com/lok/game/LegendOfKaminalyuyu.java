@@ -4,8 +4,8 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.lok.game.map.MapManager;
-import com.lok.game.screens.ScreenManager;
-import com.lok.game.screens.TownScreen;
+import com.lok.game.screen.ScreenManager;
+import com.lok.game.screen.TownScreen;
 
 public class LegendOfKaminalyuyu extends Game {
     @Override

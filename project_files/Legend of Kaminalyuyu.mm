@@ -266,9 +266,13 @@
 <font NAME="SansSerif" SIZE="16"/>
 <node COLOR="#990000" CREATED="1513709951003" ID="ID_1837400115" MODIFIED="1513709954261" TEXT="add spell component">
 <font NAME="SansSerif" SIZE="14"/>
+<node COLOR="#111111" CREATED="1514113448194" ID="ID_426049069" MODIFIED="1514113457798" TEXT="abilities = Array&lt;AbilityID&gt;"/>
+<node COLOR="#111111" CREATED="1514113463549" ID="ID_379432073" MODIFIED="1514113471388" TEXT="AbilitySystem">
+<node COLOR="#111111" CREATED="1514113472886" ID="ID_1519887037" MODIFIED="1514113489996" TEXT="contains Pool&lt;Ability&gt; currentInstances"/>
+<node COLOR="#111111" CREATED="1514113491845" ID="ID_351818071" MODIFIED="1514113497151" TEXT="instances are updated every frame"/>
+<node COLOR="#111111" CREATED="1514113498534" ID="ID_1109321459" MODIFIED="1514113517232" TEXT="ability has a isCompleted() function which will remove it from the currentInstances array"/>
+<node COLOR="#111111" CREATED="1514113522207" ID="ID_1896541194" MODIFIED="1514113530756" TEXT="doEffect will create a new AbilityInstance"/>
 </node>
-<node COLOR="#990000" CREATED="1513709955628" ID="ID_1891171421" MODIFIED="1513709962437" TEXT="add cast system for townportal with channeling bar">
-<font NAME="SansSerif" SIZE="14"/>
 </node>
 <node COLOR="#990000" CREATED="1513709963494" ID="ID_263642998" MODIFIED="1513709974324" TEXT="add some graphical effect to the townportal">
 <font NAME="SansSerif" SIZE="14"/>

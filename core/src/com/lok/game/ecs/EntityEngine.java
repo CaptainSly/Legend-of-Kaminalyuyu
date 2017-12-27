@@ -19,8 +19,10 @@ import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.Utils;
+import com.lok.game.ability.Ability;
 import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.components.AIWanderComponent;
+import com.lok.game.ecs.components.AbilityComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.ConversationComponent;
@@ -29,6 +31,7 @@ import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.AIWanderSystem;
+import com.lok.game.ecs.systems.AbilitySystem;
 import com.lok.game.ecs.systems.AnimationSystem;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.MapRevelationSystem;
@@ -56,6 +59,7 @@ public class EntityEngine {
 	private Array<String>  additionalComponents;
 	private ConversationID conversationID;
 	private String	       conversationImage;
+	private Array<String>  abilities;
     }
 
     private static final String	       TAG	= EntityEngine.class.getName();
@@ -75,10 +79,12 @@ public class EntityEngine {
 	final ComponentMapper<MapRevelationComponent> mapRevelationComponentMapper = ComponentMapper.getFor(MapRevelationComponent.class);
 	final ComponentMapper<CollisionComponent> collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
+	final ComponentMapper<AbilityComponent> abilityComponentMapper = ComponentMapper.getFor(AbilityComponent.class);
 
 	engine.addSystem(new MovementSystem(speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
 	engine.addSystem(new CollisionSystem(idComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
+	engine.addSystem(new AbilitySystem(abilityComponentMapper));
 	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
 	engine.addSystem(new AIWanderSystem(aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
@@ -190,6 +196,20 @@ public class EntityEngine {
 	idComponent.entityID = entityID;
 	entity.add(idComponent);
 
+	createSizeComponentIfNeeded(entityConfig, entity, x, y);
+	createSpeedComponentIfNeeded(entityConfig, entity);
+	createAnimationComponentIfNeeded(entityConfig, entity);
+	createMapRevelationComponentIfNeeded(entityConfig, entity);
+	createCollisionComponentIfNeeded(entityConfig, entity, x, y);
+	createConversationComponentIfNeeded(entityConfig, entity);
+	createAbilityComponentIfNeeded(entityConfig, entity);
+	createAdditionalComponentsIfNeeded(entityConfig, entity);
+
+	engine.addEntity(entity);
+	return entity;
+    }
+
+    private void createSizeComponentIfNeeded(EntityConfiguration entityConfig, Entity entity, float x, float y) {
 	if (entityConfig.size != null) {
 	    final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
 	    if (entityConfig.size != null) {
@@ -200,29 +220,9 @@ public class EntityEngine {
 	    sizeComponent.interpolatedPosition.set(x, y);
 	    entity.add(sizeComponent);
 	}
+    }
 
-	if (entityConfig.speed != 0) {
-	    final SpeedComponent speedComponent = engine.createComponent(SpeedComponent.class);
-	    speedComponent.maxSpeed = entityConfig.speed;
-	    entity.add(speedComponent);
-	}
-
-	if (entityConfig.animationID != null) {
-	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
-	    animationComponent.animationID = entityConfig.animationID;
-	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
-	    entity.add(animationComponent);
-	}
-
-	if (entityConfig.revelationRadius > 0) {
-	    final MapRevelationComponent mapRevelationComponent = engine.createComponent(MapRevelationComponent.class);
-	    mapRevelationComponent.revelationRadius = entityConfig.revelationRadius;
-	    mapRevelationComponent.minRevelationRadius = entityConfig.revelationRadius - 0.25f;
-	    mapRevelationComponent.maxRevelationRadius = entityConfig.revelationRadius + 0.25f;
-	    mapRevelationComponent.incPerFrame = 2f;
-	    entity.add(mapRevelationComponent);
-	}
-
+    private void createCollisionComponentIfNeeded(EntityConfiguration entityConfig, Entity entity, float x, float y) {
 	if (entityConfig.collisionRectangle != null) {
 	    final CollisionComponent collisionComponent = engine.createComponent(CollisionComponent.class);
 	    collisionComponent.rectOffset.set(entityConfig.collisionRectangle.x * MapManager.WORLD_UNITS_PER_PIXEL,
@@ -234,26 +234,71 @@ public class EntityEngine {
 
 	    entity.add(collisionComponent);
 	}
+    }
 
+    private void createSpeedComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
+	if (entityConfig.speed != 0) {
+	    final SpeedComponent speedComponent = engine.createComponent(SpeedComponent.class);
+	    speedComponent.maxSpeed = entityConfig.speed;
+	    entity.add(speedComponent);
+	}
+    }
+
+    private void createAnimationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
+	if (entityConfig.animationID != null) {
+	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
+	    animationComponent.animationID = entityConfig.animationID;
+	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
+	    entity.add(animationComponent);
+	}
+    }
+
+    private void createMapRevelationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
+	if (entityConfig.revelationRadius > 0) {
+	    final MapRevelationComponent mapRevelationComponent = engine.createComponent(MapRevelationComponent.class);
+	    mapRevelationComponent.revelationRadius = entityConfig.revelationRadius;
+	    mapRevelationComponent.minRevelationRadius = entityConfig.revelationRadius - 0.25f;
+	    mapRevelationComponent.maxRevelationRadius = entityConfig.revelationRadius + 0.25f;
+	    mapRevelationComponent.incPerFrame = 2f;
+	    entity.add(mapRevelationComponent);
+	}
+    }
+
+    private void createConversationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
 	if (entityConfig.conversationImage != null || entityConfig.conversationID != null) {
 	    final ConversationComponent convComponent = engine.createComponent(ConversationComponent.class);
 	    convComponent.currentConversationID = entityConfig.conversationID;
 	    convComponent.conversationImage = entityConfig.conversationImage;
 	    entity.add(convComponent);
 	}
+    }
 
+    @SuppressWarnings("unchecked")
+    private void createAbilityComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
+	if (entityConfig.abilities != null) {
+	    final AbilityComponent abilityComponent = engine.createComponent(AbilityComponent.class);
+	    for (String ability : entityConfig.abilities) {
+		try {
+		    abilityComponent.abilities.add((Ability) ClassReflection.forName(ability).getConstructor(Entity.class).newInstance(entity));
+		} catch (Exception e) {
+		    throw new GdxRuntimeException("Could not create ability " + ability + " for entity " + entity.getComponent(IDComponent.class).entityID, e);
+		}
+	    }
+	    entity.add(abilityComponent);
+	}
+    }
+
+    private void createAdditionalComponentsIfNeeded(EntityConfiguration entityConfig, Entity entity) {
 	if (entityConfig.additionalComponents != null) {
 	    for (String additionalComponent : entityConfig.additionalComponents) {
 		try {
 		    entity.add((Component) ClassReflection.forName(additionalComponent).newInstance());
 		} catch (Exception e) {
-		    throw new GdxRuntimeException("Could not create additional component for entity " + entityID, e);
+		    throw new GdxRuntimeException("Could not create additional component " + additionalComponent + " for entity " + entity.getComponent(IDComponent.class).entityID,
+			    e);
 		}
 	    }
 	}
-
-	engine.addEntity(entity);
-	return entity;
     }
 
     public void removeEntity(Entity entity) {
