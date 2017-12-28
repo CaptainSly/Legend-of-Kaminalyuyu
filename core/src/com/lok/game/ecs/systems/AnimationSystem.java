@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.lok.game.SpecialEffect;
 import com.lok.game.ecs.components.AnimationComponent;
 
 public class AnimationSystem extends IteratingSystem {
@@ -18,6 +19,10 @@ public class AnimationSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 	final AnimationComponent animationComponent = animationComponentMapper.get(entity);
+
+	for (SpecialEffect effect : animationComponent.originEffects) {
+	    effect.update(deltaTime);
+	}
 
 	if (!animationComponent.playAnimation) {
 	    return;

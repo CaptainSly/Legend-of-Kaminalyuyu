@@ -1,6 +1,7 @@
 {
   "entityID" : PLAYER,
   "animationID" : HERO,
+  "originPoint" : { "x" : 16, "y" : 7 },
   "speed" : 5,
   "revelationRadius" : 6,
   "size" : { "x" : 1, "y" : 1.5 },

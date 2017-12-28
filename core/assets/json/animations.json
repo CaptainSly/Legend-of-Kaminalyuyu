@@ -43,5 +43,16 @@
       { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
       { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
     ]
+  },
+  {
+    "animationID" : TOWNPORTAL,
+    "atlasName" : "effects/effects.atlas",
+    "atlasKey" : "townportal",
+    "numColumns" : 4,
+    "numRows" : 4,
+    "frameDuration" : 0.16,
+    "animations" : [
+      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 3 } }
+    ]
   }
 ]

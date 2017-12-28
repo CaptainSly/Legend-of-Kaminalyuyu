@@ -15,7 +15,8 @@ public class AnimationManager {
     public enum AnimationID {
 	HERO,
 	DEMON_01,
-	BOSS_01;
+	BOSS_01,
+	TOWNPORTAL;
 
 	private final int cacheIndex;
 
@@ -112,7 +113,7 @@ public class AnimationManager {
 		final Animation<TextureRegion> idleAnimation = animationCache.get(animationArrayStartIndex + AnimationType.IDLE.ordinal());
 		for (AnimationType animationType : AnimationType.values()) {
 		    final int animationArrayIndex = animationArrayStartIndex + animationType.ordinal();
-		    if (animationCache.get(animationArrayIndex) == null) {
+		    if (animationCache.size <= animationArrayIndex || animationCache.get(animationArrayIndex) == null) {
 			Gdx.app.debug(TAG, "Animation " + animationConfig.animationID + " of type " + animationType + " missing -> using IDLE animation");
 			animationCache.add(idleAnimation);
 		    }

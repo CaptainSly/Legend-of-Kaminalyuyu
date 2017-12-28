@@ -1,9 +1,41 @@
 package com.lok.game.ability;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.utils.Array;
+import com.lok.game.AnimationManager.AnimationID;
+import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.SpecialEffect;
+import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.screen.ScreenManager;
 import com.lok.game.screen.TownScreen;
 
 public class TownPortal extends Ability {
+    private SpecialEffect      effect;
+    private AnimationComponent animationComp;
+    private float	       origR, origG, origB;
+    private float	       lossPerFrameR, lossPerFrameG, lossPerFrameB;
+
+    @Override
+    public void initialize(Entity caster, AbilityID abilityID, Array<AbilityListener> abilityListeners) {
+	super.initialize(caster, abilityID, abilityListeners);
+	animationComp = caster.getComponent(AnimationComponent.class);
+	origR = animationComp.color.r;
+	origG = animationComp.color.g;
+	origB = animationComp.color.b;
+	lossPerFrameR = animationComp.color.r / 2.5f;
+	lossPerFrameG = animationComp.color.g / 2.5f;
+	lossPerFrameB = animationComp.color.b / 2.5f;
+    }
+
+    @Override
+    public void reset() {
+	super.reset();
+	effect = null;
+	animationComp = null;
+	origR = origG = origB = 0;
+	lossPerFrameR = lossPerFrameG = lossPerFrameB = 0;
+    }
 
     @Override
     public TargetType getTargetType() {
@@ -17,8 +49,17 @@ public class TownPortal extends Ability {
 
     @Override
     protected void onStartCast() {
-	// TODO create effect
+	effect = SpecialEffect.newSpecialEffect(AnimationID.TOWNPORTAL, AnimationType.IDLE, PlayMode.NORMAL);
+	effect.scaleBy(0.75f);
+	animationComp.originEffects.add(effect);
+    }
 
+    @Override
+    public void update(float deltaTime) {
+	super.update(deltaTime);
+	animationComp.color.r -= lossPerFrameR * deltaTime;
+	animationComp.color.g -= lossPerFrameG * deltaTime;
+	animationComp.color.b -= lossPerFrameB * deltaTime;
     }
 
     @Override
@@ -29,7 +70,9 @@ public class TownPortal extends Ability {
 
     @Override
     protected void onStopCast() {
-	// TODO remove effect
+	animationComp.color.set(origR, origG, origB, animationComp.color.a);
+	animationComp.originEffects.removeValue(effect, false);
+	SpecialEffect.removeSpecialEffect(effect);
     }
 
 }

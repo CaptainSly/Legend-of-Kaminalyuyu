@@ -53,6 +53,7 @@ public class EntityEngine {
     private static class EntityConfiguration {
 	private EntityID	 entityID;
 	private AnimationID	 animationID;
+	private Vector2		 originPoint;
 	private float		 speed;
 	private float		 revelationRadius;
 	private Vector2		 size;
@@ -260,6 +261,9 @@ public class EntityEngine {
 	if (entityConfig.animationID != null) {
 	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
 	    animationComponent.animationID = entityConfig.animationID;
+	    if (entityConfig.originPoint != null) {
+		animationComponent.originPoint.set(entityConfig.originPoint.x * MapManager.WORLD_UNITS_PER_PIXEL, entityConfig.originPoint.y * MapManager.WORLD_UNITS_PER_PIXEL);
+	    }
 	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
 	    entity.add(animationComponent);
 	}

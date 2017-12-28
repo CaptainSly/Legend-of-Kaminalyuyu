@@ -34,7 +34,7 @@ public abstract class Ability implements Poolable {
     }
 
     private AbilityID		   abilityID;
-    protected Entity		   owner;
+    protected Entity		   caster;
 
     private float		   channelTime;
 
@@ -49,8 +49,8 @@ public abstract class Ability implements Poolable {
 	reset();
     }
 
-    public void initialize(Entity owner, AbilityID abilityID, Array<AbilityListener> abilityListeners) {
-	this.owner = owner;
+    public void initialize(Entity caster, AbilityID abilityID, Array<AbilityListener> abilityListeners) {
+	this.caster = caster;
 	this.abilityID = abilityID;
 	this.abilityListeners = abilityListeners;
     }
@@ -58,7 +58,7 @@ public abstract class Ability implements Poolable {
     @Override
     public void reset() {
 	this.abilityID = null;
-	this.owner = null;
+	this.caster = null;
 	this.channelTime = 0;
 	this.targets = null;
 	this.completed = false;
@@ -104,7 +104,7 @@ public abstract class Ability implements Poolable {
     public void update(float deltaTime) {
 	this.channelTime += deltaTime;
 	for (AbilityListener listener : abilityListeners) {
-	    listener.onUpdateAbility(owner, this);
+	    listener.onUpdateAbility(caster, this);
 	}
     }
 
@@ -118,7 +118,7 @@ public abstract class Ability implements Poolable {
 
     public void startCast() {
 	for (AbilityListener listener : abilityListeners) {
-	    listener.onStartCast(owner, this);
+	    listener.onStartCast(caster, this);
 	}
 	onStartCast();
     }
@@ -138,7 +138,7 @@ public abstract class Ability implements Poolable {
 
     public void stopCast() {
 	for (AbilityListener listener : abilityListeners) {
-	    listener.onSopCast(owner, this);
+	    listener.onSopCast(caster, this);
 	}
 	onStopCast();
     }

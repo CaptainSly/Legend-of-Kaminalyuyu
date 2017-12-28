@@ -209,6 +209,9 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    renderTileLayer(layer);
 	}
 	for (Entity entity : map.getEntities()) {
+	    renderEntityEffects(entity);
+	}
+	for (Entity entity : map.getEntities()) {
 	    renderEntity(entity);
 	}
 	for (TiledMapTileLayer layer : foregroundLayers) {
@@ -243,6 +246,29 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	}
     }
 
+    private void renderEntityEffects(Entity entity) {
+	final AnimationComponent animationComp = animationComponentMapper.get(entity);
+
+	if (animationComp.animation != null && animationComp.originEffects.size > 0) {
+	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
+	    if (!viewBounds.overlaps(sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    if (cameraLockEntityRevelationComponent != null && !Intersector.overlaps(cameraLockEntityRevelationComponent.revelationCircle, sizeComp.boundingRectangle)) {
+		return;
+	    }
+
+	    final float x = sizeComp.interpolatedPosition.x + animationComp.originPoint.x;
+	    final float y = sizeComp.interpolatedPosition.y + animationComp.originPoint.y;
+	    for (SpecialEffect effect : animationComp.originEffects) {
+		final float width = effect.getWidth();
+		final float height = effect.getHeight();
+		batch.draw(effect.getCurrentKeyFrame(), x - width * 0.5f, y - height * 0.5f, width, height);
+	    }
+	}
+    }
+
     private void renderEntity(Entity entity) {
 	final AnimationComponent animationComp = animationComponentMapper.get(entity);
 
@@ -256,8 +282,11 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 		return;
 	    }
 
+	    final Color batchColor = batch.getColor();
+	    batch.setColor(animationComp.color);
 	    final TextureRegion keyFrame = animationComp.animation.getKeyFrame(animationComp.animationTime, true);
 	    batch.draw(keyFrame, sizeComp.interpolatedPosition.x, sizeComp.interpolatedPosition.y, sizeComp.boundingRectangle.width, sizeComp.boundingRectangle.height);
+	    batch.setColor(batchColor);
 	}
     }
 

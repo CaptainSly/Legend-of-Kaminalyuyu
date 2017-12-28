@@ -38,19 +38,18 @@ public class AbilitySystem {
 	while (iterator.hasNext()) {
 	    final Ability ability = iterator.next();
 	    if (ability.isCompleted() || ability.isInterrupted()) {
-		removeEffect(ability);
+		removeAbility(ability);
 		iterator.remove();
 	    } else if (ability.isEffectReady()) {
 		ability.doEffect();
-		// the next line triggers the stopCast event in the next update call of the CastingSystem
-		abilityComponentMapper.get(ability.owner).abilityToCast = null;
+		abilityComponentMapper.get(ability.caster).abilityToCast = null;
 	    } else {
 		ability.update(deltaTime);
 	    }
 	}
     }
 
-    public Ability newEffect(Entity caster, AbilityID abilityID) {
+    public Ability newAbility(Entity caster, AbilityID abilityID) {
 	Gdx.app.debug(TAG, "Creating new ability " + abilityID + " for entity " + caster.getComponent(IDComponent.class).entityID);
 	final Ability result = abilityPool.obtain(abilityID.getAbilityClass());
 
@@ -62,7 +61,7 @@ public class AbilitySystem {
 	return result;
     }
 
-    private void removeEffect(Ability ability) {
+    private void removeAbility(Ability ability) {
 	Gdx.app.debug(TAG, "Removing ability " + ability.getAbilityID());
 	abilityPool.free(ability);
     }

@@ -43,7 +43,7 @@ public class CastSystem extends IteratingSystem {
 
 	if (currentAbility == null) {
 	    // start casting a new ability
-	    currentAbility = abilitySystem.newEffect(entity, abilityComponent.abilityToCast);
+	    currentAbility = abilitySystem.newAbility(entity, abilityComponent.abilityToCast);
 	    abilityComponent.currentCastingAbility = currentAbility;
 	}
     }
