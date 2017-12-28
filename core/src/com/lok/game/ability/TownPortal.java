@@ -16,19 +16,19 @@ public class TownPortal extends Ability {
     }
 
     @Override
-    public void startCast() {
+    protected void onStartCast() {
 	// TODO create effect
 
     }
 
     @Override
-    public boolean onEffect() {
+    protected boolean onEffect() {
 	ScreenManager.getManager().setScreen(TownScreen.class);
 	return true;
     }
 
     @Override
-    public void stopCast() {
+    protected void onStopCast() {
 	// TODO remove effect
     }
 

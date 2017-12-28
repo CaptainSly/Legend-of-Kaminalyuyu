@@ -60,6 +60,12 @@ task buildUnitTextureAtlas(dependsOn: classes, type: JavaExec, description: "Reb
     args = ['../core/assets/units/input', '../core/assets/units', 'units.atlas']
 }
 
+task buildEffectsTextureAtlas(dependsOn: classes, type: JavaExec, description: "Rebuilds the effects texture atlas", group: "LegendOfKaminalyuyu") {
+    main = 'com.badlogic.gdx.tools.texturepacker.TexturePacker'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['../core/assets/effects/input', '../core/assets/effects', 'effects.atlas']
+}
+
 task buildTilesetTextureAtlas(dependsOn: classes, type: JavaExec, description: "Rebuilds the tilesets texture atlas", group: "LegendOfKaminalyuyu") {
     main = 'com.badlogic.gdx.tools.texturepacker.TexturePacker'
     classpath = sourceSets.main.runtimeClasspath
@@ -78,12 +84,3 @@ task buildUITextureAtlas(dependsOn: classes, type: JavaExec, description: "Rebui
     args = ['../core/assets/ui/input', '../core/assets/ui', 'ui.atlas']
 }
 
-task buildAllTextureAtlas(description: "Rebuilds all texture atlas", group: "LegendOfKaminalyuyu") {
-	dependsOn 'buildUnitTextureAtlas'
-	dependsOn 'buildTilesetTextureAtlas'
-	tasks.findByName('buildTilesetTextureAtlas').mustRunAfter 'buildUnitTextureAtlas'
-	dependsOn 'buildLightsTextureAtlas'
-	tasks.findByName('buildLightsTextureAtlas').mustRunAfter 'buildTilesetTextureAtlas'
-	dependsOn 'buildUITextureAtlas'
-	tasks.findByName('buildUITextureAtlas').mustRunAfter 'buildLightsTextureAtlas'
-}

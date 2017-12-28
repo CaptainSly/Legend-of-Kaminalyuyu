@@ -20,10 +20,10 @@ import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.Utils;
 import com.lok.game.ability.Ability.AbilityID;
-import com.lok.game.ability.AbilityEffectSystem;
+import com.lok.game.ability.AbilitySystem;
 import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.components.AIWanderComponent;
-import com.lok.game.ecs.components.CastComponent;
+import com.lok.game.ecs.components.AbilityComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.ConversationComponent;
@@ -32,8 +32,8 @@ import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.AIWanderSystem;
-import com.lok.game.ecs.systems.CastSystem;
 import com.lok.game.ecs.systems.AnimationSystem;
+import com.lok.game.ecs.systems.CastSystem;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.MapRevelationSystem;
 import com.lok.game.ecs.systems.MovementSystem;
@@ -68,7 +68,7 @@ public class EntityEngine {
 
     private final PooledEngine	       engine;
     private Array<EntityConfiguration> entityConfigurationCache;
-    private final AbilityEffectSystem  abilityEffectSystem;
+    private final AbilitySystem	       abilitySystem;
 
     private EntityEngine() {
 	entityConfigurationCache = null;
@@ -81,13 +81,13 @@ public class EntityEngine {
 	final ComponentMapper<MapRevelationComponent> mapRevelationComponentMapper = ComponentMapper.getFor(MapRevelationComponent.class);
 	final ComponentMapper<CollisionComponent> collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
 	final ComponentMapper<SizeComponent> sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
-	final ComponentMapper<CastComponent> abilityComponentMapper = ComponentMapper.getFor(CastComponent.class);
+	final ComponentMapper<AbilityComponent> abilityComponentMapper = ComponentMapper.getFor(AbilityComponent.class);
 
 	engine.addSystem(new MovementSystem(speedComponentMapper, collisionComponentMapper, sizeComponentMapper));
 	engine.addSystem(new CollisionSystem(idComponentMapper, collisionComponentMapper));
 	engine.addSystem(new AnimationSystem(animationComponentMapper));
-	this.abilityEffectSystem = new AbilityEffectSystem(abilityComponentMapper);
-	engine.addSystem(new CastSystem(abilityComponentMapper, abilityEffectSystem));
+	this.abilitySystem = new AbilitySystem(abilityComponentMapper);
+	engine.addSystem(new CastSystem(abilityComponentMapper, abilitySystem));
 	engine.addSystem(new MapRevelationSystem(sizeComponentMapper, mapRevelationComponentMapper));
 	engine.addSystem(new AIWanderSystem(aiWanderComponentMapper, speedComponentMapper, animationComponentMapper));
     }
@@ -162,7 +162,7 @@ public class EntityEngine {
     }
 
     public void update(float deltaTime) {
-	abilityEffectSystem.update(deltaTime);
+	abilitySystem.update(deltaTime);
 	engine.update(deltaTime);
     }
 
@@ -170,10 +170,18 @@ public class EntityEngine {
 	engine.addEntityListener(family, listener);
     }
 
+    public void removeEntityListener(EntityListener listener) {
+	engine.removeEntityListener(listener);
+    }
+
     public <T extends Component> T createComponent(Class<T> componentType) {
 	Gdx.app.debug(TAG, "Creating component " + componentType);
 
 	return engine.createComponent(componentType);
+    }
+
+    public AbilitySystem getAbilitySystem() {
+	return abilitySystem;
     }
 
     public <T extends EntitySystem> T getSystem(Class<T> systemType) {
@@ -279,7 +287,7 @@ public class EntityEngine {
 
     private void createAbilityComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
 	if (entityConfig.abilities != null) {
-	    final CastComponent abilityComponent = engine.createComponent(CastComponent.class);
+	    final AbilityComponent abilityComponent = engine.createComponent(AbilityComponent.class);
 	    for (AbilityID ability : entityConfig.abilities) {
 		abilityComponent.abilities.add(ability);
 	    }

@@ -10,16 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.GameRenderer;
+import com.lok.game.Utils;
 import com.lok.game.ability.Ability;
 import com.lok.game.ability.Ability.AbilityID;
+import com.lok.game.ability.Ability.AbilityListener;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ecs.components.AbilityComponent;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.ecs.components.CastComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SpeedComponent;
-import com.lok.game.ecs.systems.CastSystem;
-import com.lok.game.ecs.systems.CastSystem.CastListener;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.CollisionSystem.CollisionListener;
 import com.lok.game.map.Map;
@@ -30,7 +30,7 @@ import com.lok.game.map.MapManager.MapID;
 import com.lok.game.ui.GameUI;
 import com.lok.game.ui.UIEventListener;
 
-public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener, CastListener {
+public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener, AbilityListener {
     private float				      accumulator;
     private final float				      fixedPhysicsStep;
 
@@ -40,7 +40,7 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
     private final ComponentMapper<SpeedComponent>     speedComponentMapper;
     private final ComponentMapper<AnimationComponent> animationComponentMapper;
-    private final ComponentMapper<CastComponent>      abilityComponentMapper;
+    private final ComponentMapper<AbilityComponent>   abilityComponentMapper;
     private Entity				      player;
 
     public GameScreen() {
@@ -54,11 +54,11 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	this.player = null;
 	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
 	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
-	this.abilityComponentMapper = ComponentMapper.getFor(CastComponent.class);
+	this.abilityComponentMapper = ComponentMapper.getFor(AbilityComponent.class);
 
 	EntityEngine.getEngine().addEntityListener(Family.all(IDComponent.class).get(), this);
 	EntityEngine.getEngine().getSystem(CollisionSystem.class).addCollisionListener(this);
-	EntityEngine.getEngine().getSystem(CastSystem.class).addAbilityListener(this);
+	EntityEngine.getEngine().getAbilitySystem().addAbilityListener(this);
 	MapManager.getManager().addListener(this);
     }
 
@@ -119,7 +119,7 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
 	final SpeedComponent speedComponent = speedComponentMapper.get(player);
 	final AnimationComponent animationComponent = animationComponentMapper.get(player);
-	final CastComponent abilityComponent = abilityComponentMapper.get(player);
+	final AbilityComponent abilityComponent = abilityComponentMapper.get(player);
 	switch (event) {
 	    case DOWN:
 		abilityComponent.abilityToCast = null;
@@ -203,7 +203,12 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
     @Override
     public void onStartCast(Entity caster, Ability ability) {
-	gameUI.showAbilityChannelBar("Stadtportal", ability.getEffectDelayTime());
+	gameUI.showAbilityChannelBar(Utils.getLabel("Ability." + ability.getAbilityID().name() + ".name"), ability.getEffectDelayTime());
+    }
+
+    @Override
+    public void onUpdateAbility(Entity caster, Ability ability) {
+	gameUI.setAbilityChannelBarValue(ability.getChannelTime());
     }
 
     @Override

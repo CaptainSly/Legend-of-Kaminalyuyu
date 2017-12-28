@@ -13,10 +13,12 @@ public class Bar extends WidgetGroup {
 
     public Bar(Skin skin, String text, float width, boolean vertical) {
 	super();
-	progressBar = new ProgressBar(0, 1, 0.1f, vertical, skin, "default");
+	progressBar = new ProgressBar(0, 1, 0.001f, vertical, skin, "default");
 	progressBar.setRound(false);
 	progressBar.setPosition(6, 6);
 	progressBar.setWidth(width);
+	progressBar.setAnimateDuration(0);
+	reset(1);
 
 	frame = skin.get("progressbar_frame", Image.class);
 	frame.setSize(progressBar.getWidth() + 10, progressBar.getHeight() + 12);
@@ -29,8 +31,12 @@ public class Bar extends WidgetGroup {
 	addActor(label);
     }
 
-    public void setValue(float value, float animationDuration) {
-	progressBar.setAnimateDuration(animationDuration);
+    public void reset(float maxValue) {
+	progressBar.setValue(0);
+	progressBar.setRange(0, maxValue);
+    }
+
+    public void setValue(float value) {
 	progressBar.setValue(value);
     }
 

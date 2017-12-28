@@ -116,16 +116,18 @@ public class GameUI extends InputAdapter implements EventListener {
 	}
     }
 
-    public void showAbilityChannelBar(String text, float channelTime) {
-	abilityChannelBar.setValue(0, 0);
-	abilityChannelBar.setValue(1, channelTime);
+    public void showAbilityChannelBar(String text, float maxValue) {
+	abilityChannelBar.reset(maxValue);
 	abilityChannelBar.setText(text);
 	abilityChannelBar.setVisible(true);
     }
 
+    public void setAbilityChannelBarValue(float value) {
+	abilityChannelBar.setValue(value);
+    }
+
     public void hideAbilityChannelBar() {
 	abilityChannelBar.setVisible(false);
-	abilityChannelBar.setValue(0, 0);
     }
 
     @Override

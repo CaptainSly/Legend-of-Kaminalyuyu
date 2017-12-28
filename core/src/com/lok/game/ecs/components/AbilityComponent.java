@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.lok.game.ability.Ability;
 import com.lok.game.ability.Ability.AbilityID;
 
-public class CastComponent implements Component, Poolable {
+public class AbilityComponent implements Component, Poolable {
     public final Array<AbilityID> abilities		= new Array<AbilityID>();
     public AbilityID		  abilityToCast		= null;
     public Ability		  currentCastingAbility	= null;

@@ -1,0 +1,13 @@
+
+effects.png
+size: 512,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+townportal
+  rotate: false
+  xy: 0, 0
+  size: 504, 224
+  orig: 504, 224
+  offset: 0, 0
+  index: -1
