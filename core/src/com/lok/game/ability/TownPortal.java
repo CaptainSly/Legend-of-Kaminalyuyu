@@ -6,8 +6,8 @@ import com.badlogic.gdx.utils.Array;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.SpecialEffect;
+import com.lok.game.Utils;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.screen.ScreenManager;
 import com.lok.game.screen.TownScreen;
 
 public class TownPortal extends Ability {
@@ -64,7 +64,7 @@ public class TownPortal extends Ability {
 
     @Override
     protected boolean onEffect() {
-	ScreenManager.getManager().setScreen(TownScreen.class);
+	Utils.setScreen(TownScreen.class);
 	return true;
     }
 

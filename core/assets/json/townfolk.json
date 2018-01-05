@@ -1,6 +1,6 @@
 [
-  { "entityID" : ELDER, "conversationID" : ElderIntro, "conversationImage" : "img_elder" },
-  { "entityID" : SHAMAN, "conversationID" : ShamanIntro, "conversationImage" : "img_shaman" },
-  { "entityID" : BLACKSMITH, "conversationID" : BlacksmithIntro, "conversationImage" : "img_blacksmith" },
-  { "entityID" : PORTAL, "conversationID" : Portal, "conversationImage" : "img_portal" }
+  { "entityID" : ELDER, "size" : { "x" : 0, "y" : 0 }, "conversationID" : ElderIntro, "conversationImage" : "img_elder" },
+  { "entityID" : SHAMAN, "size" : { "x" : 0, "y" : 0 }, "conversationID" : ShamanIntro, "conversationImage" : "img_shaman" },
+  { "entityID" : BLACKSMITH, "size" : { "x" : 0, "y" : 0 }, "conversationID" : BlacksmithIntro, "conversationImage" : "img_blacksmith" },
+  { "entityID" : PORTAL, "size" : { "x" : 0, "y" : 0 }, "conversationID" : Portal, "conversationImage" : "img_portal" }
 ]

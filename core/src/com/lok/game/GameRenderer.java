@@ -110,7 +110,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 
 	this.entityComparator = new yPositionComparator(sizeComponentMapper);
 
-	final TextureAtlas textureAtlas = AssetManager.getManager().getAsset("lights/lights.atlas", TextureAtlas.class);
+	final TextureAtlas textureAtlas = Utils.getAssetManager().get("lights/lights.atlas", TextureAtlas.class);
 	lightTexture = textureAtlas.findRegion("light");
 	shadowTexture = textureAtlas.findRegion("shadow");
 	frameBuffer = null;
@@ -376,6 +376,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	}
 	if (frameBuffer != null) {
 	    frameBuffer.dispose();
+	    frameBuffer = null;
 	}
     }
 }

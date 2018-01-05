@@ -75,7 +75,7 @@ public class AnimationManager {
 
 	Gdx.app.debug(TAG, "Loading animation " + animationConfig.animationID);
 
-	final TextureAtlas textureAtlas = AssetManager.getManager().getAsset(animationConfig.atlasName, TextureAtlas.class);
+	final TextureAtlas textureAtlas = Utils.getAssetManager().get(animationConfig.atlasName, TextureAtlas.class);
 	final AtlasRegion region = textureAtlas.findRegion(animationConfig.atlasKey);
 	final int frameWidth = region.getRegionWidth() / animationConfig.numColumns;
 	final int frameHeight = region.getRegionHeight() / animationConfig.numRows;

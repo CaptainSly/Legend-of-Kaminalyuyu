@@ -2,13 +2,17 @@ package com.lok.game.screen;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.lok.game.PreferencesManager;
+import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
@@ -19,10 +23,12 @@ import com.lok.game.conversation.ConversationNode;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.ConversationComponent;
+import com.lok.game.ecs.components.IDComponent;
+import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.ui.TownUI;
 import com.lok.game.ui.UIEventListener;
 
-public class TownScreen implements Screen, ConversationListener, UIEventListener {
+public class TownScreen implements Screen, ConversationListener, UIEventListener, PreferencesListener {
     private final TownUI				 townUI;
 
     private boolean					 conversationInProgress;
@@ -34,21 +40,18 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 
     public TownScreen() {
 	this.townUI = new TownUI();
-	this.townUI.addUIEventListener(this);
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
-	this.conversationInProgress = false;
-
-	this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
-
-	this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
-	townUI.addTownLocation(EntityID.ELDER, 537, 570);
-	this.currentSelection = EntityID.ELDER;
-	townUI.selectLocation(currentSelection);
     }
 
     @Override
     public void show() {
+	entityMap.clear();
+	EntityEngine.getEngine().removeAllEntities();
+	this.conversationInProgress = false;
+	this.townUI.addUIEventListener(this);
+	PreferencesManager.getManager().addPreferencesListener(this);
+	PreferencesManager.getManager().loadGameState();
 	townUI.show();
     }
 
@@ -76,7 +79,10 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 
     @Override
     public void hide() {
+	PreferencesManager.getManager().saveGameState();
+	PreferencesManager.getManager().removePreferencesListener(this);
 	townUI.hide();
+	this.townUI.removeUIEventListener(this);
     }
 
     @Override
@@ -203,13 +209,57 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	    case SetScreen:
 		try {
 		    final Array<?> param = (Array<?>) action.getParam();
-		    ScreenManager.getManager().setScreen(ClassReflection.forName((String) param.get(0)));
-		} catch (ReflectionException e) {
+		    Utils.setScreen(ClassReflection.forName((String) param.get(0)));
+		} catch (Exception e) {
 		    throw new GdxRuntimeException("Invalid screen class for setScreen", e);
 		}
 		break;
 	    default:
 		break;
 	}
+    }
+
+    private static class EntityData {
+	private EntityID       id		     = null;
+	private Vector2	       position		     = new Vector2();
+	private ConversationID currentConversationID = null;
+    }
+
+    @Override
+    public void onSave(Json json, Preferences preferences) {
+	final Array<EntityData> entityData = new Array<EntityData>();
+	for (Entity entity : entityMap.values()) {
+	    final EntityData data = new EntityData();
+
+	    data.id = entity.getComponent(IDComponent.class).entityID;
+	    entity.getComponent(SizeComponent.class).boundingRectangle.getPosition(data.position);
+	    data.currentConversationID = entity.getComponent(ConversationComponent.class).currentConversationID;
+	    entityData.add(data);
+	}
+	preferences.putString("TownScreen-entities", json.toJson(entityData));
+    }
+
+    @Override
+    public void onLoad(Json json, Preferences preferences) {
+	if (preferences.contains("TownScreen-entities")) {
+	    @SuppressWarnings("unchecked")
+	    final Array<EntityData> entityData = json.fromJson(Array.class, preferences.getString("TownScreen-entities"));
+	    for (EntityData data : entityData) {
+		final Entity entity = EntityEngine.getEngine().createEntity(data.id, data.position.x, data.position.y);
+		this.entityMap.put(data.id.ordinal(), entity);
+		if (!data.id.equals(EntityID.PLAYER)) {
+		    townUI.addTownLocation(data.id, data.position.x, data.position.y);
+		    convCompMapper.get(entity).currentConversationID = data.currentConversationID;
+		}
+	    }
+	} else {
+	    // default town screen setup
+	    this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
+	    this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
+	    townUI.addTownLocation(EntityID.ELDER, 537, 570);
+	}
+
+	this.currentSelection = EntityID.ELDER;
+	townUI.selectLocation(currentSelection);
     }
 }

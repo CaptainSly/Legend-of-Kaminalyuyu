@@ -1,14 +1,19 @@
 package com.lok.game.map;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.lok.game.AssetManager;
+import com.lok.game.PreferencesManager.PreferencesListener;
+import com.lok.game.ecs.EntityEngine;
+import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ecs.components.IDComponent;
+import com.lok.game.ecs.components.SizeComponent;
 
-public class MapManager {
+public class MapManager implements PreferencesListener {
     public enum MapID {
 	DEMON_LAIR_01("maps/demon_lair_01.tmx");
 
@@ -28,12 +33,13 @@ public class MapManager {
     private static MapManager	     instance		   = null;
 
     private Array<Map>		     mapCache;
+    private MapID		     currentMapID;
     private final Array<MapListener> listeners;
 
     private MapManager() {
-	AssetManager.getManager().setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 	listeners = new Array<MapListener>();
 	this.mapCache = null;
+	currentMapID = null;
     }
 
     private void loadMaps() {
@@ -59,6 +65,7 @@ public class MapManager {
 	}
 
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
+	this.currentMapID = mapID;
 	final Map map = mapCache.get(mapID.ordinal());
 
 	for (MapListener listener : listeners) {
@@ -66,11 +73,11 @@ public class MapManager {
 	}
     }
 
-    public void addListener(MapListener listener) {
+    public void addMapListener(MapListener listener) {
 	listeners.add(listener);
     }
 
-    public void removeListener(MapListener listener) {
+    public void removeMapListener(MapListener listener) {
 	listeners.removeValue(listener, false);
     }
 
@@ -79,6 +86,52 @@ public class MapManager {
 	if (mapCache != null) {
 	    for (Map map : mapCache) {
 		map.dispose();
+	    }
+	}
+    }
+
+    private static class EntityData {
+	private EntityID id	  = null;
+	private Vector2	 position = new Vector2();
+    }
+
+    @Override
+    public void onSave(Json json, Preferences preferences) {
+	for (Map map : mapCache) {
+	    final MapID id = map.getMapID();
+	    final Array<EntityData> entityData = new Array<EntityData>();
+	    for (Entity entity : map.getEntities()) {
+		final EntityData data = new EntityData();
+		data.id = entity.getComponent(IDComponent.class).entityID;
+		entity.getComponent(SizeComponent.class).boundingRectangle.getPosition(data.position);
+		entityData.add(data);
+	    }
+	    preferences.putString(id.name(), json.toJson(entityData));
+	}
+	preferences.putString("currentMap", currentMapID.name());
+    }
+
+    @Override
+    public void onLoad(Json json, Preferences preferences) {
+	if (!preferences.contains("currentMap")) {
+	    changeMap(MapID.DEMON_LAIR_01);
+	} else {
+	    changeMap(MapID.valueOf(preferences.getString("currentMap")));
+	}
+
+	for (MapID mapID : MapID.values()) {
+	    if (!preferences.contains(mapID.name())) {
+		continue;
+	    }
+
+	    final Map map = mapCache.get(mapID.ordinal());
+	    for (Entity entity : map.getEntities()) {
+		EntityEngine.getEngine().removeEntity(entity);
+	    }
+	    @SuppressWarnings("unchecked")
+	    final Array<EntityData> entityData = json.fromJson(Array.class, preferences.getString(mapID.name()));
+	    for (EntityData data : entityData) {
+		EntityEngine.getEngine().createEntity(data.id, data.position.x, data.position.y);
 	    }
 	}
     }

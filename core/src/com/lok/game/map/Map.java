@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.lok.game.AssetManager;
+import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.SizeComponent;
@@ -72,7 +72,7 @@ public class Map {
 
     public Map(MapID mapID) {
 	this.mapID = mapID;
-	this.tiledMap = AssetManager.getManager().getAsset(mapID.getMapName(), TiledMap.class);
+	this.tiledMap = Utils.getAssetManager().get(mapID.getMapName(), TiledMap.class);
 	this.boundary = new Rectangle();
 	this.collisionAreas = new Array<Rectangle>();
 	this.entities = new Array<Entity>();
@@ -168,6 +168,10 @@ public class Map {
 			new Vector2(targetTileIndexX * tileWidthInWorldUnits, numTilesY * tileHeightInWorldUnits - targetTileIndexY * tileHeightInWorldUnits), targetMapID));
 	    }
 	}
+    }
+
+    public MapID getMapID() {
+	return mapID;
     }
 
     public TiledMap getTiledMap() {

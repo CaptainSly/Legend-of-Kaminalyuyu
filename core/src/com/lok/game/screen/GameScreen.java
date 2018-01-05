@@ -5,11 +5,16 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 import com.lok.game.AnimationManager;
 import com.lok.game.AnimationManager.AnimationType;
 import com.lok.game.GameRenderer;
+import com.lok.game.PreferencesManager;
+import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.Utils;
 import com.lok.game.ability.Ability;
 import com.lok.game.ability.Ability.AbilityID;
@@ -26,15 +31,14 @@ import com.lok.game.map.Map;
 import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
-import com.lok.game.map.MapManager.MapID;
 import com.lok.game.ui.GameUI;
 import com.lok.game.ui.UIEventListener;
 
-public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener, AbilityListener {
+public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener, AbilityListener, PreferencesListener {
     private float				      accumulator;
     private final float				      fixedPhysicsStep;
 
-    private final GameRenderer			      renderer;
+    private GameRenderer			      renderer;
     private final EntityEngine			      entityEngine;
     private final GameUI			      gameUI;
 
@@ -48,23 +52,30 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	accumulator = 0.0f;
 
 	this.gameUI = new GameUI();
-	this.gameUI.addUIEventListener(this);
 	this.entityEngine = EntityEngine.getEngine();
-	this.renderer = new GameRenderer();
+	this.renderer = null;
 	this.player = null;
 	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
 	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 	this.abilityComponentMapper = ComponentMapper.getFor(AbilityComponent.class);
-
-	EntityEngine.getEngine().addEntityListener(Family.all(IDComponent.class).get(), this);
-	EntityEngine.getEngine().getSystem(CollisionSystem.class).addCollisionListener(this);
-	EntityEngine.getEngine().getAbilitySystem().addAbilityListener(this);
-	MapManager.getManager().addListener(this);
     }
 
     @Override
     public void show() {
-	MapManager.getManager().changeMap(MapID.DEMON_LAIR_01);
+	if (renderer == null) {
+	    renderer = new GameRenderer();
+	}
+
+	entityEngine.removeAllEntities();
+	this.gameUI.addUIEventListener(this);
+	entityEngine.addEntityListener(Family.all(IDComponent.class).get(), this);
+	entityEngine.getSystem(CollisionSystem.class).addCollisionListener(this);
+	entityEngine.getAbilitySystem().addAbilityListener(this);
+	MapManager.getManager().addMapListener(this);
+	PreferencesManager.getManager().addPreferencesListener(MapManager.getManager());
+	PreferencesManager.getManager().addPreferencesListener(this);
+
+	PreferencesManager.getManager().loadGameState();
 	gameUI.show();
     }
 
@@ -102,7 +113,17 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
     @Override
     public void hide() {
+	PreferencesManager.getManager().saveGameState();
+
+	entityEngine.removeEntityListener(this);
+	entityEngine.getSystem(CollisionSystem.class).removeCollisionListener(this);
+	entityEngine.getAbilitySystem().removeAbilityListener(this);
+	MapManager.getManager().removeMapListener(this);
+	PreferencesManager.getManager().removePreferencesListener(this);
+	PreferencesManager.getManager().removePreferencesListener(MapManager.getManager());
+
 	gameUI.hide();
+	this.gameUI.removeUIEventListener(this);
     }
 
     @Override
@@ -214,6 +235,19 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
     @Override
     public void onSopCast(Entity caster, Ability ability) {
 	gameUI.hideAbilityChannelBar();
+    }
+
+    @Override
+    public void onSave(Json json, Preferences preferences) {
+	preferences.putString("GameScreen-playerAbilities", json.toJson(abilityComponentMapper.get(player).abilities));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onLoad(Json json, Preferences preferences) {
+	if (preferences.contains("GameScreen-playerAbilities")) {
+	    abilityComponentMapper.get(player).abilities = json.fromJson(Array.class, preferences.getString("GameScreen-playerAbilities"));
+	}
     }
 
 }

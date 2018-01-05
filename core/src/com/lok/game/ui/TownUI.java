@@ -5,8 +5,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
@@ -19,10 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.AssetManager;
 import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
@@ -53,7 +49,7 @@ public class TownUI extends InputAdapter implements EventListener {
 	this.btn_currentSelectedLocation = null;
 
 	// background
-	stage.addActor(new Image(new TextureRegionDrawable(new TextureRegion(AssetManager.getManager().getAsset("ui/village.jpg", Texture.class)))));
+	stage.addActor(skin.get("village-bgd", Image.class));
 
 	// input handling actors
 	this.touchpad = new Touchpad(skin);
@@ -236,8 +232,6 @@ public class TownUI extends InputAdapter implements EventListener {
 
     public void dispose() {
 	stage.dispose();
-	skin.dispose();
-	AssetManager.getManager().dispose();
     }
 
     public void showConversationDialog() {

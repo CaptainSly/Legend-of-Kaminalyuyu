@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.AssetManager;
 import com.lok.game.Utils;
 import com.lok.game.ability.Ability.AbilityID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
@@ -82,8 +81,6 @@ public class GameUI extends InputAdapter implements EventListener {
 
     public void dispose() {
 	stage.dispose();
-	skin.dispose();
-	AssetManager.getManager().dispose();
     }
 
     @Override

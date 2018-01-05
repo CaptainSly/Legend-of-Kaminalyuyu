@@ -34,7 +34,7 @@ public class CollisionSystem extends IteratingSystem implements MapListener {
 	this.map = null;
 	this.collisionListeners = new Array<CollisionListener>();
 
-	MapManager.getManager().addListener(this);
+	MapManager.getManager().addMapListener(this);
     }
 
     @Override

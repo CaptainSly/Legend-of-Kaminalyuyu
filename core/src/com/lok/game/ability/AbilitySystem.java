@@ -41,8 +41,8 @@ public class AbilitySystem {
 		removeAbility(ability);
 		iterator.remove();
 	    } else if (ability.isEffectReady()) {
-		ability.doEffect();
 		abilityComponentMapper.get(ability.caster).abilityToCast = null;
+		ability.doEffect();
 	    } else {
 		ability.update(deltaTime);
 	    }

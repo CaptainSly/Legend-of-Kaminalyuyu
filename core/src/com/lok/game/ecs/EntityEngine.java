@@ -189,10 +189,9 @@ public class EntityEngine {
 	return engine.getSystem(systemType);
     }
 
-    public void clear() {
-	Gdx.app.debug(TAG, "Clearing entity engine pools");
-
-	engine.clearPools();
+    public void removeAllEntities() {
+	Gdx.app.debug(TAG, "Removing all entities from engine");
+	engine.removeAllEntities();
     }
 
     public Entity createEntity(EntityID entityID, float x, float y) {

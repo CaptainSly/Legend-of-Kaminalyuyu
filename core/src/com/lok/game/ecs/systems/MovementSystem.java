@@ -27,7 +27,7 @@ public class MovementSystem extends IteratingSystem implements MapListener {
 	this.sizeComponentMapper = sizeComponentMapper;
 	this.map = null;
 
-	MapManager.getManager().addListener(this);
+	MapManager.getManager().addMapListener(this);
     }
 
     @Override

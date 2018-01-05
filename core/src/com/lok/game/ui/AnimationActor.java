@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.lok.game.AssetManager;
+import com.lok.game.Utils;
 
 public class AnimationActor extends Actor {
     private float			   animationTime;
     private final Animation<TextureRegion> animation;
 
     public AnimationActor(String textureAtlasPath, String atlasKey, int numColumns, int numRows, float frameDuration) {
-	final TextureAtlas textureAtlas = AssetManager.getManager().getAsset(textureAtlasPath, TextureAtlas.class);
+	final TextureAtlas textureAtlas = Utils.getAssetManager().get(textureAtlasPath, TextureAtlas.class);
 	final AtlasRegion region = textureAtlas.findRegion(atlasKey);
 	final int frameWidth = region.getRegionWidth() / numColumns;
 	final int frameHeight = region.getRegionHeight() / numRows;
