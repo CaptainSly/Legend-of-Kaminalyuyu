@@ -31,6 +31,7 @@ public class TownUI extends InputAdapter implements EventListener {
     private final InputMultiplexer	 inputMultiplexer;
 
     private final Array<ImageButton>	 btn_townLocations;
+    private final Array<Label>		 townLocationLabels;
     private ImageButton			 btn_currentSelectedLocation;
 
     private final Touchpad		 touchpad;
@@ -46,6 +47,7 @@ public class TownUI extends InputAdapter implements EventListener {
 	this.convDialog.addListener(this);
 	this.uiEventListeners = new Array<UIEventListener>();
 	this.btn_townLocations = new Array<ImageButton>();
+	this.townLocationLabels = new Array<Label>();
 	this.btn_currentSelectedLocation = null;
 
 	// background
@@ -65,7 +67,6 @@ public class TownUI extends InputAdapter implements EventListener {
 	this.selectionActor = new AnimationActor("ui/ui.atlas", "selection_sphere", 8, 1, 0.05f);
 	selectionActor.setPosition(0, 0);
 	selectionActor.scaleBy(0.75f);
-	selectionActor.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
 	stage.addActor(selectionActor);
 
 	this.inputMultiplexer = new InputMultiplexer(this, stage);
@@ -81,22 +82,32 @@ public class TownUI extends InputAdapter implements EventListener {
 
     public void addTownLocation(EntityID entityID, float x, float y) {
 	final ImageButton locationButton = new ImageButton(skin, "town-location");
-
 	locationButton.setUserObject(entityID);
 	locationButton.setSize(64, 64);
 	locationButton.setPosition(x, y);
 	locationButton.getImage().setOrigin(locationButton.getWidth() * 0.5f, locationButton.getHeight() * 0.5f);
 	locationButton.getImage().addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade), Actions.forever(Actions.rotateBy(7.5f))));
 	locationButton.addListener(this);
+	btn_townLocations.add(locationButton);
 
 	final Label label = new Label(Utils.getLabel("Entity." + entityID + ".name"), skin, "townlocation");
 	label.setPosition(x + 50, y + 20);
 	label.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
-
-	btn_townLocations.add(locationButton);
+	townLocationLabels.add(label);
 
 	stage.addActor(locationButton);
 	stage.addActor(label);
+    }
+
+    public void clearTownLocations() {
+	for (ImageButton button : btn_townLocations) {
+	    button.remove();
+	}
+	btn_townLocations.clear();
+	for (Label lbl : townLocationLabels) {
+	    lbl.remove();
+	}
+	townLocationLabels.clear();
     }
 
     public void selectLocation(EntityID entityID) {
@@ -208,6 +219,8 @@ public class TownUI extends InputAdapter implements EventListener {
     public void show() {
 	touchpad.uncheckAll();
 	btn_Select.setChecked(false);
+	hideConversationDialog();
+	selectionActor.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
 	Gdx.input.setInputProcessor(inputMultiplexer);
     }
 

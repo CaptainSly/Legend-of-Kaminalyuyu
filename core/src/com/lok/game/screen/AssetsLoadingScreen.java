@@ -3,17 +3,35 @@ package com.lok.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.Utils;
 import com.lok.game.map.MapManager;
+import com.lok.game.ui.Bar;
 
 public class AssetsLoadingScreen implements Screen {
     private final static String	TAG = AssetsLoadingScreen.class.getSimpleName();
 
     private AssetManager	assetManager;
     private long		startTime;
+
+    private final Stage		stage;
+    private final Bar		loadingBar;
+
+    public AssetsLoadingScreen() {
+	stage = new Stage(new FitViewport(1280, 720));
+	final Skin skin = Utils.getUISkin();
+
+	loadingBar = new Bar(skin, Utils.getLabel("Label.LoadingAssets"), 1080, false);
+	loadingBar.setPosition(100, 50);
+
+	stage.addActor(loadingBar);
+    }
 
     @Override
     public void show() {
@@ -32,16 +50,23 @@ public class AssetsLoadingScreen implements Screen {
 
     @Override
     public void render(float delta) {
+	loadingBar.setValue(assetManager.getProgress());
 	if (assetManager.update()) {
 	    Gdx.app.debug(TAG, "Finished loading of assets in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
 	    Utils.setScreen(TownScreen.class);
 	}
+
+	Gdx.gl.glClearColor(0, 0, 0, 1);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+	stage.act(delta);
+	stage.getViewport().apply();
+	stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-	// TODO Auto-generated method stub
-
+	stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -63,8 +88,7 @@ public class AssetsLoadingScreen implements Screen {
 
     @Override
     public void dispose() {
-	// TODO Auto-generated method stub
-
+	stage.dispose();
     }
 
 }

@@ -47,6 +47,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     @Override
     public void show() {
 	entityMap.clear();
+	townUI.clearTownLocations();
 	EntityEngine.getEngine().removeAllEntities();
 	this.conversationInProgress = false;
 	this.townUI.addUIEventListener(this);

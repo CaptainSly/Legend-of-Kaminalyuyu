@@ -264,9 +264,6 @@
 <node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1514995047512" ID="ID_1819383222" MODIFIED="1514995056621" TEXT="add graphic for AssetsLoadingScreen">
-<font NAME="SansSerif" SIZE="14"/>
-</node>
 <node COLOR="#990000" CREATED="1513709984579" ID="ID_920320975" MODIFIED="1514995063069" TEXT="sound manager">
 <font NAME="SansSerif" SIZE="14"/>
 </node>

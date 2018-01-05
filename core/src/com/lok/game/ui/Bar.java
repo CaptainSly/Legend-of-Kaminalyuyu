@@ -20,15 +20,15 @@ public class Bar extends WidgetGroup {
 	progressBar.setAnimateDuration(0);
 	reset(1);
 
-	frame = skin.get("progressbar_frame", Image.class);
+	frame = new Image(skin.getPatch("progressbar_frame"));
 	frame.setSize(progressBar.getWidth() + 10, progressBar.getHeight() + 12);
 
 	label = new TextButton(text, skin, "progressBar");
 	label.setSize(frame.getWidth(), frame.getHeight());
 
 	addActor(progressBar);
-	addActor(frame);
 	addActor(label);
+	addActor(frame);
     }
 
     public void reset(float maxValue) {
