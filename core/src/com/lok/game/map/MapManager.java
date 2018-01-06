@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.lok.game.PreferencesManager.PreferencesListener;
+import com.lok.game.SoundManager;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.IDComponent;
@@ -67,6 +68,9 @@ public class MapManager implements PreferencesListener {
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
 	this.currentMapID = mapID;
 	final Map map = mapCache.get(mapID.ordinal());
+	if (map.getMusicFilePath() != null) {
+	    SoundManager.getManager().playMusic(map.getMusicFilePath(), true);
+	}
 
 	for (MapListener listener : listeners) {
 	    listener.onMapChange(this, map);

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.lok.game.PreferencesManager;
 import com.lok.game.PreferencesManager.PreferencesListener;
+import com.lok.game.SoundManager;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
@@ -54,6 +55,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	PreferencesManager.getManager().addPreferencesListener(this);
 	PreferencesManager.getManager().loadGameState();
 	townUI.show();
+	SoundManager.getManager().playMusic("sounds/music/town.ogg", true);
     }
 
     @Override
@@ -110,6 +112,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		} else {
 		    townUI.nextConversationChoice();
 		}
+		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
 	    case LEFT:
 	    case DOWN:
@@ -127,6 +130,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		} else {
 		    townUI.previousConversationChoice();
 		}
+		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
 	    case SELECT_ENTITY:
 		final EntityID entityID = (EntityID) triggerActor.getUserObject();
@@ -137,13 +141,12 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		currentConversation = Conversation.load(convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID);
 		currentConversation.addConversationListener(this);
 		currentConversation.startConversation();
-
+		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
 	    case CONVERSATION_CHOICE_SELECTED:
 		final int choiceIndex = (int) triggerActor.getUserObject();
-
 		currentConversation.triggerConversationChoice(choiceIndex);
-
+		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
 	    default:
 		break;

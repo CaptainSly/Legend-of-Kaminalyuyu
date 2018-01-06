@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="16" tileheight="16" backgroundcolor="#2b292c" nextobjectid="118">
+ <properties>
+  <property name="music" value="sounds/music/demon_lair_01.ogg"/>
+ </properties>
  <tileset firstgid="1" source="tilesets/demon_lair_tileset.tsx"/>
  <layer name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">

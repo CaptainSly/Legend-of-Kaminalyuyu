@@ -3,6 +3,8 @@ package com.lok.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -38,6 +40,12 @@ public class AssetsLoadingScreen implements Screen {
 	startTime = TimeUtils.millis();
 	Gdx.app.debug(TAG, "Start loading of assets");
 	assetManager = Utils.getAssetManager();
+
+	// load sounds
+	assetManager.load("sounds/music/town.ogg", Music.class);
+	assetManager.load("sounds/music/demon_lair_01.ogg", Music.class);
+	assetManager.load("sounds/effects/menu_selection.wav", Sound.class);
+	assetManager.load("sounds/effects/teleport.wav", Sound.class);
 
 	// load GameScreen assets
 	for (MapManager.MapID mapID : MapManager.MapID.values()) {

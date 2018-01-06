@@ -65,6 +65,7 @@ public class Map {
     private final Array<Entity>	   entities;
     private final Array<Portal>	   portals;
     private final Color		   backgroundColor;
+    private final String	   musicFilePath;
     private final int		   numTilesX;
     private final int		   numTilesY;
     private final float		   tileWidthInWorldUnits;
@@ -85,6 +86,7 @@ public class Map {
 	} else {
 	    this.backgroundColor = Color.BLACK;
 	}
+	musicFilePath = mapProperties.get("music", String.class);
 
 	tileWidthInWorldUnits = mapProperties.get("tilewidth", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL;
 	tileHeightInWorldUnits = mapProperties.get("tileheight", Integer.class) * MapManager.WORLD_UNITS_PER_PIXEL;
@@ -172,6 +174,10 @@ public class Map {
 
     public MapID getMapID() {
 	return mapID;
+    }
+
+    public String getMusicFilePath() {
+	return musicFilePath;
     }
 
     public TiledMap getTiledMap() {

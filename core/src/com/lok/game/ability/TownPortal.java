@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.lok.game.AnimationManager.AnimationID;
 import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.SoundManager;
 import com.lok.game.SpecialEffect;
 import com.lok.game.Utils;
 import com.lok.game.ecs.components.AnimationComponent;
@@ -15,6 +16,7 @@ public class TownPortal extends Ability {
     private AnimationComponent animationComp;
     private float	       origR, origG, origB;
     private float	       lossPerFrameR, lossPerFrameG, lossPerFrameB;
+    private long	       soundID;
 
     @Override
     public void initialize(Entity caster, AbilityID abilityID, Array<AbilityListener> abilityListeners) {
@@ -26,6 +28,7 @@ public class TownPortal extends Ability {
 	lossPerFrameR = animationComp.color.r / 2.5f;
 	lossPerFrameG = animationComp.color.g / 2.5f;
 	lossPerFrameB = animationComp.color.b / 2.5f;
+	soundID = 0L;
     }
 
     @Override
@@ -35,6 +38,7 @@ public class TownPortal extends Ability {
 	animationComp = null;
 	origR = origG = origB = 0;
 	lossPerFrameR = lossPerFrameG = lossPerFrameB = 0;
+	soundID = 0L;
     }
 
     @Override
@@ -49,6 +53,7 @@ public class TownPortal extends Ability {
 
     @Override
     protected void onStartCast() {
+	soundID = SoundManager.getManager().playSound("sounds/effects/teleport.wav", false);
 	effect = SpecialEffect.newSpecialEffect(AnimationID.TOWNPORTAL, AnimationType.IDLE, PlayMode.NORMAL);
 	effect.scaleBy(0.75f);
 	animationComp.originEffects.add(effect);
@@ -70,6 +75,7 @@ public class TownPortal extends Ability {
 
     @Override
     protected void onStopCast() {
+	SoundManager.getManager().stopSound("sounds/effects/teleport.wav", soundID);
 	animationComp.color.set(origR, origG, origB, animationComp.color.a);
 	animationComp.originEffects.removeValue(effect, false);
 	SpecialEffect.removeSpecialEffect(effect);
