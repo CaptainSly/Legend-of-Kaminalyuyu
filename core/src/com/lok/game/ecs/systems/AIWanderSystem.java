@@ -5,8 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.lok.game.AnimationManager;
-import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.Animation;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.SpeedComponent;
@@ -39,25 +38,25 @@ public class AIWanderSystem extends IteratingSystem {
 		case 0:
 		    // go right
 		    speedComponent.speed.set(speedComponent.maxSpeed, 0);
-		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_RIGHT);
+		    animationComponent.animation = Animation.getAnimation(animationComponent.walkRightAnimation);
 		    animationComponent.playAnimation = true;
 		    break;
 		case 1:
 		    // go left
 		    speedComponent.speed.set(-speedComponent.maxSpeed, 0);
-		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_LEFT);
+		    animationComponent.animation = Animation.getAnimation(animationComponent.walkLeftAnimation);
 		    animationComponent.playAnimation = true;
 		    break;
 		case 2:
 		    // go up
 		    speedComponent.speed.set(0, speedComponent.maxSpeed);
-		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_UP);
+		    animationComponent.animation = Animation.getAnimation(animationComponent.walkUpAnimation);
 		    animationComponent.playAnimation = true;
 		    break;
 		case 3:
 		    // go down
 		    speedComponent.speed.set(0, -speedComponent.maxSpeed);
-		    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_DOWN);
+		    animationComponent.animation = Animation.getAnimation(animationComponent.walkDownAnimation);
 		    animationComponent.playAnimation = true;
 		    break;
 		case 4:

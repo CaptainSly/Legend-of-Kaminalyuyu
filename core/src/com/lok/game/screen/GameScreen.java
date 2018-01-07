@@ -10,8 +10,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.lok.game.AnimationManager;
-import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.Animation;
 import com.lok.game.GameRenderer;
 import com.lok.game.PreferencesManager;
 import com.lok.game.PreferencesManager.PreferencesListener;
@@ -145,25 +144,25 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	    case DOWN:
 		abilityComponent.abilityToCast = null;
 		speedComponent.speed.set(0, -speedComponent.maxSpeed);
-		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_DOWN);
+		animationComponent.animation = Animation.getAnimation(animationComponent.walkDownAnimation);
 		animationComponent.playAnimation = true;
 		break;
 	    case LEFT:
 		abilityComponent.abilityToCast = null;
 		speedComponent.speed.set(-speedComponent.maxSpeed, 0);
-		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_LEFT);
+		animationComponent.animation = Animation.getAnimation(animationComponent.walkLeftAnimation);
 		animationComponent.playAnimation = true;
 		break;
 	    case RIGHT:
 		abilityComponent.abilityToCast = null;
 		speedComponent.speed.set(speedComponent.maxSpeed, 0);
-		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_RIGHT);
+		animationComponent.animation = Animation.getAnimation(animationComponent.walkRightAnimation);
 		animationComponent.playAnimation = true;
 		break;
 	    case UP:
 		abilityComponent.abilityToCast = null;
 		speedComponent.speed.set(0, speedComponent.maxSpeed);
-		animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.WALK_UP);
+		animationComponent.animation = Animation.getAnimation(animationComponent.walkUpAnimation);
 		animationComponent.playAnimation = true;
 		break;
 	    case STOP_MOVEMENT:

@@ -15,9 +15,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.lok.game.AnimationManager;
-import com.lok.game.AnimationManager.AnimationID;
-import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.Animation;
+import com.lok.game.Animation.AnimationID;
 import com.lok.game.Utils;
 import com.lok.game.ability.Ability.AbilityID;
 import com.lok.game.ability.AbilitySystem;
@@ -52,7 +51,11 @@ public class EntityEngine {
 
     private static class EntityConfiguration {
 	private EntityID	 entityID;
-	private AnimationID	 animationID;
+	private AnimationID	 idleAnimationID;
+	private AnimationID	 walkLeftAnimation;
+	private AnimationID	 walkRightAnimation;
+	private AnimationID	 walkUpAnimation;
+	private AnimationID	 walkDownAnimation;
 	private Vector2		 originPoint;
 	private float		 speed;
 	private float		 revelationRadius;
@@ -257,13 +260,17 @@ public class EntityEngine {
     }
 
     private void createAnimationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.animationID != null) {
+	if (entityConfig.idleAnimationID != null) {
 	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
-	    animationComponent.animationID = entityConfig.animationID;
+	    animationComponent.idleAnimationID = entityConfig.idleAnimationID;
+	    animationComponent.walkDownAnimation = entityConfig.walkDownAnimation;
+	    animationComponent.walkLeftAnimation = entityConfig.walkLeftAnimation;
+	    animationComponent.walkRightAnimation = entityConfig.walkRightAnimation;
+	    animationComponent.walkUpAnimation = entityConfig.walkUpAnimation;
 	    if (entityConfig.originPoint != null) {
 		animationComponent.originPoint.set(entityConfig.originPoint.x * MapManager.WORLD_UNITS_PER_PIXEL, entityConfig.originPoint.y * MapManager.WORLD_UNITS_PER_PIXEL);
 	    }
-	    animationComponent.animation = AnimationManager.getManager().getAnimation(animationComponent.animationID, AnimationType.IDLE);
+	    animationComponent.animation = Animation.getAnimation(animationComponent.idleAnimationID);
 	    entity.add(animationComponent);
 	}
     }

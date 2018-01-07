@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.lok.game.Animation.AnimationID;
+import com.lok.game.assets.loader.AnimationLoader;
 import com.lok.game.map.MapManager;
 import com.lok.game.screen.AssetsLoadingScreen;
 import com.lok.game.screen.GameScreen;
@@ -39,6 +41,7 @@ public class LegendOfKaminalyuyu extends Game {
 
 	assetManager = new AssetManager();
 	assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+	assetManager.setLoader(Animation.class, new AnimationLoader(new InternalFileHandleResolver()));
 
 	// load labels
 	assetManager.load("localization/Labels", I18NBundle.class);
@@ -48,6 +51,7 @@ public class LegendOfKaminalyuyu extends Game {
 	// load UI skin
 	assetManager.load("ui/ui.json", Skin.class, new SkinLoader.SkinParameter("ui/ui.atlas"));
 	assetManager.load("ui/village.jpg", Texture.class);
+	assetManager.load(AnimationID.SELECTION_SPHERE.name(), Animation.class);
 	assetManager.finishLoading();
 	uiSkin = assetManager.get("ui/ui.json", Skin.class);
 	uiSkin.add("village-bgd", new Image(new TextureRegionDrawable(new TextureRegion(Utils.getAssetManager().get("ui/village.jpg", Texture.class)))), Image.class);

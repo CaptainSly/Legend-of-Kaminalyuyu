@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.lok.game.Animation.AnimationID;
 
 public class ConversationDialog extends Dialog {
     private final Table		 leftContent;
@@ -52,7 +53,7 @@ public class ConversationDialog extends Dialog {
 	rightContent.add(getButtonTable()).right().bottom();
 	getContentTable().add(rightContent).expand().fill().padRight(10);
 
-	this.selectionActor = new AnimationActor("ui/ui.atlas", "selection_sphere", 8, 1, 0.05f);
+	this.selectionActor = new AnimationActor(AnimationID.SELECTION_SPHERE);
 	selectionActor.setPosition(0, 0);
 	selectionActor.rotateBy(270);
 	selectionActor.scaleBy(0.75f);

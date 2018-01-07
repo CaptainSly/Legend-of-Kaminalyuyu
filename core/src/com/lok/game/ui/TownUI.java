@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.Utils;
+import com.lok.game.Animation.AnimationID;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
@@ -64,7 +65,7 @@ public class TownUI extends InputAdapter implements EventListener {
 	btn_Select.addListener(this);
 	stage.addActor(btn_Select);
 
-	this.selectionActor = new AnimationActor("ui/ui.atlas", "selection_sphere", 8, 1, 0.05f);
+	this.selectionActor = new AnimationActor(AnimationID.SELECTION_SPHERE);
 	selectionActor.setPosition(0, 0);
 	selectionActor.scaleBy(0.75f);
 	stage.addActor(selectionActor);

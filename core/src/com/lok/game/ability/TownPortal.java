@@ -3,8 +3,7 @@ package com.lok.game.ability;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
-import com.lok.game.AnimationManager.AnimationID;
-import com.lok.game.AnimationManager.AnimationType;
+import com.lok.game.Animation.AnimationID;
 import com.lok.game.SoundManager;
 import com.lok.game.SpecialEffect;
 import com.lok.game.Utils;
@@ -54,7 +53,7 @@ public class TownPortal extends Ability {
     @Override
     protected void onStartCast() {
 	soundID = SoundManager.getManager().playSound("sounds/effects/teleport.wav", false);
-	effect = SpecialEffect.newSpecialEffect(AnimationID.TOWNPORTAL, AnimationType.IDLE, PlayMode.NORMAL);
+	effect = SpecialEffect.newSpecialEffect(AnimationID.TOWNPORTAL, PlayMode.NORMAL);
 	effect.scaleBy(0.75f);
 	animationComp.originEffects.add(effect);
     }

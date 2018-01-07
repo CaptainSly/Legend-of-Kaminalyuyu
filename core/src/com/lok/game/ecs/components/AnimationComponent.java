@@ -2,28 +2,35 @@ package com.lok.game.ecs.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.lok.game.AnimationManager.AnimationID;
+import com.lok.game.Animation;
+import com.lok.game.Animation.AnimationID;
 import com.lok.game.SpecialEffect;
 
 public class AnimationComponent implements Component, Poolable {
-    public AnimationID		    animationID	  = null;
-    public float		    animationTime = 0.0f;
-    public Animation<TextureRegion> animation	  = null;
-    public Color		    color	  = new Color(1, 1, 1, 1);
+    public AnimationID		idleAnimationID	   = null;
+    public AnimationID		walkLeftAnimation  = null;
+    public AnimationID		walkRightAnimation = null;
+    public AnimationID		walkUpAnimation	   = null;
+    public AnimationID		walkDownAnimation  = null;
+    public float		animationTime	   = 0.0f;
+    public Animation		animation	   = null;
+    public Color		color		   = new Color(1, 1, 1, 1);
 
-    public Vector2		    originPoint	  = new Vector2(0, 0);
-    public Array<SpecialEffect>	    originEffects = new Array<SpecialEffect>();
+    public Vector2		originPoint	   = new Vector2(0, 0);
+    public Array<SpecialEffect>	originEffects	   = new Array<SpecialEffect>();
 
-    public boolean		    playAnimation = true;
+    public boolean		playAnimation	   = true;
 
     @Override
     public void reset() {
-	animationID = null;
+	idleAnimationID = null;
+	walkLeftAnimation = null;
+	walkRightAnimation = null;
+	walkUpAnimation = null;
+	walkDownAnimation = null;
 	animation = null;
 	color.set(1, 1, 1, 1);
 	animationTime = 0.0f;

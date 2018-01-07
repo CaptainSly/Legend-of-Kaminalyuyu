@@ -1,6 +1,10 @@
 {
   "entityID" : PLAYER,
-  "animationID" : HERO,
+  "idleAnimationID" : PLAYER_IDLE,
+  "walkDownAnimation" : PLAYER_WALK_DOWN,
+  "walkLeftAnimation" : PLAYER_WALK_LEFT,
+  "walkRightAnimation" : PLAYER_WALK_RIGHT,
+  "walkUpAnimation" : PLAYER_WALK_UP,
   "originPoint" : { "x" : 16, "y" : 7 },
   "speed" : 5,
   "revelationRadius" : 6,

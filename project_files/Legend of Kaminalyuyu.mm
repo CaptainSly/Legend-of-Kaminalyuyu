@@ -264,28 +264,11 @@
 <node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1515167157460" ID="ID_1924701403" MODIFIED="1515167176538" TEXT="add support for collision areas which are any polygon not just only rectangles">
-<font NAME="SansSerif" SIZE="14"/>
-</node>
 <node COLOR="#990000" CREATED="1514410231399" ID="ID_1931627581" MODIFIED="1514410239857" TEXT="!!! REFACTORING !!!!">
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1514473382659" ID="ID_458498428" MODIFIED="1514473447677" TEXT="add debugmsgs">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 </node>
-<node COLOR="#111111" CREATED="1514473467881" ID="ID_53763200" MODIFIED="1514473473362" TEXT="remove hardcoded 1280 x 720">
-<node COLOR="#111111" CREATED="1514473492461" ID="ID_1114694052" MODIFIED="1514473501026" TEXT="maybe UI can be size of display?"/>
-</node>
-<node COLOR="#111111" CREATED="1514472793150" ID="ID_1222805168" MODIFIED="1514472796488" TEXT="AnimationManager">
-<node COLOR="#111111" CREATED="1514472804242" ID="ID_1770814763" MODIFIED="1514472862185" TEXT="class AnimationMapper">
-<node COLOR="#111111" CREATED="1514472862547" ID="ID_136392815" MODIFIED="1514472866603" TEXT="check ComponentMapper">
-<node COLOR="#111111" CREATED="1514472939397" ID="ID_1990582294" MODIFIED="1514472954809" TEXT="int componentTypeIndex = ComponentType.getIndexFor(componentClass); &#xa;components.set(componentTypeIndex, component); &#x9;&#xa;componentsArray.add(component);"/>
-<node COLOR="#111111" CREATED="1514472969131" ID="ID_201878859" MODIFIED="1514472987224" TEXT="int componentTypeIndex = componentType.getIndex();&#xa;  &#x9;&#x9;if (componentTypeIndex &lt; components.getCapacity()) { &#xa;&#x9;&#x9;&#x9;return (T)components.get(componentType.getIndex()); &#xa;&#x9;&#x9;} else { &#xa;&#x9;&#x9;&#x9;return null; &#x9;&#xa;&#x9;}"/>
-<node COLOR="#111111" CREATED="1514473049677" ID="ID_223363419" MODIFIED="1514473055188" TEXT="use Bag class to store Animations"/>
-</node>
-<node COLOR="#111111" CREATED="1514472811898" ID="ID_1206076402" MODIFIED="1514472826720" TEXT="getFor(AnimationID, AnimationType)"/>
-</node>
-</node>
-<node COLOR="#111111" CREATED="1514473256097" ID="ID_1945979361" MODIFIED="1514473278335" TEXT="can we remove EntityConfig and directly create components out of the json string?"/>
 <node COLOR="#111111" CREATED="1514473315578" ID="ID_1036700593" MODIFIED="1514473339752" TEXT="check renderer and count how many times we are flushing due to texture swapping">
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>
 </node>

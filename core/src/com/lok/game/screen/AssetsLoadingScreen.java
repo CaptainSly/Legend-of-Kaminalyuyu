@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.lok.game.Animation;
+import com.lok.game.Animation.AnimationID;
 import com.lok.game.Utils;
 import com.lok.game.map.MapManager;
 import com.lok.game.ui.Bar;
@@ -54,6 +56,11 @@ public class AssetsLoadingScreen implements Screen {
 	assetManager.load("effects/effects.atlas", TextureAtlas.class);
 	assetManager.load("units/units.atlas", TextureAtlas.class);
 	assetManager.load("lights/lights.atlas", TextureAtlas.class);
+
+	// load animations
+	for (AnimationID aniID : AnimationID.values()) {
+	    assetManager.load(aniID.name(), Animation.class);
+	}
     }
 
     @Override

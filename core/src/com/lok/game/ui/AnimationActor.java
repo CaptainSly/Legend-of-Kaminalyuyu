@@ -1,36 +1,19 @@
 package com.lok.game.ui;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.Array;
-import com.lok.game.Utils;
+import com.lok.game.Animation;
+import com.lok.game.Animation.AnimationID;
 
 public class AnimationActor extends Actor {
-    private float			   animationTime;
-    private final Animation<TextureRegion> animation;
+    private float	    animationTime;
+    private final Animation animation;
 
-    public AnimationActor(String textureAtlasPath, String atlasKey, int numColumns, int numRows, float frameDuration) {
-	final TextureAtlas textureAtlas = Utils.getAssetManager().get(textureAtlasPath, TextureAtlas.class);
-	final AtlasRegion region = textureAtlas.findRegion(atlasKey);
-	final int frameWidth = region.getRegionWidth() / numColumns;
-	final int frameHeight = region.getRegionHeight() / numRows;
-
-	final TextureRegion[][] split = region.split(frameWidth, frameHeight);
-
-	final Array<TextureRegion> framesOfAnimation = new Array<TextureRegion>();
-	for (int x = 0; x < split.length; ++x) {
-	    for (int y = 0; y < split[x].length; ++y) {
-		framesOfAnimation.add(split[x][y]);
-	    }
-	}
-
-	this.animation = new Animation<TextureRegion>(frameDuration, framesOfAnimation);
+    public AnimationActor(AnimationID animationID) {
+	this.animation = Animation.getAnimation(animationID);
 	this.animationTime = 0;
-	setSize(frameWidth, frameHeight);
+	setSize(animation.getKeyFrame(0).getRegionWidth(), animation.getKeyFrame(0).getRegionHeight());
     }
 
     @Override

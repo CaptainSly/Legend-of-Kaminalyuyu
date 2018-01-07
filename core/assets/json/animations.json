@@ -1,58 +1,23 @@
 [
-  {
-    "animationID" : HERO,
-    "atlasName" : "units/units.atlas",
-    "atlasKey" : "hero",
-    "numColumns" : 4,
-    "numRows" : 4,
-    "frameDuration" : 0.25,
-    "animations" : [
-      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
-      { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
-      { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
-      { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
-      { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
-    ]
-  },
-  {
-    "animationID" : DEMON_01,
-    "atlasName" : "units/units.atlas",
-    "atlasKey" : "demon01",
-    "numColumns" : 4,
-    "numRows" : 4,
-    "frameDuration" : 0.25,
-    "animations" : [
-      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
-      { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
-      { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
-      { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
-      { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
-    ]
-  },
-  {
-    "animationID" : BOSS_01,
-    "atlasName" : "units/units.atlas",
-    "atlasKey" : "boss01",
-    "numColumns" : 4,
-    "numRows" : 4,
-    "frameDuration" : 0.25,
-    "animations" : [
-      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 0, "y": 0 } },
-      { "animationType" : WALK_LEFT, "firstFrameIndex" : { "x": 0, "y": 1 }, "lastFrameIndex" : { "x": 3, "y": 1 } },
-      { "animationType" : WALK_RIGHT, "firstFrameIndex" : { "x": 0, "y": 2 }, "lastFrameIndex" : { "x": 3, "y": 2 } },
-      { "animationType" : WALK_UP, "firstFrameIndex" : { "x": 0, "y": 3 }, "lastFrameIndex" : { "x": 3, "y": 3 } },
-      { "animationType" : WALK_DOWN, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 0 } }
-    ]
-  },
-  {
-    "animationID" : TOWNPORTAL,
-    "atlasName" : "effects/effects.atlas",
-    "atlasKey" : "townportal",
-    "numColumns" : 4,
-    "numRows" : 4,
-    "frameDuration" : 0.16,
-    "animations" : [
-      { "animationType" : IDLE, "firstFrameIndex" : { "x": 0, "y": 0 }, "lastFrameIndex" : { "x": 3, "y": 3 } }
-    ]
-  }
+  { "aniID":"PLAYER_IDLE", "atlas":"units/units.atlas", "atlasKey":"hero", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":0, "y":0 } },
+  { "aniID":"PLAYER_WALK_LEFT", "atlas":"units/units.atlas", "atlasKey":"hero", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":1 }, "lastFrame":{ "x":3, "y":1 } },
+  { "aniID":"PLAYER_WALK_RIGHT", "atlas":"units/units.atlas", "atlasKey":"hero", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":2 }, "lastFrame":{ "x":3, "y":2 } },
+  { "aniID":"PLAYER_WALK_UP", "atlas":"units/units.atlas", "atlasKey":"hero", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":3 }, "lastFrame":{ "x":3, "y":3 } },
+  { "aniID":"PLAYER_WALK_DOWN", "atlas":"units/units.atlas", "atlasKey":"hero", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":3, "y":0 } },
+
+  { "aniID":"DEMON_01_IDLE", "atlas":"units/units.atlas", "atlasKey":"demon01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":0, "y":0 } },
+  { "aniID":"DEMON_01_WALK_LEFT", "atlas":"units/units.atlas", "atlasKey":"demon01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":1 }, "lastFrame":{ "x":3, "y":1 } },
+  { "aniID":"DEMON_01_WALK_RIGHT", "atlas":"units/units.atlas", "atlasKey":"demon01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":2 }, "lastFrame":{ "x":3, "y":2 } },
+  { "aniID":"DEMON_01_WALK_UP", "atlas":"units/units.atlas", "atlasKey":"demon01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":3 }, "lastFrame":{ "x":3, "y":3 } },
+  { "aniID":"DEMON_01_WALK_DOWN", "atlas":"units/units.atlas", "atlasKey":"demon01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":3, "y":0 } },
+
+  { "aniID":"BOSS_01_IDLE", "atlas":"units/units.atlas", "atlasKey":"boss01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":0, "y":0 } },
+  { "aniID":"BOSS_01_WALK_LEFT", "atlas":"units/units.atlas", "atlasKey":"boss01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":1 }, "lastFrame":{ "x":3, "y":1 } },
+  { "aniID":"BOSS_01_WALK_RIGHT", "atlas":"units/units.atlas", "atlasKey":"boss01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":2 }, "lastFrame":{ "x":3, "y":2 } },
+  { "aniID":"BOSS_01_WALK_UP", "atlas":"units/units.atlas", "atlasKey":"boss01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":3 }, "lastFrame":{ "x":3, "y":3 } },
+  { "aniID":"BOSS_01_WALK_DOWN", "atlas":"units/units.atlas", "atlasKey":"boss01", "columns":4, "rows":4, "duration":0.25, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":3, "y":0 } },
+
+  { "aniID":"TOWNPORTAL", "atlas":"effects/effects.atlas", "atlasKey":"townportal", "columns":4, "rows":4, "duration":0.16, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":3, "y":3 } },
+
+  { "aniID":"SELECTION_SPHERE", "atlas":"ui/ui.atlas", "atlasKey":"selection_sphere", "columns":8, "rows":1, "duration":0.05, "firstFrame":{ "x":0, "y":0 }, "lastFrame":{ "x":7, "y":0 } }
 ]
