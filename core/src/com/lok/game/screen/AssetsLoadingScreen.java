@@ -78,7 +78,7 @@ public class AssetsLoadingScreen implements Screen {
 	    if (assetManager.update()) {
 		Gdx.app.debug(TAG, "Finished loading of assets in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
 		startTime = TimeUtils.millis();
-		loadingBar.setText("Preparing caches");
+		loadingBar.setText(Utils.getLabel("Label.PreparingCaches"));
 		loadingProgress = 1;
 	    }
 	} else if (loadingProgress == 1) {

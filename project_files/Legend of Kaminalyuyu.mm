@@ -296,6 +296,9 @@
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>
 </node>
 <node COLOR="#111111" CREATED="1515356328010" ID="ID_1419442995" MODIFIED="1515356338310" TEXT="go through every class again and check for optimizations/loggings"/>
+<node COLOR="#111111" CREATED="1515402968733" ID="ID_575014411" MODIFIED="1515402982881" TEXT="screens should only load gamestate when they are initialized">
+<node COLOR="#111111" CREATED="1515402990930" ID="ID_147410529" MODIFIED="1515403005720" TEXT="otherwise we always create/delete entities etc. and GC is triggering"/>
+</node>
 </node>
 </node>
 </node>

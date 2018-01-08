@@ -11,6 +11,8 @@ public class DesktopLauncher {
 	config.title = "Legend of Kaminalyuyu";
 	config.width = 1280;
 	config.height = 720;
+	config.fullscreen = false;
+	config.vSyncEnabled = false;
 
 	new LwjglApplication(new LegendOfKaminalyuyu(), config);
     }

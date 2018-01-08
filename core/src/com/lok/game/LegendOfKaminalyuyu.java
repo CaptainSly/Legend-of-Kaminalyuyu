@@ -59,6 +59,7 @@ public class LegendOfKaminalyuyu extends Game {
 	Colors.put("Thought", new Color(0x9fa2a3ff));
 
 	Gdx.graphics.setTitle(getLabel("GameWindow.Title"));
+	screenCache = null;
 	this.nextScreen = new AssetsLoadingScreen();
     }
 
