@@ -264,14 +264,38 @@
 <node COLOR="#00b439" CREATED="1509645351011" ID="ID_1312867918" MODIFIED="1512508249625" TEXT="todo">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="16"/>
-<node COLOR="#990000" CREATED="1514410231399" ID="ID_1931627581" MODIFIED="1514410239857" TEXT="!!! REFACTORING !!!!">
+<node COLOR="#990000" CREATED="1514410231399" ID="ID_1931627581" MODIFIED="1515356091441" TEXT="!!! REFACTORING !!!!">
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1514473382659" ID="ID_458498428" MODIFIED="1514473447677" TEXT="add debugmsgs">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 </node>
+<node COLOR="#111111" CREATED="1515356023845" FOLDED="true" ID="ID_404064887" MODIFIED="1515401956141" TEXT="Animation handling">
+<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1515356031465" ID="ID_529460192" MODIFIED="1515356033910" TEXT="add debug msgs"/>
+</node>
+<node COLOR="#111111" CREATED="1515356035874" ID="ID_1726085920" MODIFIED="1515356042671" TEXT="load maps during assetsloading screen"/>
+<node COLOR="#111111" CREATED="1515356247782" ID="ID_1015459951" MODIFIED="1515356258220" TEXT="load conversations during assetloading screen"/>
+<node COLOR="#111111" CREATED="1515356093311" ID="ID_717792674" MODIFIED="1515356099423" TEXT="remove EntityConfiguration class">
+<node COLOR="#111111" CREATED="1515356100348" ID="ID_623360037" MODIFIED="1515356113563" TEXT="load entities during assetloadingscreen">
+<node COLOR="#111111" CREATED="1515356128483" ID="ID_822604945" MODIFIED="1515356139690" TEXT="use json deserialization and add class : to jsonfile"/>
+</node>
+</node>
+<node COLOR="#111111" CREATED="1515356168548" ID="ID_1081393576" MODIFIED="1515356181957" TEXT="remove EntityData classes and use json serializer interface instead"/>
+<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515356222530" TEXT="add generic screen class for  correct game loop">
+<node COLOR="#111111" CREATED="1515356387356" ID="ID_1947068688" MODIFIED="1515356427614" TEXT="every screen class comes with a generic UI class for input handling"/>
+<node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515356536623" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin">
+<node COLOR="#111111" CREATED="1515356818593" ID="ID_75183359" MODIFIED="1515401947462" TEXT="need an initializeAnimationCache(AssetManager mgr) method to prefill the animationCache">
+<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1515356876124" ID="ID_745811082" MODIFIED="1515401951168" TEXT="show that in assetloadingscreen as text">
+<icon BUILTIN="info"/>
+</node>
+</node>
+</node>
+</node>
 <node COLOR="#111111" CREATED="1514473315578" ID="ID_1036700593" MODIFIED="1514473339752" TEXT="check renderer and count how many times we are flushing due to texture swapping">
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>
 </node>
+<node COLOR="#111111" CREATED="1515356328010" ID="ID_1419442995" MODIFIED="1515356338310" TEXT="go through every class again and check for optimizations/loggings"/>
 </node>
 </node>
 </node>

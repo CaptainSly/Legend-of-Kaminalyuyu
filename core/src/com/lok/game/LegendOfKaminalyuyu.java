@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.lok.game.Animation.AnimationID;
 import com.lok.game.assets.loader.AnimationLoader;
 import com.lok.game.map.MapManager;
 import com.lok.game.screen.AssetsLoadingScreen;
@@ -51,7 +50,6 @@ public class LegendOfKaminalyuyu extends Game {
 	// load UI skin
 	assetManager.load("ui/ui.json", Skin.class, new SkinLoader.SkinParameter("ui/ui.atlas"));
 	assetManager.load("ui/village.jpg", Texture.class);
-	assetManager.load(AnimationID.SELECTION_SPHERE.name(), Animation.class);
 	assetManager.finishLoading();
 	uiSkin = assetManager.get("ui/ui.json", Skin.class);
 	uiSkin.add("village-bgd", new Image(new TextureRegionDrawable(new TextureRegion(Utils.getAssetManager().get("ui/village.jpg", Texture.class)))), Image.class);
@@ -61,12 +59,7 @@ public class LegendOfKaminalyuyu extends Game {
 	Colors.put("Thought", new Color(0x9fa2a3ff));
 
 	Gdx.graphics.setTitle(getLabel("GameWindow.Title"));
-	screenCache = new ObjectMap<Class<? extends Screen>, Screen>();
-	screenCache.put(AssetsLoadingScreen.class, new AssetsLoadingScreen());
-	screenCache.put(TownScreen.class, new TownScreen());
-	screenCache.put(GameScreen.class, new GameScreen());
-	this.nextScreen = null;
-	setScreen(AssetsLoadingScreen.class);
+	this.nextScreen = new AssetsLoadingScreen();
     }
 
     public AssetManager getAssetManager() {
@@ -79,6 +72,17 @@ public class LegendOfKaminalyuyu extends Game {
 
     public String getLabel(String labelKey) {
 	return localizationBundle.format(labelKey);
+    }
+
+    public void initializeScreenCache() {
+	if (screenCache == null) {
+	    Gdx.app.debug(TAG, "Initializing screen cache");
+	    screenCache = new ObjectMap<Class<? extends Screen>, Screen>();
+	    screenCache.put(TownScreen.class, new TownScreen());
+	    screenCache.put(GameScreen.class, new GameScreen());
+	} else {
+	    Gdx.app.error(TAG, "Screen cache is initialized multiple times");
+	}
     }
 
     @Override

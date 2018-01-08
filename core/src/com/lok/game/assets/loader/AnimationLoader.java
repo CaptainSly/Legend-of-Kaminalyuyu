@@ -12,28 +12,39 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.lok.game.Animation;
 import com.lok.game.Animation.AnimationID;
 import com.lok.game.Utils;
 
 public class AnimationLoader extends AsynchronousAssetLoader<Animation, AnimationLoader.AnimationParameter> {
+    private static final String TAG = AnimationLoader.class.getSimpleName();
+
     public static class AnimationParameter extends AssetLoaderParameters<Animation> {
+	private Array<JsonValue> jsonFileContent;
+
+	public AnimationParameter(String jsonFilePath) {
+	    jsonFileContent = Utils.fromJson(Gdx.files.internal(jsonFilePath));
+	}
     }
 
-    public Animation	     animation;
-    private Array<JsonValue> jsonFileContent;
+    public Animation animation;
 
     public AnimationLoader(FileHandleResolver resolver) {
 	super(resolver);
-	jsonFileContent = null;
     }
 
     @Override
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, AnimationParameter parameter) {
+	Gdx.app.debug(TAG, "Loading animation " + fileName);
+	if (parameter.jsonFileContent == null || parameter.jsonFileContent.size == 0) {
+	    throw new GdxRuntimeException("AnimationParameter jsonFileContent cannot be null or empty");
+	}
+
 	final AnimationID idToLoad = AnimationID.valueOf(fileName);
 	animation = null;
-	for (JsonValue jsonVal : jsonFileContent) {
+	for (JsonValue jsonVal : parameter.jsonFileContent) {
 	    final AnimationID aniID = AnimationID.valueOf(jsonVal.getString("aniID"));
 	    if (aniID.equals(idToLoad)) {
 		final TextureAtlas textureAtlas = manager.get(jsonVal.getString("atlas"), TextureAtlas.class);
@@ -55,9 +66,12 @@ public class AnimationLoader extends AsynchronousAssetLoader<Animation, Animatio
 		    }
 		}
 		this.animation = new Animation(jsonVal.getFloat("duration"), framesOfAnimation);
-		break;
+		Gdx.app.debug(TAG, "Created new animation " + fileName + " with width " + frameWidth + " and height " + frameHeight);
+		return;
 	    }
 	}
+
+	throw new GdxRuntimeException("There is no Animation for " + fileName + " with the given parameter");
     }
 
     @Override
@@ -70,13 +84,9 @@ public class AnimationLoader extends AsynchronousAssetLoader<Animation, Animatio
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, AnimationParameter parameter) {
-	if (jsonFileContent == null) {
-	    jsonFileContent = Utils.fromJson(Gdx.files.internal("json/animations.json"));
-	}
-
 	final Array<AssetDescriptor> dependencies = new Array<AssetDescriptor>();
 	final AnimationID idToLoad = AnimationID.valueOf(fileName);
-	for (JsonValue jsonVal : jsonFileContent) {
+	for (JsonValue jsonVal : parameter.jsonFileContent) {
 	    final AnimationID aniID = AnimationID.valueOf(jsonVal.getString("aniID"));
 	    if (aniID.equals(idToLoad)) {
 		dependencies.add(new AssetDescriptor(jsonVal.getString("atlas"), TextureAtlas.class));

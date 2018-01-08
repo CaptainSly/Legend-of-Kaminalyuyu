@@ -1,10 +1,13 @@
 package com.lok.game;
 
-import com.badlogic.ashley.utils.Bag;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 public class Animation extends com.badlogic.gdx.graphics.g2d.Animation<TextureRegion> {
+    private static final String TAG = Animation.class.getSimpleName();
+
     public enum AnimationID {
 	PLAYER_IDLE,
 	PLAYER_WALK_LEFT,
@@ -25,23 +28,30 @@ public class Animation extends com.badlogic.gdx.graphics.g2d.Animation<TextureRe
 	BOSS_01_WALK_DOWN,
 
 	TOWNPORTAL,
-	
+
 	SELECTION_SPHERE;
     }
 
-    private final static Bag<Animation> animationCache = new Bag<Animation>(AnimationID.values().length);
+    private static Array<Animation> animationCache = null;
 
     public Animation(float frameDuration, Array<? extends TextureRegion> keyFrames) {
 	super(frameDuration, keyFrames, PlayMode.NORMAL);
     }
 
-    public static Animation getAnimation(AnimationID animationID) {
-	Animation result = animationCache.get(animationID.ordinal());
-	if (result == null) {
-	    result = Utils.getAssetManager().get(animationID.name(), Animation.class);
-	    animationCache.set(animationID.ordinal(), result);
+    public static void initializeAnimationCache(AssetManager assetManager) {
+	if (animationCache == null) {
+	    Gdx.app.debug(TAG, "Initializing animation cache");
+	    animationCache = new Array<Animation>();
+	    for (AnimationID aniID : AnimationID.values()) {
+		animationCache.add(assetManager.get(aniID.name(), Animation.class));
+	    }
+	} else {
+	    Gdx.app.error(TAG, "Animation cache is initialized multiple times");
 	}
-	return result;
+    }
+
+    public static Animation getAnimation(AnimationID animationID) {
+	return animationCache.get(animationID.ordinal());
     }
 
 }
