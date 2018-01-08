@@ -273,8 +273,12 @@
 <icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1515356031465" ID="ID_529460192" MODIFIED="1515356033910" TEXT="add debug msgs"/>
 </node>
-<node COLOR="#111111" CREATED="1515356035874" ID="ID_1726085920" MODIFIED="1515356042671" TEXT="load maps during assetsloading screen"/>
-<node COLOR="#111111" CREATED="1515356247782" ID="ID_1015459951" MODIFIED="1515356258220" TEXT="load conversations during assetloading screen"/>
+<node COLOR="#111111" CREATED="1515356035874" ID="ID_1726085920" MODIFIED="1515437983167" TEXT="load maps during assetsloading screen">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1515356247782" ID="ID_1015459951" MODIFIED="1515438827557" TEXT="load conversations during assetloading screen">
+<icon BUILTIN="button_ok"/>
+</node>
 <node COLOR="#111111" CREATED="1515356093311" ID="ID_717792674" MODIFIED="1515356099423" TEXT="remove EntityConfiguration class">
 <node COLOR="#111111" CREATED="1515356100348" ID="ID_623360037" MODIFIED="1515356113563" TEXT="load entities during assetloadingscreen">
 <node COLOR="#111111" CREATED="1515356128483" ID="ID_822604945" MODIFIED="1515356139690" TEXT="use json deserialization and add class : to jsonfile"/>
@@ -298,6 +302,12 @@
 <node COLOR="#111111" CREATED="1515356328010" ID="ID_1419442995" MODIFIED="1515356338310" TEXT="go through every class again and check for optimizations/loggings"/>
 <node COLOR="#111111" CREATED="1515402968733" ID="ID_575014411" MODIFIED="1515402982881" TEXT="screens should only load gamestate when they are initialized">
 <node COLOR="#111111" CREATED="1515402990930" ID="ID_147410529" MODIFIED="1515403005720" TEXT="otherwise we always create/delete entities etc. and GC is triggering"/>
+</node>
+<node COLOR="#111111" CREATED="1515436662952" ID="ID_778154347" MODIFIED="1515436710242" TEXT="map sollte nur EntityInformation speichern und nicht ein array&lt;entity&gt;">
+<icon BUILTIN="help"/>
+<node COLOR="#111111" CREATED="1515436678893" ID="ID_807977364" MODIFIED="1515436688140" TEXT="entities k&#xf6;nnen dann mit extra methode geladen werden">
+<node COLOR="#111111" CREATED="1515436691997" ID="ID_1852297900" MODIFIED="1515436695990" TEXT="z.b. bei mapwechsel"/>
+</node>
 </node>
 </node>
 </node>

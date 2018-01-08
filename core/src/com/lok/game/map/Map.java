@@ -12,51 +12,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
-import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.MapManager.MapID;
 
 public class Map {
-    private static final String TAG = Map.class.getName();
-
-    public static class Portal {
-	private final Rectangle	area;
-	private final Vector2	targetPosition;
-	private final MapID	targetMapID;
-
-	private Portal(Rectangle area, Vector2 targetPosition, MapID targetMapID) {
-	    this.area = area;
-	    this.targetPosition = targetPosition;
-	    this.targetMapID = targetMapID;
-	}
-
-	public Rectangle getArea() {
-	    return area;
-	}
-
-	public boolean isColliding(Rectangle rectangle) {
-	    return area.overlaps(rectangle);
-	}
-
-	public void activate(Entity entity) {
-	    Gdx.app.debug(TAG, "Entity " + entity + " activated portal with target map " + targetMapID + " and position " + targetPosition);
-
-	    if (targetMapID != null) {
-		MapManager.getManager().changeMap(targetMapID);
-	    }
-
-	    final SizeComponent sizeComp = entity.getComponent(SizeComponent.class);
-
-	    if (sizeComp == null) {
-		return;
-	    }
-
-	    sizeComp.interpolatedPosition.set(targetPosition);
-	    sizeComp.boundingRectangle.setPosition(targetPosition);
-	}
-    }
+    private static final String	   TAG = Map.class.getName();
 
     private final MapID		   mapID;
     private final TiledMap	   tiledMap;
@@ -71,9 +32,9 @@ public class Map {
     private final float		   tileWidthInWorldUnits;
     private final float		   tileHeightInWorldUnits;
 
-    public Map(MapID mapID) {
+    public Map(MapID mapID, TiledMap tiledMap) {
 	this.mapID = mapID;
-	this.tiledMap = Utils.getAssetManager().get(mapID.getMapName(), TiledMap.class);
+	this.tiledMap = tiledMap;
 	this.boundary = new Rectangle();
 	this.collisionAreas = new Array<Rectangle>();
 	this.entities = new Array<Entity>();
@@ -97,8 +58,6 @@ public class Map {
 	for (MapLayer mapLayer : tiledMap.getLayers()) {
 	    if ("Portals".equals(mapLayer.getName())) {
 		parsePortals(mapLayer);
-	    } else if ("Entities".equals(mapLayer.getName())) {
-		parseEntities(mapLayer);
 	    } else if ("Collision".equals(mapLayer.getName())) {
 		parseCollisionAreas(mapLayer);
 	    }
@@ -118,25 +77,32 @@ public class Map {
 	}
     }
 
-    private void parseEntities(MapLayer mapLayer) {
-	for (MapObject mapObj : mapLayer.getObjects()) {
-	    if (mapObj instanceof RectangleMapObject) {
-		final MapProperties entityProperties = mapObj.getProperties();
-		final String EntityIDStr = entityProperties.get("entityID", String.class);
-		final EntityID entityID;
-
-		if (EntityIDStr == null) {
-		    throw new GdxRuntimeException("Entity of map " + mapID + " does not have an entityID specified");
-		} else {
-		    entityID = EntityID.valueOf(EntityIDStr);
-		    if (entityID == null) {
-			throw new GdxRuntimeException("Entity of map " + mapID + " does not have a valid entityID " + EntityIDStr);
-		    }
-		}
-
-		final Rectangle entityArea = ((RectangleMapObject) mapObj).getRectangle();
-		entities.add(EntityEngine.getEngine().createEntity(entityID, entityArea.x * MapManager.WORLD_UNITS_PER_PIXEL, entityArea.y * MapManager.WORLD_UNITS_PER_PIXEL));
+    public void loadEntities() {
+	for (MapLayer mapLayer : tiledMap.getLayers()) {
+	    if (!"Entities".equals(mapLayer.getName())) {
+		continue;
 	    }
+
+	    for (MapObject mapObj : mapLayer.getObjects()) {
+		if (mapObj instanceof RectangleMapObject) {
+		    final MapProperties entityProperties = mapObj.getProperties();
+		    final String EntityIDStr = entityProperties.get("entityID", String.class);
+		    final EntityID entityID;
+
+		    if (EntityIDStr == null) {
+			throw new GdxRuntimeException("Entity of map " + mapID + " does not have an entityID specified");
+		    } else {
+			entityID = EntityID.valueOf(EntityIDStr);
+			if (entityID == null) {
+			    throw new GdxRuntimeException("Entity of map " + mapID + " does not have a valid entityID " + EntityIDStr);
+			}
+		    }
+
+		    final Rectangle entityArea = ((RectangleMapObject) mapObj).getRectangle();
+		    entities.add(EntityEngine.getEngine().createEntity(entityID, entityArea.x * MapManager.WORLD_UNITS_PER_PIXEL, entityArea.y * MapManager.WORLD_UNITS_PER_PIXEL));
+		}
+	    }
+	    return;
 	}
     }
 

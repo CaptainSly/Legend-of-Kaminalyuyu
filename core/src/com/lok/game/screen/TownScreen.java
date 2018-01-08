@@ -138,7 +138,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		if (currentConversation != null) {
 		    currentConversation.removeConversationListener(this);
 		}
-		currentConversation = Conversation.load(convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID);
+		currentConversation = Conversation.getConversation(convCompMapper.get(entityMap.get(entityID.ordinal())).currentConversationID);
 		currentConversation.addConversationListener(this);
 		currentConversation.startConversation();
 		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);

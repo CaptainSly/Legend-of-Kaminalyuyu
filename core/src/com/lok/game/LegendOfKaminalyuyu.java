@@ -19,7 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.lok.game.assets.loader.AnimationLoader;
-import com.lok.game.map.MapManager;
+import com.lok.game.assets.loader.ConversationLoader;
+import com.lok.game.assets.loader.MapLoader;
+import com.lok.game.conversation.Conversation;
+import com.lok.game.map.Map;
 import com.lok.game.screen.AssetsLoadingScreen;
 import com.lok.game.screen.GameScreen;
 import com.lok.game.screen.TownScreen;
@@ -41,6 +44,8 @@ public class LegendOfKaminalyuyu extends Game {
 	assetManager = new AssetManager();
 	assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 	assetManager.setLoader(Animation.class, new AnimationLoader(new InternalFileHandleResolver()));
+	assetManager.setLoader(Map.class, new MapLoader(new InternalFileHandleResolver()));
+	assetManager.setLoader(Conversation.class, new ConversationLoader(new InternalFileHandleResolver()));
 
 	// load labels
 	assetManager.load("localization/Labels", I18NBundle.class);
@@ -132,6 +137,5 @@ public class LegendOfKaminalyuyu extends Game {
 	uiSkin.dispose();
 	assetManager.dispose();
 	screen.dispose();
-	MapManager.getManager().dispose();
     }
 }

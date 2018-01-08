@@ -3,10 +3,10 @@ package com.lok.game.map;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.SoundManager;
 import com.lok.game.ecs.EntityEngine;
@@ -43,15 +43,6 @@ public class MapManager implements PreferencesListener {
 	currentMapID = null;
     }
 
-    private void loadMaps() {
-	final long start = TimeUtils.millis();
-	mapCache = new Array<Map>();
-	for (MapID mapID : MapID.values()) {
-	    mapCache.add(new Map(mapID));
-	}
-	Gdx.app.debug(TAG, "Loaded all maps in " + TimeUtils.timeSinceMillis(start) / 1000.0f);
-    }
-
     public static MapManager getManager() {
 	if (instance == null) {
 	    instance = new MapManager();
@@ -60,11 +51,19 @@ public class MapManager implements PreferencesListener {
 	return instance;
     }
 
-    public void changeMap(MapID mapID) {
+    public void initializeMapCache(AssetManager assetManager) {
 	if (mapCache == null) {
-	    loadMaps();
+	    Gdx.app.debug(TAG, "Initializing map cache");
+	    mapCache = new Array<Map>();
+	    for (MapID mapID : MapID.values()) {
+		mapCache.add(assetManager.get(mapID.name(), Map.class));
+	    }
+	} else {
+	    Gdx.app.error(TAG, "Map cache is initialized multiple times");
 	}
+    }
 
+    public void changeMap(MapID mapID) {
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
 	this.currentMapID = mapID;
 	final Map map = mapCache.get(mapID.ordinal());
@@ -77,21 +76,18 @@ public class MapManager implements PreferencesListener {
 	}
     }
 
+    public void loadAllMapEntities() {
+	for (Map map : mapCache) {
+	    map.loadEntities();
+	}
+    }
+
     public void addMapListener(MapListener listener) {
 	listeners.add(listener);
     }
 
     public void removeMapListener(MapListener listener) {
 	listeners.removeValue(listener, false);
-    }
-
-    public void dispose() {
-	Gdx.app.debug(TAG, "Disposing mapmanager");
-	if (mapCache != null) {
-	    for (Map map : mapCache) {
-		map.dispose();
-	    }
-	}
     }
 
     private static class EntityData {

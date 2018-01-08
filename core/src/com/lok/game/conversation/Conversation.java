@@ -1,11 +1,10 @@
 package com.lok.game.conversation;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.lok.game.Utils;
 import com.lok.game.conversation.ConversationChoice.ConversationAction;
 import com.lok.game.conversation.ConversationChoice.ConversationActionID;
 
@@ -37,7 +36,7 @@ public class Conversation {
     private final ObjectMap<Integer, ConversationNode> nodes;
     private final Array<ConversationListener>	       listeners;
 
-    private Conversation(ConversationID conversationID, ConversationNode startNode) {
+    public Conversation(ConversationID conversationID, ConversationNode startNode) {
 	if (conversationID == null || startNode == null) {
 	    throw new IllegalStateException("Conversation must have an ID " + conversationID + " and a startnode " + startNode);
 	}
@@ -72,6 +71,22 @@ public class Conversation {
 	for (ConversationListener listener : listeners) {
 	    listener.onStartConversation(this, startNode);
 	}
+    }
+
+    public static void initializeConversationCache(AssetManager assetManager) {
+	if (conversationCache == null) {
+	    Gdx.app.debug(TAG, "Initializing conversation cache");
+	    conversationCache = new Array<Conversation>();
+	    for (ConversationID convID : ConversationID.values()) {
+		conversationCache.add(assetManager.get(convID.name(), Conversation.class));
+	    }
+	} else {
+	    Gdx.app.error(TAG, "Conversation cache is initialized multiple times");
+	}
+    }
+
+    public static Conversation getConversation(ConversationID conversationID) {
+	return conversationCache.get(conversationID.ordinal());
     }
 
     public void triggerConversationChoice(int choiceIndex) {
@@ -113,39 +128,5 @@ public class Conversation {
 	    listener.onConversationChoiceSelected(this, currentNode, nextNode, choice);
 	}
 	currentNode = nextNode;
-    }
-
-    public static Conversation load(ConversationID conversationID) {
-	if (conversationCache == null) {
-	    // initialize cache
-	    final int max = ConversationID.values().length;
-	    conversationCache = new Array<Conversation>(max);
-	    for (int i = max; i >= 0; --i) {
-		conversationCache.add(null);
-	    }
-	}
-
-	if (conversationCache.get(conversationID.ordinal()) != null) {
-	    return conversationCache.get(conversationID.ordinal());
-	}
-
-	final Object fromJson = Utils.fromJson(Gdx.files.internal(conversationID.filePath));
-
-	if (fromJson instanceof Array<?>) {
-	    // multiple nodes defined for the conversation
-	    final Array<?> jsonArray = (Array<?>) fromJson;
-	    final Conversation conversation = new Conversation(conversationID, Utils.readJsonValue(ConversationNode.class, (JsonValue) jsonArray.get(0)));
-	    for (int i = 1; i < jsonArray.size; ++i) {
-		conversation.addNode(Utils.readJsonValue(ConversationNode.class, (JsonValue) jsonArray.get(i)));
-	    }
-
-	    conversationCache.set(conversationID.ordinal(), conversation);
-	    return conversation;
-	} else {
-	    // only one node defined for the conversation
-	    final Conversation conversation = new Conversation(conversationID, Utils.readJsonValue(ConversationNode.class, (JsonValue) fromJson));
-	    conversationCache.set(conversationID.ordinal(), conversation);
-	    return conversation;
-	}
     }
 }

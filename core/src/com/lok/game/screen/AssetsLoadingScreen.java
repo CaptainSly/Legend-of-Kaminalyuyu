@@ -7,7 +7,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -18,7 +17,11 @@ import com.lok.game.LegendOfKaminalyuyu;
 import com.lok.game.Utils;
 import com.lok.game.assets.loader.AnimationLoader;
 import com.lok.game.assets.loader.AnimationLoader.AnimationParameter;
+import com.lok.game.conversation.Conversation;
+import com.lok.game.conversation.Conversation.ConversationID;
+import com.lok.game.map.Map;
 import com.lok.game.map.MapManager;
+import com.lok.game.map.MapManager.MapID;
 import com.lok.game.ui.Bar;
 
 public class AssetsLoadingScreen implements Screen {
@@ -39,7 +42,7 @@ public class AssetsLoadingScreen implements Screen {
 
 	loadingBar = new Bar(skin, Utils.getLabel("Label.LoadingAssets"), 1080, false);
 	loadingBar.setPosition(100, 50);
-	loadingBar.reset(1.1f);
+	loadingBar.reset(1.2f);
 
 	stage.addActor(loadingBar);
     }
@@ -56,10 +59,7 @@ public class AssetsLoadingScreen implements Screen {
 	assetManager.load("sounds/effects/menu_selection.wav", Sound.class);
 	assetManager.load("sounds/effects/teleport.wav", Sound.class);
 
-	// load GameScreen assets
-	for (MapManager.MapID mapID : MapManager.MapID.values()) {
-	    assetManager.load(mapID.getMapName(), TiledMap.class);
-	}
+	// load texture atlas
 	assetManager.load("effects/effects.atlas", TextureAtlas.class);
 	assetManager.load("units/units.atlas", TextureAtlas.class);
 	assetManager.load("lights/lights.atlas", TextureAtlas.class);
@@ -68,6 +68,16 @@ public class AssetsLoadingScreen implements Screen {
 	final AnimationLoader.AnimationParameter aniParam = new AnimationParameter("json/animations.json");
 	for (AnimationID aniID : AnimationID.values()) {
 	    assetManager.load(aniID.name(), Animation.class, aniParam);
+	}
+
+	// load maps
+	for (MapID mapID : MapID.values()) {
+	    assetManager.load(mapID.name(), Map.class);
+	}
+
+	// load conversations
+	for (ConversationID convID : ConversationID.values()) {
+	    assetManager.load(convID.name(), Conversation.class);
 	}
     }
 
@@ -85,8 +95,19 @@ public class AssetsLoadingScreen implements Screen {
 	    // prefill caches
 	    Animation.initializeAnimationCache(assetManager);
 	    ((LegendOfKaminalyuyu) Gdx.app.getApplicationListener()).initializeScreenCache();
+	    MapManager.getManager().initializeMapCache(assetManager);
+	    Conversation.initializeConversationCache(assetManager);
 	    Gdx.app.debug(TAG, "Finished prefilling caches in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
 	    loadingBar.setValue(1.1f);
+
+	    startTime = TimeUtils.millis();
+	    loadingBar.setText(Utils.getLabel("Label.LoadingMapEntities"));
+	    loadingProgress = 2;
+
+	} else if (loadingProgress == 2) {
+	    MapManager.getManager().loadAllMapEntities();
+	    Gdx.app.debug(TAG, "Finished loading of all map entities in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
+	    loadingBar.setValue(1.2f);
 	    Utils.setScreen(TownScreen.class);
 	}
 

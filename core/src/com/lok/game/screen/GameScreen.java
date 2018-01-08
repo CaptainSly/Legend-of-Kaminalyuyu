@@ -27,9 +27,9 @@ import com.lok.game.ecs.components.SpeedComponent;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.CollisionSystem.CollisionListener;
 import com.lok.game.map.Map;
-import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
+import com.lok.game.map.Portal;
 import com.lok.game.ui.GameUI;
 import com.lok.game.ui.UIEventListener;
 

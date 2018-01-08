@@ -81,7 +81,7 @@ public class AnimationLoader extends AsynchronousAssetLoader<Animation, Animatio
 	return animation;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings("rawtypes")
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, AnimationParameter parameter) {
 	final Array<AssetDescriptor> dependencies = new Array<AssetDescriptor>();
@@ -89,7 +89,7 @@ public class AnimationLoader extends AsynchronousAssetLoader<Animation, Animatio
 	for (JsonValue jsonVal : parameter.jsonFileContent) {
 	    final AnimationID aniID = AnimationID.valueOf(jsonVal.getString("aniID"));
 	    if (aniID.equals(idToLoad)) {
-		dependencies.add(new AssetDescriptor(jsonVal.getString("atlas"), TextureAtlas.class));
+		dependencies.add(new AssetDescriptor<TextureAtlas>(jsonVal.getString("atlas"), TextureAtlas.class));
 		break;
 	    }
 	}

@@ -33,8 +33,8 @@ import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
-import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapManager;
+import com.lok.game.map.Portal;
 
 public class GameRenderer extends OrthogonalTiledMapRenderer {
     private final static String TAG = GameRenderer.class.getName();

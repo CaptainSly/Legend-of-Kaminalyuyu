@@ -10,9 +10,9 @@ import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
 import com.lok.game.map.Map;
-import com.lok.game.map.Map.Portal;
 import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
+import com.lok.game.map.Portal;
 
 public class CollisionSystem extends IteratingSystem implements MapListener {
     public static interface CollisionListener {

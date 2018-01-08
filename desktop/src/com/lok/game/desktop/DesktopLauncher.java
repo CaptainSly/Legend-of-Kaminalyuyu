@@ -12,7 +12,7 @@ public class DesktopLauncher {
 	config.width = 1280;
 	config.height = 720;
 	config.fullscreen = false;
-	config.vSyncEnabled = false;
+	config.vSyncEnabled = config.fullscreen;
 
 	new LwjglApplication(new LegendOfKaminalyuyu(), config);
     }
