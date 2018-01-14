@@ -70,6 +70,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     private final Array<TiledMapTileLayer>	      foregroundLayers;
     private TiledMapImageLayer			      lightMapLayer;
 
+    private Array<Entity>			      mapEntities;
     private final yPositionComparator		      entityComparator;
 
     private final ComponentMapper<SizeComponent>      sizeComponentMapper;
@@ -108,6 +109,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	this.sizeComponentMapper = ComponentMapper.getFor(SizeComponent.class);
 	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
 
+	this.mapEntities = null;
 	this.entityComparator = new yPositionComparator(sizeComponentMapper);
 
 	final TextureAtlas textureAtlas = Utils.getAssetManager().get("lights/lights.atlas", TextureAtlas.class);
@@ -119,6 +121,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     public void setMap(Map map) {
 	this.map = map;
 	super.setMap(map.getTiledMap());
+	mapEntities = MapManager.getManager().getCurrentMapEntities();
 
 	this.backgroundLayers.clear();
 	this.foregroundLayers.clear();
@@ -170,7 +173,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     }
 
     private void interpolateEntities(float alpha) {
-	for (Entity entity : map.getEntities()) {
+	for (Entity entity : mapEntities) {
 	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
 
 	    final float invAlpha = 1.0f - alpha;
@@ -182,7 +185,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
     public void render(float alpha) {
 	AnimatedTiledMapTile.updateAnimationBaseTime();
 	interpolateEntities(alpha);
-	map.getEntities().sort(entityComparator);
+	mapEntities.sort(entityComparator);
 
 	if (cameraLockEntitySizeComponent != null) {
 	    camera.position.set(cameraLockEntitySizeComponent.interpolatedPosition, 0);
@@ -202,16 +205,16 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	if (groundLayer != null) {
 	    renderTileLayer(groundLayer);
 	}
-	for (Entity entity : map.getEntities()) {
+	for (Entity entity : mapEntities) {
 	    renderEntityShadow(entity);
 	}
 	for (TiledMapTileLayer layer : backgroundLayers) {
 	    renderTileLayer(layer);
 	}
-	for (Entity entity : map.getEntities()) {
+	for (Entity entity : mapEntities) {
 	    renderEntityEffects(entity);
 	}
-	for (Entity entity : map.getEntities()) {
+	for (Entity entity : mapEntities) {
 	    renderEntity(entity);
 	}
 	for (TiledMapTileLayer layer : foregroundLayers) {
@@ -336,7 +339,7 @@ public class GameRenderer extends OrthogonalTiledMapRenderer {
 	    shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
 	}
 
-	for (Entity entity : map.getEntities()) {
+	for (Entity entity : mapEntities) {
 	    final CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
 	    final SizeComponent sizeComp = sizeComponentMapper.get(entity);
 	    if (collisionComponent != null) {

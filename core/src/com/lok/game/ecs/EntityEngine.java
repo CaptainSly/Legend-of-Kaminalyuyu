@@ -1,6 +1,5 @@
 package com.lok.game.ecs;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
@@ -8,24 +7,14 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.lok.game.Animation;
-import com.lok.game.Animation.AnimationID;
-import com.lok.game.Utils;
-import com.lok.game.ability.Ability.AbilityID;
 import com.lok.game.ability.AbilitySystem;
-import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AbilityComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.CollisionComponent;
-import com.lok.game.ecs.components.ConversationComponent;
+import com.lok.game.ecs.components.Component;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.MapRevelationComponent;
 import com.lok.game.ecs.components.SizeComponent;
@@ -36,7 +25,6 @@ import com.lok.game.ecs.systems.CastSystem;
 import com.lok.game.ecs.systems.CollisionSystem;
 import com.lok.game.ecs.systems.MapRevelationSystem;
 import com.lok.game.ecs.systems.MovementSystem;
-import com.lok.game.map.MapManager;
 
 public class EntityEngine {
     public static enum EntityID {
@@ -49,24 +37,6 @@ public class EntityEngine {
 	PORTAL
     }
 
-    private static class EntityConfiguration {
-	private EntityID	 entityID;
-	private AnimationID	 idleAnimationID;
-	private AnimationID	 walkLeftAnimation;
-	private AnimationID	 walkRightAnimation;
-	private AnimationID	 walkUpAnimation;
-	private AnimationID	 walkDownAnimation;
-	private Vector2		 originPoint;
-	private float		 speed;
-	private float		 revelationRadius;
-	private Vector2		 size;
-	private Rectangle	 collisionRectangle;
-	private Array<String>	 additionalComponents;
-	private ConversationID	 conversationID;
-	private String		 conversationImage;
-	private Array<AbilityID> abilities;
-    }
-
     private static final String	       TAG	= EntityEngine.class.getName();
     private static EntityEngine	       instance	= null;
 
@@ -76,7 +46,7 @@ public class EntityEngine {
 
     private EntityEngine() {
 	entityConfigurationCache = null;
-	engine = new PooledEngine(128, 512, 512, 2048);
+	engine = new PooledEngine(64, 128, 512, 1024);
 
 	final ComponentMapper<IDComponent> idComponentMapper = ComponentMapper.getFor(IDComponent.class);
 	final ComponentMapper<SpeedComponent> speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
@@ -104,65 +74,16 @@ public class EntityEngine {
 	return instance;
     }
 
-    private void loadEntityConfigurations() {
-	final long startTime = TimeUtils.millis();
-	entityConfigurationCache = new Array<EntityConfiguration>();
-
-	// parse player
-	Object fromJson = Utils.fromJson(Gdx.files.internal("json/player.json"));
-	final Array<EntityConfiguration> configsInFile = new Array<EntityConfiguration>();
-	if (fromJson instanceof Array<?>) {
-	    // multiple entity types defined within file
-	    for (Object val : (Array<?>) fromJson) {
-		configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) val));
+    public void initializeEntityConfigurationCache(AssetManager assetManager) {
+	if (entityConfigurationCache == null) {
+	    Gdx.app.debug(TAG, "Initializing entity configuration cache");
+	    entityConfigurationCache = new Array<EntityConfiguration>();
+	    for (EntityID entityID : EntityID.values()) {
+		entityConfigurationCache.add(assetManager.get(entityID.name(), EntityConfiguration.class));
 	    }
 	} else {
-	    // only one entity type defined -> load it
-	    configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) fromJson));
+	    Gdx.app.error(TAG, "Entity configuration cache is initialized multiple times");
 	}
-
-	// parse townfolk entities
-	fromJson = Utils.fromJson(Gdx.files.internal("json/townfolk.json"));
-	if (fromJson instanceof Array<?>) {
-	    // multiple entity types defined within file
-	    for (Object val : (Array<?>) fromJson) {
-		configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) val));
-	    }
-	} else {
-	    // only one entity type defined -> load it
-	    configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) fromJson));
-	}
-
-	// parse monster entities
-	fromJson = Utils.fromJson(Gdx.files.internal("json/monsters.json"));
-	if (fromJson instanceof Array<?>) {
-	    // multiple entity types defined within file
-	    for (Object val : (Array<?>) fromJson) {
-		configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) val));
-	    }
-	} else {
-	    // only one entity type defined -> load it
-	    configsInFile.add(Utils.readJsonValue(EntityConfiguration.class, (JsonValue) fromJson));
-	}
-
-	for (EntityID entityID : EntityID.values()) {
-	    boolean foundEntityConfig = false;
-
-	    for (EntityConfiguration entityCfg : configsInFile) {
-		if (!entityID.equals(entityCfg.entityID)) {
-		    continue;
-		}
-
-		foundEntityConfig = true;
-		entityConfigurationCache.add(entityCfg);
-	    }
-
-	    if (!foundEntityConfig) {
-		throw new GdxRuntimeException("Missing EntityConfiguration for " + entityID);
-	    }
-	}
-
-	Gdx.app.debug(TAG, "Loaded all entity configurations in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f);
     }
 
     public void update(float deltaTime) {
@@ -178,12 +99,6 @@ public class EntityEngine {
 	engine.removeEntityListener(listener);
     }
 
-    public <T extends Component> T createComponent(Class<T> componentType) {
-	Gdx.app.debug(TAG, "Creating component " + componentType);
-
-	return engine.createComponent(componentType);
-    }
-
     public AbilitySystem getAbilitySystem() {
 	return abilitySystem;
     }
@@ -192,134 +107,39 @@ public class EntityEngine {
 	return engine.getSystem(systemType);
     }
 
-    public void removeAllEntities() {
-	Gdx.app.debug(TAG, "Removing all entities from engine");
-	engine.removeAllEntities();
-    }
-
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Entity createEntity(EntityID entityID, float x, float y) {
-	if (entityConfigurationCache == null) {
-	    loadEntityConfigurations();
-	}
-
 	Gdx.app.debug(TAG, "Creating entity " + entityID + " at location (" + x + "/" + y + ")");
 
-	final EntityConfiguration entityConfig = entityConfigurationCache.get(entityID.ordinal());
 	final Entity entity = engine.createEntity();
 
 	final IDComponent idComponent = engine.createComponent(IDComponent.class);
 	idComponent.entityID = entityID;
 	entity.add(idComponent);
 
-	createSizeComponentIfNeeded(entityConfig, entity, x, y);
-	createSpeedComponentIfNeeded(entityConfig, entity);
-	createAnimationComponentIfNeeded(entityConfig, entity);
-	createMapRevelationComponentIfNeeded(entityConfig, entity);
-	createCollisionComponentIfNeeded(entityConfig, entity, x, y);
-	createConversationComponentIfNeeded(entityConfig, entity);
-	createAbilityComponentIfNeeded(entityConfig, entity);
-	createAdditionalComponentsIfNeeded(entityConfig, entity);
+	final EntityConfiguration components = entityConfigurationCache.get(entityID.ordinal());
+	for (Component component : components) {
+	    final Component entityComponent = engine.createComponent(component.getClass());
+	    entityComponent.initialize(component);
+
+	    if (entityComponent instanceof SizeComponent) {
+		final SizeComponent sizeComp = (SizeComponent) entityComponent;
+		sizeComp.boundingRectangle.setPosition(x, y);
+		sizeComp.interpolatedPosition.set(x, y);
+	    } else if (entityComponent instanceof CollisionComponent) {
+		final CollisionComponent collisionComp = (CollisionComponent) entityComponent;
+		collisionComp.collisionRectangle.setPosition(x + collisionComp.rectOffset.x, y + collisionComp.rectOffset.y);
+	    }
+
+	    entity.add(entityComponent);
+	}
 
 	engine.addEntity(entity);
 	return entity;
     }
 
-    private void createSizeComponentIfNeeded(EntityConfiguration entityConfig, Entity entity, float x, float y) {
-	if (entityConfig.size != null) {
-	    final SizeComponent sizeComponent = engine.createComponent(SizeComponent.class);
-	    if (entityConfig.size != null) {
-		sizeComponent.boundingRectangle.set(x, y, entityConfig.size.x, entityConfig.size.y);
-	    } else {
-		sizeComponent.boundingRectangle.set(x, y, 0, 0);
-	    }
-	    sizeComponent.interpolatedPosition.set(x, y);
-	    entity.add(sizeComponent);
-	}
-    }
-
-    private void createCollisionComponentIfNeeded(EntityConfiguration entityConfig, Entity entity, float x, float y) {
-	if (entityConfig.collisionRectangle != null) {
-	    final CollisionComponent collisionComponent = engine.createComponent(CollisionComponent.class);
-	    collisionComponent.rectOffset.set(entityConfig.collisionRectangle.x * MapManager.WORLD_UNITS_PER_PIXEL,
-		    entityConfig.collisionRectangle.y * MapManager.WORLD_UNITS_PER_PIXEL);
-
-	    collisionComponent.collisionRectangle.set(x + collisionComponent.rectOffset.x, y + collisionComponent.rectOffset.y, // position
-		    entityConfig.collisionRectangle.width * MapManager.WORLD_UNITS_PER_PIXEL, // width
-		    entityConfig.collisionRectangle.height * MapManager.WORLD_UNITS_PER_PIXEL); // height
-
-	    entity.add(collisionComponent);
-	}
-    }
-
-    private void createSpeedComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.speed != 0) {
-	    final SpeedComponent speedComponent = engine.createComponent(SpeedComponent.class);
-	    speedComponent.maxSpeed = entityConfig.speed;
-	    entity.add(speedComponent);
-	}
-    }
-
-    private void createAnimationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.idleAnimationID != null) {
-	    final AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
-	    animationComponent.idleAnimationID = entityConfig.idleAnimationID;
-	    animationComponent.walkDownAnimation = entityConfig.walkDownAnimation;
-	    animationComponent.walkLeftAnimation = entityConfig.walkLeftAnimation;
-	    animationComponent.walkRightAnimation = entityConfig.walkRightAnimation;
-	    animationComponent.walkUpAnimation = entityConfig.walkUpAnimation;
-	    if (entityConfig.originPoint != null) {
-		animationComponent.originPoint.set(entityConfig.originPoint.x * MapManager.WORLD_UNITS_PER_PIXEL, entityConfig.originPoint.y * MapManager.WORLD_UNITS_PER_PIXEL);
-	    }
-	    animationComponent.animation = Animation.getAnimation(animationComponent.idleAnimationID);
-	    entity.add(animationComponent);
-	}
-    }
-
-    private void createMapRevelationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.revelationRadius > 0) {
-	    final MapRevelationComponent mapRevelationComponent = engine.createComponent(MapRevelationComponent.class);
-	    mapRevelationComponent.revelationRadius = entityConfig.revelationRadius;
-	    mapRevelationComponent.minRevelationRadius = entityConfig.revelationRadius - 0.25f;
-	    mapRevelationComponent.maxRevelationRadius = entityConfig.revelationRadius + 0.25f;
-	    mapRevelationComponent.incPerFrame = 2f;
-	    entity.add(mapRevelationComponent);
-	}
-    }
-
-    private void createConversationComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.conversationImage != null || entityConfig.conversationID != null) {
-	    final ConversationComponent convComponent = engine.createComponent(ConversationComponent.class);
-	    convComponent.currentConversationID = entityConfig.conversationID;
-	    convComponent.conversationImage = entityConfig.conversationImage;
-	    entity.add(convComponent);
-	}
-    }
-
-    private void createAbilityComponentIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.abilities != null) {
-	    final AbilityComponent abilityComponent = engine.createComponent(AbilityComponent.class);
-	    for (AbilityID ability : entityConfig.abilities) {
-		abilityComponent.abilities.add(ability);
-	    }
-	    entity.add(abilityComponent);
-	}
-    }
-
-    @SuppressWarnings("unchecked")
-    private void createAdditionalComponentsIfNeeded(EntityConfiguration entityConfig, Entity entity) {
-	if (entityConfig.additionalComponents != null) {
-	    for (String additionalComponent : entityConfig.additionalComponents) {
-		try {
-		    entity.add(engine.createComponent(ClassReflection.forName(additionalComponent)));
-		} catch (Exception e) {
-		    throw new GdxRuntimeException("Could not create component " + additionalComponent + " for entity " + entity.getComponent(IDComponent.class).entityID, e);
-		}
-	    }
-	}
-    }
-
     public void removeEntity(Entity entity) {
-	Gdx.app.debug(TAG, "Removing entity " + entity);
+	Gdx.app.debug(TAG, "Removing entity " + entity.getComponent(IDComponent.class).entityID);
 
 	engine.removeEntity(entity);
     }

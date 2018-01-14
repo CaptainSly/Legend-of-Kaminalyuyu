@@ -1,6 +1,30 @@
 [
-  { "entityID" : ELDER, "size" : { "x" : 0, "y" : 0 }, "conversationID" : ElderIntro, "conversationImage" : "img_elder" },
-  { "entityID" : SHAMAN, "size" : { "x" : 0, "y" : 0 }, "conversationID" : ShamanIntro, "conversationImage" : "img_shaman" },
-  { "entityID" : BLACKSMITH, "size" : { "x" : 0, "y" : 0 }, "conversationID" : BlacksmithIntro, "conversationImage" : "img_blacksmith" },
-  { "entityID" : PORTAL, "size" : { "x" : 0, "y" : 0 }, "conversationID" : Portal, "conversationImage" : "img_portal" }
+  {
+    "entityID": "ELDER",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 0, "height": 0 } },
+      { "class": "com.lok.game.ecs.components.ConversationComponent", "currentConversationID": "ElderIntro", "conversationImage": "img_elder" }
+    ]
+  },
+  {
+    "entityID": "SHAMAN",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 0, "height": 0 } },
+      { "class": "com.lok.game.ecs.components.ConversationComponent", "currentConversationID": "ShamanIntro", "conversationImage": "img_shaman" }
+    ]
+  },
+  {
+    "entityID": "BLACKSMITH",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 0, "height": 0 } },
+      { "class": "com.lok.game.ecs.components.ConversationComponent", "currentConversationID": "BlacksmithIntro", "conversationImage": "img_blacksmith" }
+    ]
+  },
+  {
+    "entityID": "PORTAL",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 0, "height": 0 } },
+      { "class": "com.lok.game.ecs.components.ConversationComponent", "currentConversationID": "Portal", "conversationImage": "img_portal" }
+    ]
+  }
 ]

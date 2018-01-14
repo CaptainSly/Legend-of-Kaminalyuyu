@@ -37,7 +37,7 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
     private float				      accumulator;
     private final float				      fixedPhysicsStep;
 
-    private GameRenderer			      renderer;
+    private final GameRenderer			      renderer;
     private final EntityEngine			      entityEngine;
     private final GameUI			      gameUI;
 
@@ -51,8 +51,8 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	accumulator = 0.0f;
 
 	this.gameUI = new GameUI();
+	renderer = new GameRenderer();
 	this.entityEngine = EntityEngine.getEngine();
-	this.renderer = null;
 	this.player = null;
 	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
 	this.animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
@@ -61,11 +61,6 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
     @Override
     public void show() {
-	if (renderer == null) {
-	    renderer = new GameRenderer();
-	}
-
-	entityEngine.removeAllEntities();
 	this.gameUI.addUIEventListener(this);
 	entityEngine.addEntityListener(Family.all(IDComponent.class).get(), this);
 	entityEngine.getSystem(CollisionSystem.class).addCollisionListener(this);
@@ -74,8 +69,9 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	PreferencesManager.getManager().addPreferencesListener(MapManager.getManager());
 	PreferencesManager.getManager().addPreferencesListener(this);
 
-	PreferencesManager.getManager().loadGameState();
 	gameUI.show();
+
+	PreferencesManager.getManager().loadGameState();
     }
 
     @Override
@@ -113,6 +109,9 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
     @Override
     public void hide() {
 	PreferencesManager.getManager().saveGameState();
+	for (Entity entity : MapManager.getManager().getCurrentMapEntities()) {
+	    EntityEngine.getEngine().removeEntity(entity);
+	}
 
 	entityEngine.removeEntityListener(this);
 	entityEngine.getSystem(CollisionSystem.class).removeCollisionListener(this);

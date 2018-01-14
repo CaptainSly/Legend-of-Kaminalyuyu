@@ -1,24 +1,29 @@
 [
   {
-    "entityID" : DEMON_01,
-    "idleAnimationID" : DEMON_01_IDLE,
-    "walkDownAnimation" : DEMON_01_WALK_DOWN,
-    "walkLeftAnimation" : DEMON_01_WALK_LEFT,
-    "walkRightAnimation" : DEMON_01_WALK_RIGHT,
-    "walkUpAnimation" : DEMON_01_WALK_UP,
-    "speed" : 1,
-    "size" : { "x" : 1, "y" : 1.5 },
-    "collisionRectangle" : { "x" : 3, "y" : 10, "width" : 26 , "height" : 10 },
-    "additionalComponents" : [ "com.lok.game.ecs.components.AIWanderComponent" ]
+    "entityID" : "DEMON_01",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 1, "height": 1.5 } },
+      {	"class": "com.lok.game.ecs.components.SpeedComponent", "maxSpeed": 1 },
+      {
+        "class": "com.lok.game.ecs.components.AnimationComponent",
+        "idleAnimationID": "DEMON_01_IDLE",
+        "walkLeftAnimation": "DEMON_01_WALK_LEFT", "walkRightAnimation": "DEMON_01_WALK_RIGHT", "walkUpAnimation": "DEMON_01_WALK_UP", "walkDownAnimation": "DEMON_01_WALK_DOWN"
+      },
+      {	"class": "com.lok.game.ecs.components.CollisionComponent", "rectOffset": { "x": 0.09375, "y": 0.3125 }, "collisionRectangle": { "width": 0.8125, "height": 0.3125 } },
+      {	"class": "com.lok.game.ecs.components.AIWanderComponent" }
+    ]
   },
   {
-    "entityID" : BOSS_01,
-    "idleAnimationID" : BOSS_01_IDLE,
-    "walkDownAnimation" : BOSS_01_WALK_DOWN,
-    "walkLeftAnimation" : BOSS_01_WALK_LEFT,
-    "walkRightAnimation" : BOSS_01_WALK_RIGHT,
-    "walkUpAnimation" : BOSS_01_WALK_UP,
-    "size" : { "x" : 2.5, "y" : 3 },
-    "collisionRectangle" : { "x" : 2, "y" : 2, "width" : 70 , "height" : 30 }
+    "entityID" : "BOSS_01",
+    "components": [
+      { "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 2.5, "height": 3 } },
+      {	"class": "com.lok.game.ecs.components.SpeedComponent", "maxSpeed": 1 },
+      {
+        "class": "com.lok.game.ecs.components.AnimationComponent",
+        "idleAnimationID": "BOSS_01_IDLE",
+        "walkLeftAnimation": "BOSS_01_WALK_LEFT", "walkRightAnimation": "BOSS_01_WALK_RIGHT", "walkUpAnimation": "BOSS_01_WALK_UP", "walkDownAnimation": "BOSS_01_WALK_DOWN"
+      },
+      {	"class": "com.lok.game.ecs.components.CollisionComponent", "rectOffset": { "x": 0.0625, "y": 0.0625 }, "collisionRectangle": { "width": 2.1875, "height": 0.9375 } }
+    ]
   }
 ]

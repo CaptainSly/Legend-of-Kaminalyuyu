@@ -1,15 +1,13 @@
 package com.lok.game.ecs.components;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool.Poolable;
 import com.lok.game.Animation;
 import com.lok.game.Animation.AnimationID;
 import com.lok.game.SpecialEffect;
 
-public class AnimationComponent implements Component, Poolable {
+public class AnimationComponent implements Component<AnimationComponent> {
     public AnimationID		idleAnimationID	   = null;
     public AnimationID		walkLeftAnimation  = null;
     public AnimationID		walkRightAnimation = null;
@@ -37,5 +35,17 @@ public class AnimationComponent implements Component, Poolable {
 	playAnimation = true;
 	originPoint.set(0, 0);
 	originEffects.clear();
+    }
+
+    @Override
+    public void initialize(AnimationComponent configComponent) {
+	this.idleAnimationID = configComponent.idleAnimationID;
+	this.walkLeftAnimation = configComponent.walkLeftAnimation;
+	this.walkRightAnimation = configComponent.walkRightAnimation;
+	this.walkUpAnimation = configComponent.walkUpAnimation;
+	this.walkDownAnimation = configComponent.walkDownAnimation;
+	this.animation = Animation.getAnimation(idleAnimationID);
+	this.color.set(configComponent.color);
+	this.originPoint.set(configComponent.originPoint);
     }
 }

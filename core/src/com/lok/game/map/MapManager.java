@@ -10,9 +10,9 @@ import com.badlogic.gdx.utils.Json;
 import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.SoundManager;
 import com.lok.game.ecs.EntityEngine;
-import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
+import com.lok.game.map.MapEntityData.MapEntityDataSerializer;
 
 public class MapManager implements PreferencesListener {
     public enum MapID {
@@ -29,18 +29,22 @@ public class MapManager implements PreferencesListener {
 	}
     }
 
-    public static float		     WORLD_UNITS_PER_PIXEL = 1.0f / 32.0f;
-    private static final String	     TAG		   = MapManager.class.getName();
-    private static MapManager	     instance		   = null;
+    public static float			  WORLD_UNITS_PER_PIXEL	= 1.0f / 32.0f;
+    private static final String		  TAG			= MapManager.class.getName();
+    private static MapManager		  instance		= null;
 
-    private Array<Map>		     mapCache;
-    private MapID		     currentMapID;
-    private final Array<MapListener> listeners;
+    private Array<Map>			  mapCache;
+    private Map				  currentMap;
+    private final Array<Entity>		  currentMapEntities;
+    private final Array<MapListener>	  listeners;
+    private final MapEntityDataSerializer serializer;
 
     private MapManager() {
 	listeners = new Array<MapListener>();
 	this.mapCache = null;
-	currentMapID = null;
+	currentMap = null;
+	this.currentMapEntities = new Array<Entity>();
+	this.serializer = new MapEntityDataSerializer();
     }
 
     public static MapManager getManager() {
@@ -65,10 +69,17 @@ public class MapManager implements PreferencesListener {
 
     public void changeMap(MapID mapID) {
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
-	this.currentMapID = mapID;
 	final Map map = mapCache.get(mapID.ordinal());
+	this.currentMap = map;
 	if (map.getMusicFilePath() != null) {
 	    SoundManager.getManager().playMusic(map.getMusicFilePath(), true);
+	}
+	for (Entity entity : currentMapEntities) {
+	    EntityEngine.getEngine().removeEntity(entity);
+	}
+	currentMapEntities.clear();
+	for (MapEntityData entityData : map.getEntityData()) {
+	    currentMapEntities.add(EntityEngine.getEngine().createEntity(entityData.entityID, entityData.position.x, entityData.position.y));
 	}
 
 	for (MapListener listener : listeners) {
@@ -76,10 +87,12 @@ public class MapManager implements PreferencesListener {
 	}
     }
 
-    public void loadAllMapEntities() {
-	for (Map map : mapCache) {
-	    map.loadEntities();
-	}
+    public Array<Entity> getCurrentMapEntities() {
+	return currentMapEntities;
+    }
+
+    public Array<Portal> getCurrentMapPortals() {
+	return currentMap.getPortals();
     }
 
     public void addMapListener(MapListener listener) {
@@ -90,49 +103,49 @@ public class MapManager implements PreferencesListener {
 	listeners.removeValue(listener, false);
     }
 
-    private static class EntityData {
-	private EntityID id	  = null;
-	private Vector2	 position = new Vector2();
-    }
-
     @Override
     public void onSave(Json json, Preferences preferences) {
+	preferences.putString("currentMap", currentMap.getMapID().name());
 	for (Map map : mapCache) {
 	    final MapID id = map.getMapID();
-	    final Array<EntityData> entityData = new Array<EntityData>();
-	    for (Entity entity : map.getEntities()) {
-		final EntityData data = new EntityData();
-		data.id = entity.getComponent(IDComponent.class).entityID;
-		entity.getComponent(SizeComponent.class).boundingRectangle.getPosition(data.position);
-		entityData.add(data);
+	    final Array<MapEntityData> entityDataArr = new Array<MapEntityData>();
+	    for (Entity entity : currentMapEntities) {
+		final SizeComponent sizeComp = entity.getComponent(SizeComponent.class);
+		entityDataArr.add(
+			MapEntityData.newMapEntityData(entity.getComponent(IDComponent.class).entityID, new Vector2(sizeComp.boundingRectangle.x, sizeComp.boundingRectangle.y)));
 	    }
-	    preferences.putString(id.name(), json.toJson(entityData));
+	    json.setSerializer(MapEntityData.class, serializer);
+	    preferences.putString(id.name(), json.toJson(entityDataArr));
+	    for (MapEntityData data : entityDataArr) {
+		MapEntityData.removeMapEntityData(data);
+	    }
 	}
-	preferences.putString("currentMap", currentMapID.name());
     }
 
     @Override
     public void onLoad(Json json, Preferences preferences) {
-	if (!preferences.contains("currentMap")) {
-	    changeMap(MapID.DEMON_LAIR_01);
-	} else {
-	    changeMap(MapID.valueOf(preferences.getString("currentMap")));
-	}
-
+	json.setSerializer(MapEntityData.class, serializer);
 	for (MapID mapID : MapID.values()) {
 	    if (!preferences.contains(mapID.name())) {
 		continue;
 	    }
 
 	    final Map map = mapCache.get(mapID.ordinal());
-	    for (Entity entity : map.getEntities()) {
-		EntityEngine.getEngine().removeEntity(entity);
+	    for (MapEntityData data : map.getEntityData()) {
+		MapEntityData.removeMapEntityData(data);
 	    }
+	    map.getEntityData().clear();
 	    @SuppressWarnings("unchecked")
-	    final Array<EntityData> entityData = json.fromJson(Array.class, preferences.getString(mapID.name()));
-	    for (EntityData data : entityData) {
-		EntityEngine.getEngine().createEntity(data.id, data.position.x, data.position.y);
+	    final Array<MapEntityData> entityDataArr = json.fromJson(Array.class, preferences.getString(mapID.name()));
+	    for (MapEntityData data : entityDataArr) {
+		map.getEntityData().add(data);
 	    }
+	}
+
+	if (!preferences.contains("currentMap")) {
+	    changeMap(MapID.DEMON_LAIR_01);
+	} else {
+	    changeMap(MapID.valueOf(preferences.getString("currentMap")));
 	}
     }
 }

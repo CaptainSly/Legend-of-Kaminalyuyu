@@ -9,12 +9,10 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.CollisionComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
-import com.lok.game.map.Map;
-import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 import com.lok.game.map.Portal;
 
-public class CollisionSystem extends IteratingSystem implements MapListener {
+public class CollisionSystem extends IteratingSystem {
     public static interface CollisionListener {
 	public void onEntityCollision(EntityID entityIDA, Entity entityA, EntityID entityIDB, Entity entityB);
 
@@ -24,54 +22,45 @@ public class CollisionSystem extends IteratingSystem implements MapListener {
     private final ComponentMapper<CollisionComponent> collisionComponentMapper;
     private final ComponentMapper<IDComponent>	      idComponentMapper;
     private final Array<CollisionListener>	      collisionListeners;
-    private Map					      map;
+    private final MapManager			      mapManager;
 
     public CollisionSystem(ComponentMapper<IDComponent> idComponentMapper, ComponentMapper<CollisionComponent> collisionComponentMapper) {
 	super(Family.all(SizeComponent.class, CollisionComponent.class).get());
 
 	this.collisionComponentMapper = collisionComponentMapper;
 	this.idComponentMapper = idComponentMapper;
-	this.map = null;
+	this.mapManager = MapManager.getManager();
 	this.collisionListeners = new Array<CollisionListener>();
-
-	MapManager.getManager().addMapListener(this);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 	final CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
 
-	if (map != null) {
-	    final IDComponent idComp = idComponentMapper.get(entity);
+	final IDComponent idComp = idComponentMapper.get(entity);
 
-	    for (Portal portal : map.getPortals()) {
-		if (portal.isColliding(collisionComponent.collisionRectangle)) {
-		    for (CollisionListener collisionListener : collisionListeners) {
-			collisionListener.onPortalCollision(idComp.entityID, entity, portal);
-		    }
-		}
-	    }
-
-	    for (Entity mapEntity : map.getEntities()) {
-		if (entity.equals(mapEntity)) {
-		    continue;
-		}
-
-		final CollisionComponent collisionComponentMapEntity = collisionComponentMapper.get(mapEntity);
-		final IDComponent idCompMapEntity = idComponentMapper.get(mapEntity);
-
-		if (collisionComponentMapEntity != null && collisionComponentMapEntity.collisionRectangle.overlaps(collisionComponent.collisionRectangle)) {
-		    for (CollisionListener collisionListener : collisionListeners) {
-			collisionListener.onEntityCollision(idComp.entityID, entity, idCompMapEntity.entityID, mapEntity);
-		    }
+	for (Portal portal : mapManager.getCurrentMapPortals()) {
+	    if (portal.isColliding(collisionComponent.collisionRectangle)) {
+		for (CollisionListener collisionListener : collisionListeners) {
+		    collisionListener.onPortalCollision(idComp.entityID, entity, portal);
 		}
 	    }
 	}
-    }
 
-    @Override
-    public void onMapChange(MapManager manager, Map map) {
-	this.map = map;
+	for (Entity mapEntity : mapManager.getCurrentMapEntities()) {
+	    if (entity.equals(mapEntity)) {
+		continue;
+	    }
+
+	    final CollisionComponent collisionComponentMapEntity = collisionComponentMapper.get(mapEntity);
+	    final IDComponent idCompMapEntity = idComponentMapper.get(mapEntity);
+
+	    if (collisionComponentMapEntity != null && collisionComponentMapEntity.collisionRectangle.overlaps(collisionComponent.collisionRectangle)) {
+		for (CollisionListener collisionListener : collisionListeners) {
+		    collisionListener.onEntityCollision(idComp.entityID, entity, idCompMapEntity.entityID, mapEntity);
+		}
+	    }
+	}
     }
 
     public void addCollisionListener(CollisionListener collisionListener) {

@@ -18,8 +18,16 @@ public final class Utils {
 	return json.fromJson(null, file);
     }
 
+    public static <T> T fromJson(Class<T> type, String jsonString) {
+	return json.fromJson(type, jsonString);
+    }
+
     public static <T> T readJsonValue(Class<T> type, JsonValue jsonMap) {
 	return json.readValue(type, jsonMap);
+    }
+
+    public static String toJson(Object object) {
+	return json.toJson(object, object.getClass(), (Class<?>) null);
     }
 
     public static AssetManager getAssetManager() {

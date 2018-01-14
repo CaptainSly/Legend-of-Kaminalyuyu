@@ -279,15 +279,24 @@
 <node COLOR="#111111" CREATED="1515356247782" ID="ID_1015459951" MODIFIED="1515438827557" TEXT="load conversations during assetloading screen">
 <icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#111111" CREATED="1515356093311" ID="ID_717792674" MODIFIED="1515356099423" TEXT="remove EntityConfiguration class">
+<node COLOR="#111111" CREATED="1515356093311" FOLDED="true" ID="ID_717792674" MODIFIED="1515867904667" TEXT="remove EntityConfiguration class">
+<icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1515356100348" ID="ID_623360037" MODIFIED="1515356113563" TEXT="load entities during assetloadingscreen">
 <node COLOR="#111111" CREATED="1515356128483" ID="ID_822604945" MODIFIED="1515356139690" TEXT="use json deserialization and add class : to jsonfile"/>
 </node>
 </node>
-<node COLOR="#111111" CREATED="1515356168548" ID="ID_1081393576" MODIFIED="1515356181957" TEXT="remove EntityData classes and use json serializer interface instead"/>
-<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515356222530" TEXT="add generic screen class for  correct game loop">
+<node COLOR="#111111" CREATED="1515356168548" ID="ID_1081393576" MODIFIED="1515873193806" TEXT="remove EntityData classes and use json serializer interface instead">
+<icon BUILTIN="button_ok"/>
+</node>
+<node COLOR="#111111" CREATED="1515436662952" FOLDED="true" ID="ID_778154347" MODIFIED="1515873204905" TEXT="map sollte nur EntityInformation speichern und nicht ein array&lt;entity&gt;">
+<icon BUILTIN="button_ok"/>
+<node COLOR="#111111" CREATED="1515436678893" ID="ID_807977364" MODIFIED="1515436688140" TEXT="entities k&#xf6;nnen dann mit extra methode geladen werden">
+<node COLOR="#111111" CREATED="1515436691997" ID="ID_1852297900" MODIFIED="1515436695990" TEXT="z.b. bei mapwechsel"/>
+</node>
+</node>
+<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515957329118" TEXT="add generic screen class for  correct game loop">
 <node COLOR="#111111" CREATED="1515356387356" ID="ID_1947068688" MODIFIED="1515356427614" TEXT="every screen class comes with a generic UI class for input handling"/>
-<node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515356536623" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin">
+<node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515957366164" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin and Utils.json">
 <node COLOR="#111111" CREATED="1515356818593" ID="ID_75183359" MODIFIED="1515401947462" TEXT="need an initializeAnimationCache(AssetManager mgr) method to prefill the animationCache">
 <icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1515356876124" ID="ID_745811082" MODIFIED="1515401951168" TEXT="show that in assetloadingscreen as text">
@@ -296,19 +305,18 @@
 </node>
 </node>
 </node>
+<node COLOR="#111111" CREATED="1515957391719" ID="ID_282437043" MODIFIED="1515957452986" TEXT="move PreferencesManager in its own package">
+<node COLOR="#111111" CREATED="1515957402130" ID="ID_339938006" MODIFIED="1515957425320" TEXT="create gamestate.serializable package and move entitydata classes inside"/>
+<node COLOR="#111111" CREATED="1515957427191" ID="ID_88869623" MODIFIED="1515957436315" TEXT="set serializer in preferencesmanager constructor for json"/>
+<node COLOR="#111111" CREATED="1515957437393" ID="ID_1762788378" MODIFIED="1515957449352" TEXT="remove these lines of code from the onSave/onLoad methods"/>
+</node>
 <node COLOR="#111111" CREATED="1514473315578" ID="ID_1036700593" MODIFIED="1514473339752" TEXT="check renderer and count how many times we are flushing due to texture swapping">
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>
+<node COLOR="#111111" CREATED="1515957462014" ID="ID_1292146758" MODIFIED="1515957477903" TEXT="create a &quot;setDebug&quot; method to turn on/off debug rendering">
+<node COLOR="#111111" CREATED="1515957478310" ID="ID_899873383" MODIFIED="1515957481279" TEXT="instead of loglevel"/>
+</node>
 </node>
 <node COLOR="#111111" CREATED="1515356328010" ID="ID_1419442995" MODIFIED="1515356338310" TEXT="go through every class again and check for optimizations/loggings"/>
-<node COLOR="#111111" CREATED="1515402968733" ID="ID_575014411" MODIFIED="1515402982881" TEXT="screens should only load gamestate when they are initialized">
-<node COLOR="#111111" CREATED="1515402990930" ID="ID_147410529" MODIFIED="1515403005720" TEXT="otherwise we always create/delete entities etc. and GC is triggering"/>
-</node>
-<node COLOR="#111111" CREATED="1515436662952" ID="ID_778154347" MODIFIED="1515436710242" TEXT="map sollte nur EntityInformation speichern und nicht ein array&lt;entity&gt;">
-<icon BUILTIN="help"/>
-<node COLOR="#111111" CREATED="1515436678893" ID="ID_807977364" MODIFIED="1515436688140" TEXT="entities k&#xf6;nnen dann mit extra methode geladen werden">
-<node COLOR="#111111" CREATED="1515436691997" ID="ID_1852297900" MODIFIED="1515436695990" TEXT="z.b. bei mapwechsel"/>
-</node>
-</node>
 </node>
 </node>
 </node>

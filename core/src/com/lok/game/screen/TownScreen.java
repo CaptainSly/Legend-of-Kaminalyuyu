@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -14,6 +13,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.lok.game.PreferencesManager;
 import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.SoundManager;
+import com.lok.game.TownEntityData;
+import com.lok.game.TownEntityData.TownEntityDataSerializer;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
@@ -35,6 +36,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     private boolean					 conversationInProgress;
     private Conversation				 currentConversation;
     private final ComponentMapper<ConversationComponent> convCompMapper;
+    private final TownEntityDataSerializer		 serializer;
 
     private final IntMap<Entity>			 entityMap;
     private EntityID					 currentSelection;
@@ -43,19 +45,18 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	this.townUI = new TownUI();
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
+	this.serializer = new TownEntityDataSerializer();
     }
 
     @Override
     public void show() {
 	entityMap.clear();
-	townUI.clearTownLocations();
-	EntityEngine.getEngine().removeAllEntities();
 	this.conversationInProgress = false;
 	this.townUI.addUIEventListener(this);
 	PreferencesManager.getManager().addPreferencesListener(this);
-	PreferencesManager.getManager().loadGameState();
 	townUI.show();
 	SoundManager.getManager().playMusic("sounds/music/town.ogg", true);
+	PreferencesManager.getManager().loadGameState();
     }
 
     @Override
@@ -83,6 +84,9 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     @Override
     public void hide() {
 	PreferencesManager.getManager().saveGameState();
+	for (Entity entity : entityMap.values()) {
+	    EntityEngine.getEngine().removeEntity(entity);
+	}
 	PreferencesManager.getManager().removePreferencesListener(this);
 	townUI.hide();
 	this.townUI.removeUIEventListener(this);
@@ -223,44 +227,48 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	}
     }
 
-    private static class EntityData {
-	private EntityID       id		     = null;
-	private Vector2	       position		     = new Vector2();
-	private ConversationID currentConversationID = null;
-    }
-
     @Override
     public void onSave(Json json, Preferences preferences) {
-	final Array<EntityData> entityData = new Array<EntityData>();
+	final Array<TownEntityData> dataToStore = new Array<TownEntityData>();
 	for (Entity entity : entityMap.values()) {
-	    final EntityData data = new EntityData();
+	    dataToStore.add(TownEntityData.newTownEntityData( // param
+		    entity.getComponent(IDComponent.class).entityID, // entityID
+		    entity.getComponent(ConversationComponent.class).currentConversationID, // conversationID
+		    entity.getComponent(SizeComponent.class).boundingRectangle.x, // x
+		    entity.getComponent(SizeComponent.class).boundingRectangle.y)); // y
 
-	    data.id = entity.getComponent(IDComponent.class).entityID;
-	    entity.getComponent(SizeComponent.class).boundingRectangle.getPosition(data.position);
-	    data.currentConversationID = entity.getComponent(ConversationComponent.class).currentConversationID;
-	    entityData.add(data);
 	}
-	preferences.putString("TownScreen-entities", json.toJson(entityData));
+	json.setSerializer(TownEntityData.class, serializer);
+	preferences.putString("TownScreen-entityData", json.toJson(dataToStore));
+	for (TownEntityData data : dataToStore) {
+	    TownEntityData.removeTownEntityData(data);
+	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onLoad(Json json, Preferences preferences) {
-	if (preferences.contains("TownScreen-entities")) {
-	    @SuppressWarnings("unchecked")
-	    final Array<EntityData> entityData = json.fromJson(Array.class, preferences.getString("TownScreen-entities"));
-	    for (EntityData data : entityData) {
-		final Entity entity = EntityEngine.getEngine().createEntity(data.id, data.position.x, data.position.y);
-		this.entityMap.put(data.id.ordinal(), entity);
-		if (!data.id.equals(EntityID.PLAYER)) {
-		    townUI.addTownLocation(data.id, data.position.x, data.position.y);
-		    convCompMapper.get(entity).currentConversationID = data.currentConversationID;
-		}
-	    }
+	final Array<TownEntityData> dataToLoad;
+	if (preferences.contains("TownScreen-entityData")) {
+	    json.setSerializer(TownEntityData.class, serializer);
+	    dataToLoad = json.fromJson(Array.class, preferences.getString("TownScreen-entityData"));
 	} else {
 	    // default town screen setup
-	    this.entityMap.put(EntityID.PLAYER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.PLAYER, 0, 0));
-	    this.entityMap.put(EntityID.ELDER.ordinal(), EntityEngine.getEngine().createEntity(EntityID.ELDER, 537, 570));
-	    townUI.addTownLocation(EntityID.ELDER, 537, 570);
+	    dataToLoad = new Array<TownEntityData>();
+	    dataToLoad.add(TownEntityData.newTownEntityData(EntityID.PLAYER, null, 0, 0));
+	    dataToLoad.add(TownEntityData.newTownEntityData(EntityID.ELDER, ConversationID.ElderIntro, 537, 570));
+	}
+
+	entityMap.clear();
+	townUI.clearTownLocations();
+	for (TownEntityData data : dataToLoad) {
+	    final Entity entity = EntityEngine.getEngine().createEntity(data.entityID, data.position.x, data.position.y);
+	    this.entityMap.put(data.entityID.ordinal(), entity);
+	    if (!EntityID.PLAYER.equals(data.entityID)) {
+		convCompMapper.get(entity).currentConversationID = data.conversationID;
+		townUI.addTownLocation(data.entityID, data.position.x, data.position.y);
+	    }
+	    TownEntityData.removeTownEntityData(data);
 	}
 
 	this.currentSelection = EntityID.ELDER;

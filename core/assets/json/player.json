@@ -1,15 +1,19 @@
-{
-  "entityID" : PLAYER,
-  "idleAnimationID" : PLAYER_IDLE,
-  "walkDownAnimation" : PLAYER_WALK_DOWN,
-  "walkLeftAnimation" : PLAYER_WALK_LEFT,
-  "walkRightAnimation" : PLAYER_WALK_RIGHT,
-  "walkUpAnimation" : PLAYER_WALK_UP,
-  "originPoint" : { "x" : 16, "y" : 7 },
-  "speed" : 5,
-  "revelationRadius" : 6,
-  "size" : { "x" : 1, "y" : 1.5 },
-  "collisionRectangle" : { "x" : 4, "y" : 2, "width" : 26 , "height" : 9 },
-  "conversationImage" : "img_player",
-  "abilities" : [ TOWNPORTAL ]
-}
+[
+  {
+    "entityID" : "PLAYER",
+    "components": [
+    	{ "class": "com.lok.game.ecs.components.SizeComponent", "boundingRectangle": { "width": 1, "height": 1.5 } },
+    	{	"class": "com.lok.game.ecs.components.SpeedComponent", "maxSpeed": 5 },
+    	{
+        "class": "com.lok.game.ecs.components.AnimationComponent",
+        "originPoint": { "x": 0.5, "y": 0.21875	},
+        "idleAnimationID": "PLAYER_IDLE",
+    		"walkLeftAnimation": "PLAYER_WALK_LEFT", "walkRightAnimation": "PLAYER_WALK_RIGHT", "walkUpAnimation": "PLAYER_WALK_UP", "walkDownAnimation": "PLAYER_WALK_DOWN"
+    	},
+    	{	"class": "com.lok.game.ecs.components.MapRevelationComponent", "minRevelationRadius": 5.75, "maxRevelationRadius": 6.25, "revelationRadius": 6, "incPerFrame": 2 },
+    	{	"class": "com.lok.game.ecs.components.CollisionComponent", "rectOffset": { "x": 0.125, "y": 0.0625 }, "collisionRectangle": { "width": 0.8125, "height": 0.28125 } },
+    	{	"class": "com.lok.game.ecs.components.ConversationComponent", "conversationImage": "img_player" },
+    	{	"class": "com.lok.game.ecs.components.AbilityComponent", "abilities": [ "TOWNPORTAL" ] }
+    ]
+  }
+]

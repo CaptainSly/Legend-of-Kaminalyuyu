@@ -22,7 +22,7 @@ public class PreferencesManager {
     private PreferencesManager() {
 	gameStatePreferences = Gdx.app.getPreferences("lok-gamestate");
 	listeners = new Array<PreferencesListener>();
-	json = new Json();
+	this.json = new Json();
     }
 
     public static PreferencesManager getManager() {
