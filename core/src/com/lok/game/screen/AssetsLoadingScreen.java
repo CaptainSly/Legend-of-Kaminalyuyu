@@ -13,8 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.Animation;
-import com.lok.game.Animation.AnimationID;
 import com.lok.game.Utils;
 import com.lok.game.assets.loader.AnimationLoader.AnimationParameter;
 import com.lok.game.assets.loader.EntityConfigurationLoader.EntityConfigurationParameter;
@@ -24,7 +22,9 @@ import com.lok.game.ecs.EntityConfiguration;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.Map;
 import com.lok.game.map.MapManager.MapID;
+import com.lok.game.ui.Animation;
 import com.lok.game.ui.Bar;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class AssetsLoadingScreen implements Screen {
     private final static String	TAG = AssetsLoadingScreen.class.getSimpleName();

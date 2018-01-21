@@ -7,13 +7,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.lok.game.PreferencesManager.PreferencesListener;
-import com.lok.game.SoundManager;
 import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
-import com.lok.game.map.MapEntityData.MapEntityDataSerializer;
+import com.lok.game.serialization.MapEntityData;
+import com.lok.game.serialization.PreferencesManager.PreferencesListener;
+import com.lok.game.sound.SoundManager;
 
 public class MapManager implements PreferencesListener {
     public enum MapID {
@@ -30,22 +30,20 @@ public class MapManager implements PreferencesListener {
 	}
     }
 
-    public static float			  WORLD_UNITS_PER_PIXEL	= 1.0f / 32.0f;
-    private static final String		  TAG			= MapManager.class.getName();
-    private static MapManager		  instance		= null;
+    public static float		     WORLD_UNITS_PER_PIXEL = 1.0f / 32.0f;
+    private static final String	     TAG		   = MapManager.class.getName();
+    private static MapManager	     instance		   = null;
 
-    private Array<Map>			  mapCache;
-    private Map				  currentMap;
-    private final Array<Entity>		  currentMapEntities;
-    private final Array<MapListener>	  listeners;
-    private final MapEntityDataSerializer serializer;
+    private Array<Map>		     mapCache;
+    private Map			     currentMap;
+    private final Array<Entity>	     currentMapEntities;
+    private final Array<MapListener> listeners;
 
     private MapManager() {
 	listeners = new Array<MapListener>();
 	this.mapCache = null;
 	currentMap = null;
 	this.currentMapEntities = new Array<Entity>();
-	this.serializer = new MapEntityDataSerializer();
     }
 
     public static MapManager getManager() {
@@ -107,7 +105,6 @@ public class MapManager implements PreferencesListener {
 		entityDataArr.add(
 			MapEntityData.newMapEntityData(entity.getComponent(IDComponent.class).entityID, new Vector2(sizeComp.boundingRectangle.x, sizeComp.boundingRectangle.y)));
 	    }
-	    json.setSerializer(MapEntityData.class, serializer);
 	    preferences.putString(id.name(), json.toJson(entityDataArr));
 	    for (MapEntityData data : entityDataArr) {
 		MapEntityData.removeMapEntityData(data);
@@ -126,7 +123,6 @@ public class MapManager implements PreferencesListener {
 	    }
 	}
 
-	json.setSerializer(MapEntityData.class, serializer);
 	for (MapID mapID : MapID.values()) {
 	    if (!preferences.contains(mapID.name())) {
 		continue;

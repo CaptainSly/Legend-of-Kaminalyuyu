@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.lok.game.SpecialEffect;
 import com.lok.game.ecs.components.AnimationComponent;
+import com.lok.game.ui.SpecialEffect;
 
 public class AnimationSystem extends IteratingSystem {
     private final ComponentMapper<AnimationComponent> animationComponentMapper;

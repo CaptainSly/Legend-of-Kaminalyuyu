@@ -20,8 +20,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.Utils;
-import com.lok.game.Animation.AnimationID;
 import com.lok.game.ecs.EntityEngine.EntityID;
+import com.lok.game.ui.Animation.AnimationID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 

@@ -28,6 +28,7 @@ import com.lok.game.map.Map;
 import com.lok.game.screen.AssetsLoadingScreen;
 import com.lok.game.screen.GameScreen;
 import com.lok.game.screen.TownScreen;
+import com.lok.game.ui.Animation;
 
 public class LegendOfKaminalyuyu extends Game {
     private final static String			       TAG = LegendOfKaminalyuyu.class.getSimpleName();

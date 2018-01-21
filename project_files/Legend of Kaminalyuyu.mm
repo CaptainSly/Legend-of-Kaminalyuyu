@@ -294,21 +294,15 @@
 <node COLOR="#111111" CREATED="1515436691997" ID="ID_1852297900" MODIFIED="1515436695990" TEXT="z.b. bei mapwechsel"/>
 </node>
 </node>
-<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515957329118" TEXT="add generic screen class for  correct game loop">
-<node COLOR="#111111" CREATED="1515356387356" ID="ID_1947068688" MODIFIED="1515356427614" TEXT="every screen class comes with a generic UI class for input handling"/>
-<node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515957366164" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin and Utils.json">
-<node COLOR="#111111" CREATED="1515356818593" ID="ID_75183359" MODIFIED="1515401947462" TEXT="need an initializeAnimationCache(AssetManager mgr) method to prefill the animationCache">
+<node COLOR="#111111" CREATED="1515957391719" FOLDED="true" ID="ID_282437043" MODIFIED="1516560801272" TEXT="move PreferencesManager in its own package">
 <icon BUILTIN="button_ok"/>
-<node COLOR="#111111" CREATED="1515356876124" ID="ID_745811082" MODIFIED="1515401951168" TEXT="show that in assetloadingscreen as text">
-<icon BUILTIN="info"/>
-</node>
-</node>
-</node>
-</node>
-<node COLOR="#111111" CREATED="1515957391719" ID="ID_282437043" MODIFIED="1515957452986" TEXT="move PreferencesManager in its own package">
 <node COLOR="#111111" CREATED="1515957402130" ID="ID_339938006" MODIFIED="1515957425320" TEXT="create gamestate.serializable package and move entitydata classes inside"/>
 <node COLOR="#111111" CREATED="1515957427191" ID="ID_88869623" MODIFIED="1515957436315" TEXT="set serializer in preferencesmanager constructor for json"/>
 <node COLOR="#111111" CREATED="1515957437393" ID="ID_1762788378" MODIFIED="1515957449352" TEXT="remove these lines of code from the onSave/onLoad methods"/>
+</node>
+<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515957329118" TEXT="add generic screen class for  correct game loop">
+<node COLOR="#111111" CREATED="1515356387356" ID="ID_1947068688" MODIFIED="1515356427614" TEXT="every screen class comes with a generic UI class for input handling"/>
+<node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515957366164" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin and Utils.json"/>
 </node>
 <node COLOR="#111111" CREATED="1514473315578" ID="ID_1036700593" MODIFIED="1514473339752" TEXT="check renderer and count how many times we are flushing due to texture swapping">
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>

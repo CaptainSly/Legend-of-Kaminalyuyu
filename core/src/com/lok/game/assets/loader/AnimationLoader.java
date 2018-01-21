@@ -14,9 +14,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
-import com.lok.game.Animation;
-import com.lok.game.Animation.AnimationID;
 import com.lok.game.Utils;
+import com.lok.game.ui.Animation;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class AnimationLoader extends AsynchronousAssetLoader<Animation, AnimationLoader.AnimationParameter> {
     private static final String TAG = AnimationLoader.class.getSimpleName();

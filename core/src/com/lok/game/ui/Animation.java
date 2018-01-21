@@ -1,9 +1,10 @@
-package com.lok.game;
+package com.lok.game.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.lok.game.Utils;
 
 public class Animation extends com.badlogic.gdx.graphics.g2d.Animation<TextureRegion> {
     private static final String TAG = Animation.class.getSimpleName();

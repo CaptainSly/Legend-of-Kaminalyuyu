@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.lok.game.Animation.AnimationID;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class ConversationDialog extends Dialog {
     private final Table		 leftContent;

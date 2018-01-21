@@ -10,11 +10,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.lok.game.PreferencesManager;
-import com.lok.game.PreferencesManager.PreferencesListener;
-import com.lok.game.SoundManager;
-import com.lok.game.TownEntityData;
-import com.lok.game.TownEntityData.TownEntityDataSerializer;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
@@ -27,6 +22,10 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.ConversationComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
+import com.lok.game.serialization.PreferencesManager;
+import com.lok.game.serialization.PreferencesManager.PreferencesListener;
+import com.lok.game.sound.SoundManager;
+import com.lok.game.serialization.TownEntityData;
 import com.lok.game.ui.TownUI;
 import com.lok.game.ui.UIEventListener;
 
@@ -36,7 +35,6 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     private boolean					 conversationInProgress;
     private Conversation				 currentConversation;
     private final ComponentMapper<ConversationComponent> convCompMapper;
-    private final TownEntityDataSerializer		 serializer;
 
     private final IntMap<Entity>			 entityMap;
     private EntityID					 currentSelection;
@@ -45,7 +43,6 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	this.townUI = new TownUI();
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
-	this.serializer = new TownEntityDataSerializer();
     }
 
     @Override
@@ -238,7 +235,6 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		    entity.getComponent(SizeComponent.class).boundingRectangle.y)); // y
 
 	}
-	json.setSerializer(TownEntityData.class, serializer);
 	preferences.putString("TownScreen-entityData", json.toJson(dataToStore));
 	for (TownEntityData data : dataToStore) {
 	    TownEntityData.removeTownEntityData(data);
@@ -250,7 +246,6 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     public void onLoad(Json json, Preferences preferences) {
 	final Array<TownEntityData> dataToLoad;
 	if (preferences.contains("TownScreen-entityData")) {
-	    json.setSerializer(TownEntityData.class, serializer);
 	    dataToLoad = json.fromJson(Array.class, preferences.getString("TownScreen-entityData"));
 	} else {
 	    // default town screen setup

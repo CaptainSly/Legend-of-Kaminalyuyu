@@ -1,4 +1,4 @@
-package com.lok.game;
+package com.lok.game.serialization;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -23,6 +23,8 @@ public class PreferencesManager {
 	gameStatePreferences = Gdx.app.getPreferences("lok-gamestate");
 	listeners = new Array<PreferencesListener>();
 	this.json = new Json();
+	json.setSerializer(MapEntityData.class, new MapEntityData.MapEntityDataSerializer());
+	json.setSerializer(TownEntityData.class, new TownEntityData.TownEntityDataSerializer());
     }
 
     public static PreferencesManager getManager() {

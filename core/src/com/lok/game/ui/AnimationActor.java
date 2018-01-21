@@ -3,8 +3,7 @@ package com.lok.game.ui;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.lok.game.Animation;
-import com.lok.game.Animation.AnimationID;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class AnimationActor extends Actor {
     private float	    animationTime;

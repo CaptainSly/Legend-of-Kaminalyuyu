@@ -1,8 +1,9 @@
-package com.lok.game;
+package com.lok.game.sound;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.lok.game.Utils;
 
 public class SoundManager {
     private static SoundManager	instance = null;

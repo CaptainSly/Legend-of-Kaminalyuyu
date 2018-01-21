@@ -3,9 +3,9 @@ package com.lok.game.ecs.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.lok.game.Animation;
-import com.lok.game.Animation.AnimationID;
-import com.lok.game.SpecialEffect;
+import com.lok.game.ui.Animation;
+import com.lok.game.ui.SpecialEffect;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class AnimationComponent implements Component<AnimationComponent> {
     public AnimationID		idleAnimationID	   = null;

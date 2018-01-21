@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.MapManager.MapID;
+import com.lok.game.serialization.MapEntityData;
 
 public class Map {
     private final MapID		       mapID;

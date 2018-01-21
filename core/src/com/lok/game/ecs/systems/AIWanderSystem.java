@@ -5,10 +5,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.lok.game.Animation;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AnimationComponent;
 import com.lok.game.ecs.components.SpeedComponent;
+import com.lok.game.ui.Animation;
 
 public class AIWanderSystem extends IteratingSystem {
     private final ComponentMapper<SpeedComponent>     speedComponentMapper;

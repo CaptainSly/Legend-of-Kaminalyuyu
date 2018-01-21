@@ -1,4 +1,4 @@
-package com.lok.game;
+package com.lok.game.serialization;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;

@@ -1,4 +1,4 @@
-package com.lok.game;
+package com.lok.game.ui;
 
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.ReflectionPool;
-import com.lok.game.Animation.AnimationID;
 import com.lok.game.map.MapManager;
+import com.lok.game.ui.Animation.AnimationID;
 
 public class SpecialEffect implements Poolable {
     private static Pool<SpecialEffect> effectPool = new ReflectionPool<SpecialEffect>(SpecialEffect.class);
