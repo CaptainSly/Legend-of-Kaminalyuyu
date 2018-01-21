@@ -15,17 +15,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.Animation;
 import com.lok.game.Animation.AnimationID;
-import com.lok.game.LegendOfKaminalyuyu;
 import com.lok.game.Utils;
 import com.lok.game.assets.loader.AnimationLoader.AnimationParameter;
 import com.lok.game.assets.loader.EntityConfigurationLoader.EntityConfigurationParameter;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
 import com.lok.game.ecs.EntityConfiguration;
-import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.Map;
-import com.lok.game.map.MapManager;
 import com.lok.game.map.MapManager.MapID;
 import com.lok.game.ui.Bar;
 
@@ -35,19 +32,15 @@ public class AssetsLoadingScreen implements Screen {
     private AssetManager	assetManager;
     private long		startTime;
 
-    private int			loadingProgress;
-
     private final Stage		stage;
     private final Bar		loadingBar;
 
     public AssetsLoadingScreen() {
-	loadingProgress = 0;
 	stage = new Stage(new FitViewport(1280, 720));
 	final Skin skin = Utils.getUISkin();
 
 	loadingBar = new Bar(skin, Utils.getLabel("Label.LoadingAssets"), 1080, false);
 	loadingBar.setPosition(100, 50);
-	loadingBar.reset(1.1f);
 
 	stage.addActor(loadingBar);
     }
@@ -107,23 +100,9 @@ public class AssetsLoadingScreen implements Screen {
 
     @Override
     public void render(float delta) {
-	if (loadingProgress == 0) {
-	    loadingBar.setValue(assetManager.getProgress());
-	    if (assetManager.update()) {
-		Gdx.app.debug(TAG, "Finished loading of assets in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
-		startTime = TimeUtils.millis();
-		loadingBar.setText(Utils.getLabel("Label.PreparingCaches"));
-		loadingProgress = 1;
-	    }
-	} else if (loadingProgress == 1) {
-	    // prefill caches
-	    Animation.initializeAnimationCache(assetManager);
-	    ((LegendOfKaminalyuyu) Gdx.app.getApplicationListener()).initializeScreenCache();
-	    MapManager.getManager().initializeMapCache(assetManager);
-	    Conversation.initializeConversationCache(assetManager);
-	    EntityEngine.getEngine().initializeEntityConfigurationCache(assetManager);
-	    Gdx.app.debug(TAG, "Finished prefilling caches in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
-	    loadingBar.setValue(1.1f);
+	loadingBar.setValue(assetManager.getProgress());
+	if (assetManager.update()) {
+	    Gdx.app.debug(TAG, "Finished loading of assets in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
 	    Utils.setScreen(TownScreen.class);
 	}
 

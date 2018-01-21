@@ -38,19 +38,16 @@ public class Animation extends com.badlogic.gdx.graphics.g2d.Animation<TextureRe
 	super(frameDuration, keyFrames, PlayMode.NORMAL);
     }
 
-    public static void initializeAnimationCache(AssetManager assetManager) {
+    public static Animation getAnimation(AnimationID animationID) {
 	if (animationCache == null) {
 	    Gdx.app.debug(TAG, "Initializing animation cache");
 	    animationCache = new Array<Animation>();
+	    final AssetManager assetManager = Utils.getAssetManager();
 	    for (AnimationID aniID : AnimationID.values()) {
 		animationCache.add(assetManager.get(aniID.name(), Animation.class));
 	    }
-	} else {
-	    Gdx.app.error(TAG, "Animation cache is initialized multiple times");
 	}
-    }
 
-    public static Animation getAnimation(AnimationID animationID) {
 	return animationCache.get(animationID.ordinal());
     }
 

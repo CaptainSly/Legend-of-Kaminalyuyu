@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.lok.game.PreferencesManager.PreferencesListener;
 import com.lok.game.SoundManager;
+import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
@@ -55,18 +56,6 @@ public class MapManager implements PreferencesListener {
 	return instance;
     }
 
-    public void initializeMapCache(AssetManager assetManager) {
-	if (mapCache == null) {
-	    Gdx.app.debug(TAG, "Initializing map cache");
-	    mapCache = new Array<Map>();
-	    for (MapID mapID : MapID.values()) {
-		mapCache.add(assetManager.get(mapID.name(), Map.class));
-	    }
-	} else {
-	    Gdx.app.error(TAG, "Map cache is initialized multiple times");
-	}
-    }
-
     public void changeMap(MapID mapID) {
 	Gdx.app.debug(TAG, "Changing map to " + mapID);
 	final Map map = mapCache.get(mapID.ordinal());
@@ -74,10 +63,7 @@ public class MapManager implements PreferencesListener {
 	if (map.getMusicFilePath() != null) {
 	    SoundManager.getManager().playMusic(map.getMusicFilePath(), true);
 	}
-	for (Entity entity : currentMapEntities) {
-	    EntityEngine.getEngine().removeEntity(entity);
-	}
-	currentMapEntities.clear();
+	removeMapEntities();
 	for (MapEntityData entityData : map.getEntityData()) {
 	    currentMapEntities.add(EntityEngine.getEngine().createEntity(entityData.entityID, entityData.position.x, entityData.position.y));
 	}
@@ -85,6 +71,13 @@ public class MapManager implements PreferencesListener {
 	for (MapListener listener : listeners) {
 	    listener.onMapChange(this, map);
 	}
+    }
+
+    public void removeMapEntities() {
+	for (Entity entity : currentMapEntities) {
+	    EntityEngine.getEngine().removeEntity(entity);
+	}
+	currentMapEntities.clear();
     }
 
     public Array<Entity> getCurrentMapEntities() {
@@ -124,6 +117,15 @@ public class MapManager implements PreferencesListener {
 
     @Override
     public void onLoad(Json json, Preferences preferences) {
+	if (mapCache == null) {
+	    Gdx.app.debug(TAG, "Initializing map cache");
+	    mapCache = new Array<Map>();
+	    final AssetManager assetManager = Utils.getAssetManager();
+	    for (MapID id : MapID.values()) {
+		mapCache.add(assetManager.get(id.name(), Map.class));
+	    }
+	}
+
 	json.setSerializer(MapEntityData.class, serializer);
 	for (MapID mapID : MapID.values()) {
 	    if (!preferences.contains(mapID.name())) {

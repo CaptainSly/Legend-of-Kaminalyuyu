@@ -83,17 +83,6 @@ public class LegendOfKaminalyuyu extends Game {
 	return localizationBundle.format(labelKey);
     }
 
-    public void initializeScreenCache() {
-	if (screenCache == null) {
-	    Gdx.app.debug(TAG, "Initializing screen cache");
-	    screenCache = new ObjectMap<Class<? extends Screen>, Screen>();
-	    screenCache.put(TownScreen.class, new TownScreen());
-	    screenCache.put(GameScreen.class, new GameScreen());
-	} else {
-	    Gdx.app.error(TAG, "Screen cache is initialized multiple times");
-	}
-    }
-
     @Override
     public void setScreen(Screen screen) {
 	Gdx.app.error(TAG, "setScreen is called directly. setScreen(Class<? extends Screen> needs to be called instead!");
@@ -101,6 +90,13 @@ public class LegendOfKaminalyuyu extends Game {
     }
 
     public void setScreen(Class<? extends Screen> type) {
+	if (screenCache == null) {
+	    Gdx.app.debug(TAG, "Initializing screen cache");
+	    screenCache = new ObjectMap<Class<? extends Screen>, Screen>();
+	    screenCache.put(TownScreen.class, new TownScreen());
+	    screenCache.put(GameScreen.class, new GameScreen());
+	}
+
 	final Screen screen = screenCache.get(type);
 
 	if (screen == null) {
@@ -139,6 +135,12 @@ public class LegendOfKaminalyuyu extends Game {
     public void dispose() {
 	uiSkin.dispose();
 	assetManager.dispose();
-	screen.dispose();
+	if (screenCache != null) {
+	    for (Screen screen : screenCache.values()) {
+		screen.dispose();
+	    }
+	} else if (screen != null) {
+	    screen.dispose();
+	}
     }
 }

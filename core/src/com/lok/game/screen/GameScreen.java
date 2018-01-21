@@ -109,9 +109,7 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
     @Override
     public void hide() {
 	PreferencesManager.getManager().saveGameState();
-	for (Entity entity : MapManager.getManager().getCurrentMapEntities()) {
-	    EntityEngine.getEngine().removeEntity(entity);
-	}
+	MapManager.getManager().removeMapEntities();
 
 	entityEngine.removeEntityListener(this);
 	entityEngine.getSystem(CollisionSystem.class).removeCollisionListener(this);

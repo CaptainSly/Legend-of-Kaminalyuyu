@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.lok.game.Utils;
 import com.lok.game.conversation.ConversationChoice.ConversationAction;
 import com.lok.game.conversation.ConversationChoice.ConversationActionID;
 
@@ -73,19 +74,16 @@ public class Conversation {
 	}
     }
 
-    public static void initializeConversationCache(AssetManager assetManager) {
+    public static Conversation getConversation(ConversationID conversationID) {
 	if (conversationCache == null) {
 	    Gdx.app.debug(TAG, "Initializing conversation cache");
 	    conversationCache = new Array<Conversation>();
+	    final AssetManager assetManager = Utils.getAssetManager();
 	    for (ConversationID convID : ConversationID.values()) {
 		conversationCache.add(assetManager.get(convID.name(), Conversation.class));
 	    }
-	} else {
-	    Gdx.app.error(TAG, "Conversation cache is initialized multiple times");
 	}
-    }
 
-    public static Conversation getConversation(ConversationID conversationID) {
 	return conversationCache.get(conversationID.ordinal());
     }
 

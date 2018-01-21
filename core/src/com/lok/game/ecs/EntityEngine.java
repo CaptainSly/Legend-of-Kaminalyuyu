@@ -9,6 +9,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import com.lok.game.Utils;
 import com.lok.game.ability.AbilitySystem;
 import com.lok.game.ecs.components.AIWanderComponent;
 import com.lok.game.ecs.components.AbilityComponent;
@@ -74,18 +75,6 @@ public class EntityEngine {
 	return instance;
     }
 
-    public void initializeEntityConfigurationCache(AssetManager assetManager) {
-	if (entityConfigurationCache == null) {
-	    Gdx.app.debug(TAG, "Initializing entity configuration cache");
-	    entityConfigurationCache = new Array<EntityConfiguration>();
-	    for (EntityID entityID : EntityID.values()) {
-		entityConfigurationCache.add(assetManager.get(entityID.name(), EntityConfiguration.class));
-	    }
-	} else {
-	    Gdx.app.error(TAG, "Entity configuration cache is initialized multiple times");
-	}
-    }
-
     public void update(float deltaTime) {
 	abilitySystem.update(deltaTime);
 	engine.update(deltaTime);
@@ -109,6 +98,15 @@ public class EntityEngine {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Entity createEntity(EntityID entityID, float x, float y) {
+	if (entityConfigurationCache == null) {
+	    Gdx.app.debug(TAG, "Initializing entity configuration cache");
+	    entityConfigurationCache = new Array<EntityConfiguration>();
+	    final AssetManager assetManager = Utils.getAssetManager();
+	    for (EntityID id : EntityID.values()) {
+		entityConfigurationCache.add(assetManager.get(id.name(), EntityConfiguration.class));
+	    }
+	}
+
 	Gdx.app.debug(TAG, "Creating entity " + entityID + " at location (" + x + "/" + y + ")");
 
 	final Entity entity = engine.createEntity();
