@@ -1,7 +1,6 @@
 package com.lok.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -36,10 +35,6 @@ public final class Utils {
 
     public static String getLabel(String labelKey) {
 	return ((LegendOfKaminalyuyu) Gdx.app.getApplicationListener()).getLabel(labelKey);
-    }
-
-    public static void setScreen(Class<? extends Screen> type) {
-	((LegendOfKaminalyuyu) Gdx.app.getApplicationListener()).setScreen(type);
     }
 
     public static Skin getUISkin() {

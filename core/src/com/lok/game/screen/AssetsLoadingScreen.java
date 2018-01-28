@@ -3,17 +3,16 @@ package com.lok.game.screen;
 import java.util.EnumSet;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.Utils;
+import com.lok.game.LegendOfKaminalyuyu;
 import com.lok.game.assets.loader.AnimationLoader.AnimationParameter;
 import com.lok.game.assets.loader.EntityConfigurationLoader.EntityConfigurationParameter;
 import com.lok.game.conversation.Conversation;
@@ -23,33 +22,22 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.map.Map;
 import com.lok.game.map.MapManager.MapID;
 import com.lok.game.ui.Animation;
-import com.lok.game.ui.Bar;
 import com.lok.game.ui.Animation.AnimationID;
+import com.lok.game.ui.AssetsLoadingUI;
 
-public class AssetsLoadingScreen implements Screen {
+public class AssetsLoadingScreen extends Screen<AssetsLoadingUI> {
     private final static String	TAG = AssetsLoadingScreen.class.getSimpleName();
 
-    private AssetManager	assetManager;
     private long		startTime;
 
-    private final Stage		stage;
-    private final Bar		loadingBar;
-
-    public AssetsLoadingScreen() {
-	stage = new Stage(new FitViewport(1280, 720));
-	final Skin skin = Utils.getUISkin();
-
-	loadingBar = new Bar(skin, Utils.getLabel("Label.LoadingAssets"), 1080, false);
-	loadingBar.setPosition(100, 50);
-
-	stage.addActor(loadingBar);
+    public AssetsLoadingScreen(LegendOfKaminalyuyu game, AssetManager assetManager, Skin uiSkin) {
+	super(game, assetManager, AssetsLoadingUI.class, uiSkin);
     }
 
     @Override
     public void show() {
 	startTime = TimeUtils.millis();
 	Gdx.app.debug(TAG, "Start loading of assets");
-	assetManager = Utils.getAssetManager();
 
 	// load sounds
 	assetManager.load("sounds/music/town.ogg", Music.class);
@@ -99,46 +87,33 @@ public class AssetsLoadingScreen implements Screen {
     }
 
     @Override
-    public void render(float delta) {
-	loadingBar.setValue(assetManager.getProgress());
+    public void onUpdate(float fixedPhysicsStep) {
 	if (assetManager.update()) {
 	    Gdx.app.debug(TAG, "Finished loading of assets in " + TimeUtils.timeSinceMillis(startTime) / 1000.0f + " seconds");
-	    Utils.setScreen(TownScreen.class);
+	    game.setScreen(TownScreen.class);
 	}
-
-	Gdx.gl.glClearColor(0, 0, 0, 1);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-	stage.act(delta);
-	stage.getViewport().apply();
-	stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-	stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {
-	// TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void resume() {
-	// TODO Auto-generated method stub
 
     }
 
     @Override
     public void hide() {
+	super.hide();
 	dispose();
     }
 
     @Override
-    public void dispose() {
-	stage.dispose();
+    public void onUIEvent(Actor triggerActor, UIEvent event) {
+	// not needed
+    }
+
+    @Override
+    public void onSave(Json json, Preferences preferences) {
+	// not needed
+    }
+
+    @Override
+    public void onLoad(Json json, Preferences preferences) {
+	// not needed
     }
 
 }

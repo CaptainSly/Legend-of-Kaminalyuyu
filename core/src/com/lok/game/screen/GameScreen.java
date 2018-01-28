@@ -6,14 +6,17 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.lok.game.LegendOfKaminalyuyu;
 import com.lok.game.Utils;
 import com.lok.game.ability.Ability;
 import com.lok.game.ability.Ability.AbilityID;
 import com.lok.game.ability.Ability.AbilityListener;
+import com.lok.game.ability.TownPortal;
 import com.lok.game.ecs.EntityEngine;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.AbilityComponent;
@@ -27,31 +30,20 @@ import com.lok.game.map.MapListener;
 import com.lok.game.map.MapManager;
 import com.lok.game.map.Portal;
 import com.lok.game.serialization.PreferencesManager;
-import com.lok.game.serialization.PreferencesManager.PreferencesListener;
 import com.lok.game.ui.Animation;
-import com.lok.game.ui.GameRenderer;
 import com.lok.game.ui.GameUI;
-import com.lok.game.ui.UIEventListener;
 
-public class GameScreen implements Screen, UIEventListener, EntityListener, CollisionListener, MapListener, AbilityListener, PreferencesListener {
-    private float				      accumulator;
-    private final float				      fixedPhysicsStep;
-
-    private final GameRenderer			      renderer;
+public class GameScreen extends Screen<GameUI> implements EntityListener, CollisionListener, MapListener, AbilityListener {
     private final EntityEngine			      entityEngine;
-    private final GameUI			      gameUI;
 
     private final ComponentMapper<SpeedComponent>     speedComponentMapper;
     private final ComponentMapper<AnimationComponent> animationComponentMapper;
     private final ComponentMapper<AbilityComponent>   abilityComponentMapper;
     private Entity				      player;
 
-    public GameScreen() {
-	fixedPhysicsStep = 1.0f / 30.0f;
-	accumulator = 0.0f;
+    public GameScreen(LegendOfKaminalyuyu game, AssetManager assetManager, Skin uiSkin) {
+	super(game, assetManager, GameUI.class, uiSkin);
 
-	this.gameUI = new GameUI();
-	renderer = new GameRenderer();
 	this.entityEngine = EntityEngine.getEngine();
 	this.player = null;
 	this.speedComponentMapper = ComponentMapper.getFor(SpeedComponent.class);
@@ -61,71 +53,30 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 
     @Override
     public void show() {
-	this.gameUI.addUIEventListener(this);
 	entityEngine.addEntityListener(Family.all(IDComponent.class).get(), this);
 	entityEngine.getSystem(CollisionSystem.class).addCollisionListener(this);
 	entityEngine.getAbilitySystem().addAbilityListener(this);
 	MapManager.getManager().addMapListener(this);
 	PreferencesManager.getManager().addPreferencesListener(MapManager.getManager());
-	PreferencesManager.getManager().addPreferencesListener(this);
 
-	gameUI.show();
-
-	PreferencesManager.getManager().loadGameState();
+	super.show();
     }
 
     @Override
-    public void render(float delta) {
-	if (delta > 0.25f) {
-	    delta = 0.25f;
-	}
-
-	accumulator += delta;
-	while (accumulator >= fixedPhysicsStep) {
-	    entityEngine.update(fixedPhysicsStep);
-	    accumulator -= fixedPhysicsStep;
-	}
-
-	renderer.render(accumulator / fixedPhysicsStep);
-	gameUI.render(delta);
-    }
-
-    @Override
-    public void resize(int width, int height) {
-	gameUI.resize(width, height);
-	renderer.resize(width, height);
-    }
-
-    @Override
-    public void pause() {
-	// TODO
-    }
-
-    @Override
-    public void resume() {
-	// TODO
+    public void onUpdate(float fixedPhysicsStep) {
+	entityEngine.update(fixedPhysicsStep);
     }
 
     @Override
     public void hide() {
-	PreferencesManager.getManager().saveGameState();
+	super.hide();
 	MapManager.getManager().removeMapEntities();
 
 	entityEngine.removeEntityListener(this);
 	entityEngine.getSystem(CollisionSystem.class).removeCollisionListener(this);
 	entityEngine.getAbilitySystem().removeAbilityListener(this);
 	MapManager.getManager().removeMapListener(this);
-	PreferencesManager.getManager().removePreferencesListener(this);
 	PreferencesManager.getManager().removePreferencesListener(MapManager.getManager());
-
-	gameUI.hide();
-	this.gameUI.removeUIEventListener(this);
-    }
-
-    @Override
-    public void dispose() {
-	gameUI.dispose();
-	renderer.dispose();
     }
 
     @Override
@@ -198,7 +149,7 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 	    if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 		this.player = entity;
-		renderer.lockCameraToEntity(entity);
+		screenUI.lockCameraToEntity(entity);
 	    }
 	}
     }
@@ -208,29 +159,36 @@ public class GameScreen implements Screen, UIEventListener, EntityListener, Coll
 	if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 	    if (entity.getComponent(IDComponent.class).entityID == EntityID.PLAYER) {
 		this.player = null;
-		renderer.lockCameraToEntity(null);
+		screenUI.lockCameraToEntity(null);
 	    }
 	}
     }
 
     @Override
     public void onMapChange(MapManager manager, Map map) {
-	renderer.setMap(map);
+	screenUI.setMap(map);
     }
 
     @Override
     public void onStartCast(Entity caster, Ability ability) {
-	gameUI.showAbilityChannelBar(Utils.getLabel("Ability." + ability.getAbilityID().name() + ".name"), ability.getEffectDelayTime());
+	screenUI.showAbilityChannelBar(Utils.getLabel("Ability." + ability.getAbilityID().name() + ".name"), ability.getEffectDelayTime());
     }
 
     @Override
     public void onUpdateAbility(Entity caster, Ability ability) {
-	gameUI.setAbilityChannelBarValue(ability.getChannelTime());
+	screenUI.setAbilityChannelBarValue(ability.getChannelTime());
+    }
+
+    @Override
+    public void onEffectAbility(Entity caster, Ability ability) {
+	if (ability instanceof TownPortal) {
+	    game.setScreen(TownScreen.class);
+	}
     }
 
     @Override
     public void onSopCast(Entity caster, Ability ability) {
-	gameUI.hideAbilityChannelBar();
+	screenUI.hideAbilityChannelBar();
     }
 
     @Override

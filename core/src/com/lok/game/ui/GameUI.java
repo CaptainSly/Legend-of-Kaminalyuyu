@@ -1,37 +1,27 @@
 package com.lok.game.ui;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.lok.game.Utils;
 import com.lok.game.ability.Ability.AbilityID;
+import com.lok.game.map.Map;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 
-public class GameUI extends InputAdapter implements EventListener {
-    private final Stage			 stage;
-    private final Skin			 skin;
-    private final InputMultiplexer	 inputMultiplexer;
+public class GameUI extends ScreenUI {
+    private final GameRenderer renderer;
+    private final Touchpad     touchpad;
+    private final Button       btn_townPortal;
+    private final Bar	       abilityChannelBar;
 
-    private final Touchpad		 touchpad;
-    private final Button		 btn_townPortal;
-    private final Bar			 abilityChannelBar;
+    public GameUI(AssetManager assetManager, Skin skin) {
+	super(assetManager, skin);
 
-    private final Array<UIEventListener> uiEventListeners;
-
-    public GameUI() {
-	this.stage = new Stage(new FitViewport(1280, 720));
-	this.skin = Utils.getUISkin();
-	this.uiEventListeners = new Array<UIEventListener>();
+	renderer = new GameRenderer();
 
 	touchpad = new Touchpad(skin);
 	touchpad.setPosition(15, 15);
@@ -48,39 +38,31 @@ public class GameUI extends InputAdapter implements EventListener {
 	abilityChannelBar.setPosition(500, 20);
 	abilityChannelBar.setVisible(false);
 	stage.addActor(abilityChannelBar);
-
-	this.inputMultiplexer = new InputMultiplexer(this, stage);
     }
 
-    public void addUIEventListener(UIEventListener listener) {
-	this.uiEventListeners.add(listener);
-    }
-
-    public void removeUIEventListener(UIEventListener listener) {
-	this.uiEventListeners.removeValue(listener, false);
-    }
-
-    public void show() {
-	Gdx.input.setInputProcessor(inputMultiplexer);
-    }
-
-    public void render(float delta) {
-	stage.act(delta);
+    @Override
+    public void render(float alpha) {
+	renderer.render(alpha);
 	stage.getViewport().apply();
 	stage.draw();
     }
 
+    @Override
     public void resize(int width, int height) {
-	stage.getViewport().update(width, height, true);
+	renderer.resize(width, height);
+	super.resize(width, height);
     }
 
+    @Override
     public void hide() {
 	btn_townPortal.setChecked(false);
-	Gdx.input.setInputProcessor(null);
+	super.hide();
     }
 
+    @Override
     public void dispose() {
-	stage.dispose();
+	renderer.dispose();
+	super.dispose();
     }
 
     @Override
@@ -205,5 +187,13 @@ public class GameUI extends InputAdapter implements EventListener {
 	}
 
 	return false;
+    }
+
+    public void lockCameraToEntity(Entity entity) {
+	renderer.lockCameraToEntity(entity);
+    }
+
+    public void setMap(Map map) {
+	renderer.setMap(map);
     }
 }

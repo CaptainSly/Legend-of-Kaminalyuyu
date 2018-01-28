@@ -3,12 +3,10 @@ package com.lok.game.ability;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
-import com.lok.game.Utils;
 import com.lok.game.ecs.components.AnimationComponent;
-import com.lok.game.screen.TownScreen;
 import com.lok.game.sound.SoundManager;
-import com.lok.game.ui.SpecialEffect;
 import com.lok.game.ui.Animation.AnimationID;
+import com.lok.game.ui.SpecialEffect;
 
 public class TownPortal extends Ability {
     private SpecialEffect      effect;
@@ -68,7 +66,7 @@ public class TownPortal extends Ability {
 
     @Override
     protected boolean onEffect() {
-	Utils.setScreen(TownScreen.class);
+	// special use case -> screen transition to TownScreen is handled within GameScreen logic
 	return true;
     }
 

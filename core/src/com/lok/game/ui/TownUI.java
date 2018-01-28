@@ -1,15 +1,10 @@
 package com.lok.game.ui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,35 +13,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lok.game.Utils;
 import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ui.Animation.AnimationID;
 import com.lok.game.ui.Touchpad.TouchpadDirection;
 import com.lok.game.ui.UIEventListener.UIEvent;
 
-public class TownUI extends InputAdapter implements EventListener {
-    private final Stage			 stage;
-    private final Skin			 skin;
-    private final ConversationDialog	 convDialog;
-    private final InputMultiplexer	 inputMultiplexer;
+public class TownUI extends ScreenUI {
+    private final ConversationDialog convDialog;
 
-    private final Array<ImageButton>	 btn_townLocations;
-    private final Array<Label>		 townLocationLabels;
-    private ImageButton			 btn_currentSelectedLocation;
+    private final Array<ImageButton> btn_townLocations;
+    private final Array<Label>	     townLocationLabels;
+    private ImageButton		     btn_currentSelectedLocation;
 
-    private final Touchpad		 touchpad;
-    private final TextButton		 btn_Select;
-    private final AnimationActor	 selectionActor;
+    private final Touchpad	     touchpad;
+    private final TextButton	     btn_Select;
+    private final AnimationActor     selectionActor;
 
-    private final Array<UIEventListener> uiEventListeners;
+    public TownUI(AssetManager assetManager, Skin skin) {
+	super(assetManager, skin);
 
-    public TownUI() {
-	this.stage = new Stage(new FitViewport(1280, 720));
-	this.skin = Utils.getUISkin();
 	this.convDialog = new ConversationDialog(skin);
 	this.convDialog.addListener(this);
-	this.uiEventListeners = new Array<UIEventListener>();
 	this.btn_townLocations = new Array<ImageButton>();
 	this.townLocationLabels = new Array<Label>();
 	this.btn_currentSelectedLocation = null;
@@ -69,16 +57,6 @@ public class TownUI extends InputAdapter implements EventListener {
 	selectionActor.setPosition(0, 0);
 	selectionActor.scaleBy(0.75f);
 	stage.addActor(selectionActor);
-
-	this.inputMultiplexer = new InputMultiplexer(this, stage);
-    }
-
-    public void addUIEventListener(UIEventListener listener) {
-	this.uiEventListeners.add(listener);
-    }
-
-    public void removeUIEventListener(UIEventListener listener) {
-	this.uiEventListeners.removeValue(listener, false);
     }
 
     public void addTownLocation(EntityID entityID, float x, float y) {
@@ -217,35 +195,27 @@ public class TownUI extends InputAdapter implements EventListener {
 	return false;
     }
 
+    @Override
     public void show() {
 	touchpad.uncheckAll();
 	btn_Select.setChecked(false);
 	hideConversationDialog();
 	selectionActor.addAction(Actions.sequence(Actions.alpha(0), Actions.fadeIn(1, Interpolation.fade)));
-	Gdx.input.setInputProcessor(inputMultiplexer);
+
+	super.show();
     }
 
-    public void render(float delta) {
-	Gdx.gl.glClearColor(0, 0, 0, 1);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-	convDialog.update(delta);
-	stage.act(delta);
-	stage.getViewport().apply();
-	stage.draw();
+    @Override
+    public void update(float fixedPhysicsStep) {
+	convDialog.update(fixedPhysicsStep);
+	super.update(fixedPhysicsStep);
     }
 
-    public void resize(int width, int height) {
-	stage.getViewport().update(width, height, true);
-    }
-
+    @Override
     public void hide() {
 	convDialog.hide(Actions.fadeOut(0));
-	Gdx.input.setInputProcessor(null);
-    }
 
-    public void dispose() {
-	stage.dispose();
+	super.hide();
     }
 
     public void showConversationDialog() {

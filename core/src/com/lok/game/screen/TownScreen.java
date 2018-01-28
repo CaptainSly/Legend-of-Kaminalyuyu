@@ -3,13 +3,15 @@ package com.lok.game.screen;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.lok.game.LegendOfKaminalyuyu;
 import com.lok.game.Utils;
 import com.lok.game.conversation.Conversation;
 import com.lok.game.conversation.Conversation.ConversationID;
@@ -22,16 +24,11 @@ import com.lok.game.ecs.EntityEngine.EntityID;
 import com.lok.game.ecs.components.ConversationComponent;
 import com.lok.game.ecs.components.IDComponent;
 import com.lok.game.ecs.components.SizeComponent;
-import com.lok.game.serialization.PreferencesManager;
-import com.lok.game.serialization.PreferencesManager.PreferencesListener;
-import com.lok.game.sound.SoundManager;
 import com.lok.game.serialization.TownEntityData;
+import com.lok.game.sound.SoundManager;
 import com.lok.game.ui.TownUI;
-import com.lok.game.ui.UIEventListener;
 
-public class TownScreen implements Screen, ConversationListener, UIEventListener, PreferencesListener {
-    private final TownUI				 townUI;
-
+public class TownScreen extends Screen<TownUI> implements ConversationListener {
     private boolean					 conversationInProgress;
     private Conversation				 currentConversation;
     private final ComponentMapper<ConversationComponent> convCompMapper;
@@ -39,8 +36,8 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     private final IntMap<Entity>			 entityMap;
     private EntityID					 currentSelection;
 
-    public TownScreen() {
-	this.townUI = new TownUI();
+    public TownScreen(LegendOfKaminalyuyu game, AssetManager assetManager, Skin uiSkin) {
+	super(game, assetManager, TownUI.class, uiSkin);
 	this.convCompMapper = ComponentMapper.getFor(ConversationComponent.class);
 	this.entityMap = new IntMap<Entity>();
     }
@@ -49,49 +46,22 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     public void show() {
 	entityMap.clear();
 	this.conversationInProgress = false;
-	this.townUI.addUIEventListener(this);
-	PreferencesManager.getManager().addPreferencesListener(this);
-	townUI.show();
 	SoundManager.getManager().playMusic("sounds/music/town.ogg", true);
-	PreferencesManager.getManager().loadGameState();
-    }
 
-    @Override
-    public void render(float delta) {
-	townUI.render(delta);
-    }
-
-    @Override
-    public void resize(int width, int height) {
-	townUI.resize(width, height);
-    }
-
-    @Override
-    public void pause() {
-	// TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void resume() {
-	// TODO Auto-generated method stub
-
+	super.show();
     }
 
     @Override
     public void hide() {
-	PreferencesManager.getManager().saveGameState();
+	super.hide();
 	for (Entity entity : entityMap.values()) {
 	    EntityEngine.getEngine().removeEntity(entity);
 	}
-	PreferencesManager.getManager().removePreferencesListener(this);
-	townUI.hide();
-	this.townUI.removeUIEventListener(this);
     }
 
     @Override
-    public void dispose() {
-	townUI.dispose();
+    public void onUpdate(float fixedPhysicsStep) {
+	// no special update logic needed
     }
 
     @Override
@@ -109,9 +79,9 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		    } else if (EntityID.PORTAL.equals(currentSelection) && entityMap.containsKey(EntityID.SHAMAN.ordinal())) {
 			currentSelection = EntityID.SHAMAN;
 		    }
-		    townUI.selectLocation(currentSelection);
+		    screenUI.selectLocation(currentSelection);
 		} else {
-		    townUI.nextConversationChoice();
+		    screenUI.nextConversationChoice();
 		}
 		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
@@ -127,9 +97,9 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		    } else if (EntityID.PORTAL.equals(currentSelection) && entityMap.containsKey(EntityID.ELDER.ordinal())) {
 			currentSelection = EntityID.ELDER;
 		    }
-		    townUI.selectLocation(currentSelection);
+		    screenUI.selectLocation(currentSelection);
 		} else {
-		    townUI.previousConversationChoice();
+		    screenUI.previousConversationChoice();
 		}
 		SoundManager.getManager().playSound("sounds/effects/menu_selection.wav", false);
 		break;
@@ -155,31 +125,31 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
     }
 
     private void updateConversationDialog(ConversationNode node) {
-	townUI.updateConversationDialog( // params
+	screenUI.updateConversationDialog( // params
 		Utils.getLabel("Entity." + node.getEntityID() + ".name"), // title
 		convCompMapper.get(entityMap.get(node.getEntityID().ordinal())).conversationImage, // image
 		Utils.getLabel(node.getTextID())); // text
 
 	final int max = node.getChoices().size;
 	for (int i = 0; i < max; ++i) {
-	    townUI.addConversationDialogChoice(Utils.getLabel(node.getChoices().get(i).getTextID()), i);
+	    screenUI.addConversationDialogChoice(Utils.getLabel(node.getChoices().get(i).getTextID()), i);
 	}
 
-	townUI.selectConversationChoice(0);
+	screenUI.selectConversationChoice(0);
     }
 
     @Override
     public void onStartConversation(Conversation conversation, ConversationNode startNode) {
 	conversationInProgress = true;
 	updateConversationDialog(startNode);
-	townUI.showConversationDialog();
-	townUI.selectConversationChoice(0);
+	screenUI.showConversationDialog();
+	screenUI.selectConversationChoice(0);
     }
 
     @Override
     public void onEndConversation(Conversation conversation, ConversationNode currentNode, ConversationChoice selectedChoice) {
 	conversationInProgress = false;
-	townUI.hideConversationDialog();
+	screenUI.hideConversationDialog();
     }
 
     @Override
@@ -198,7 +168,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 		final Float y = (Float) param.get(2);
 
 		this.entityMap.put(entityID.ordinal(), EntityEngine.getEngine().createEntity(entityID, x, y));
-		townUI.addTownLocation(entityID, x, y);
+		screenUI.addTownLocation(entityID, x, y);
 
 		break;
 	    }
@@ -214,7 +184,7 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	    case SetScreen:
 		try {
 		    final Array<?> param = (Array<?>) action.getParam();
-		    Utils.setScreen(ClassReflection.forName((String) param.get(0)));
+		    game.setScreen(ClassReflection.forName((String) param.get(0)));
 		} catch (Exception e) {
 		    throw new GdxRuntimeException("Invalid screen class for setScreen", e);
 		}
@@ -255,18 +225,18 @@ public class TownScreen implements Screen, ConversationListener, UIEventListener
 	}
 
 	entityMap.clear();
-	townUI.clearTownLocations();
+	screenUI.clearTownLocations();
 	for (TownEntityData data : dataToLoad) {
 	    final Entity entity = EntityEngine.getEngine().createEntity(data.entityID, data.position.x, data.position.y);
 	    this.entityMap.put(data.entityID.ordinal(), entity);
 	    if (!EntityID.PLAYER.equals(data.entityID)) {
 		convCompMapper.get(entity).currentConversationID = data.conversationID;
-		townUI.addTownLocation(data.entityID, data.position.x, data.position.y);
+		screenUI.addTownLocation(data.entityID, data.position.x, data.position.y);
 	    }
 	    TownEntityData.removeTownEntityData(data);
 	}
 
 	this.currentSelection = EntityID.ELDER;
-	townUI.selectLocation(currentSelection);
+	screenUI.selectLocation(currentSelection);
     }
 }

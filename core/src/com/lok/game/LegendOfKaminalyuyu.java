@@ -3,7 +3,6 @@ package com.lok.game;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
@@ -27,18 +26,19 @@ import com.lok.game.ecs.EntityConfiguration;
 import com.lok.game.map.Map;
 import com.lok.game.screen.AssetsLoadingScreen;
 import com.lok.game.screen.GameScreen;
+import com.lok.game.screen.Screen;
 import com.lok.game.screen.TownScreen;
 import com.lok.game.ui.Animation;
 
 public class LegendOfKaminalyuyu extends Game {
-    private final static String			       TAG = LegendOfKaminalyuyu.class.getSimpleName();
+    private final static String				     TAG = LegendOfKaminalyuyu.class.getSimpleName();
 
-    private AssetManager			       assetManager;
-    private I18NBundle				       localizationBundle;
-    private Skin				       uiSkin;
+    private AssetManager				     assetManager;
+    private I18NBundle					     localizationBundle;
+    private Skin					     uiSkin;
 
-    private ObjectMap<Class<? extends Screen>, Screen> screenCache;
-    private Screen				       nextScreen;
+    private ObjectMap<Class<? extends Screen<?>>, Screen<?>> screenCache;
+    private Screen<?>					     nextScreen;
 
     @Override
     public void create() {
@@ -61,7 +61,7 @@ public class LegendOfKaminalyuyu extends Game {
 	assetManager.load("ui/village.jpg", Texture.class);
 	assetManager.finishLoading();
 	uiSkin = assetManager.get("ui/ui.json", Skin.class);
-	uiSkin.add("village-bgd", new Image(new TextureRegionDrawable(new TextureRegion(Utils.getAssetManager().get("ui/village.jpg", Texture.class)))), Image.class);
+	uiSkin.add("village-bgd", new Image(new TextureRegionDrawable(new TextureRegion(assetManager.get("ui/village.jpg", Texture.class)))), Image.class);
 
 	// set custom colors used for markup language for any UI text
 	Colors.put("Highlight", new Color(0x4250f4ff));
@@ -69,7 +69,7 @@ public class LegendOfKaminalyuyu extends Game {
 
 	Gdx.graphics.setTitle(getLabel("GameWindow.Title"));
 	screenCache = null;
-	this.nextScreen = new AssetsLoadingScreen();
+	this.nextScreen = new AssetsLoadingScreen(this, assetManager, uiSkin);
     }
 
     public AssetManager getAssetManager() {
@@ -85,20 +85,20 @@ public class LegendOfKaminalyuyu extends Game {
     }
 
     @Override
-    public void setScreen(Screen screen) {
+    public void setScreen(com.badlogic.gdx.Screen screen) {
 	Gdx.app.error(TAG, "setScreen is called directly. setScreen(Class<? extends Screen> needs to be called instead!");
 	return;
     }
 
-    public void setScreen(Class<? extends Screen> type) {
+    public void setScreen(Class<? extends Screen<?>> type) {
 	if (screenCache == null) {
 	    Gdx.app.debug(TAG, "Initializing screen cache");
-	    screenCache = new ObjectMap<Class<? extends Screen>, Screen>();
-	    screenCache.put(TownScreen.class, new TownScreen());
-	    screenCache.put(GameScreen.class, new GameScreen());
+	    screenCache = new ObjectMap<Class<? extends Screen<?>>, Screen<?>>();
+	    screenCache.put(TownScreen.class, new TownScreen(this, assetManager, uiSkin));
+	    screenCache.put(GameScreen.class, new GameScreen(this, assetManager, uiSkin));
 	}
 
-	final Screen screen = screenCache.get(type);
+	final Screen<?> screen = screenCache.get(type);
 
 	if (screen == null) {
 	    Gdx.app.error(TAG, "Trying to set a screen that is not loaded into the cache yet: " + type);
@@ -137,7 +137,7 @@ public class LegendOfKaminalyuyu extends Game {
 	uiSkin.dispose();
 	assetManager.dispose();
 	if (screenCache != null) {
-	    for (Screen screen : screenCache.values()) {
+	    for (Screen<?> screen : screenCache.values()) {
 		screen.dispose();
 	    }
 	} else if (screen != null) {

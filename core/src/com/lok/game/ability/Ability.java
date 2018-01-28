@@ -11,6 +11,8 @@ public abstract class Ability implements Poolable {
 	public void onUpdateAbility(Entity caster, Ability ability);
 
 	public void onSopCast(Entity caster, Ability ability);
+
+	public void onEffectAbility(Entity caster, Ability ability);
     }
 
     public static enum AbilityID {
@@ -127,6 +129,9 @@ public abstract class Ability implements Poolable {
 
     public void doEffect() {
 	completed = onEffect();
+	for (AbilityListener listener : abilityListeners) {
+	    listener.onEffectAbility(caster, this);
+	}
     }
 
     /**

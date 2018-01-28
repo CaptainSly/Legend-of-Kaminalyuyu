@@ -300,10 +300,12 @@
 <node COLOR="#111111" CREATED="1515957427191" ID="ID_88869623" MODIFIED="1515957436315" TEXT="set serializer in preferencesmanager constructor for json"/>
 <node COLOR="#111111" CREATED="1515957437393" ID="ID_1762788378" MODIFIED="1515957449352" TEXT="remove these lines of code from the onSave/onLoad methods"/>
 </node>
-<node COLOR="#111111" CREATED="1515356214120" ID="ID_1584420934" MODIFIED="1515957329118" TEXT="add generic screen class for  correct game loop">
+<node COLOR="#111111" CREATED="1515356214120" FOLDED="true" ID="ID_1584420934" MODIFIED="1517144406125" TEXT="add generic screen class for  correct game loop">
+<icon BUILTIN="button_ok"/>
 <node COLOR="#111111" CREATED="1515356387356" ID="ID_1947068688" MODIFIED="1515356427614" TEXT="every screen class comes with a generic UI class for input handling"/>
 <node COLOR="#111111" CREATED="1515356509580" ID="ID_723540252" MODIFIED="1515957366164" TEXT="try to get rid of Utils.getAssestManager and Utils.getUISkin and Utils.json"/>
 </node>
+<node COLOR="#111111" CREATED="1517144392347" ID="ID_973064821" MODIFIED="1517144401071" TEXT="remove Utils.getAssetManager and Utils.getJson"/>
 <node COLOR="#111111" CREATED="1514473315578" ID="ID_1036700593" MODIFIED="1514473339752" TEXT="check renderer and count how many times we are flushing due to texture swapping">
 <node COLOR="#111111" CREATED="1514994324384" ID="ID_485026097" MODIFIED="1514994330454" TEXT="goal is maximum of 4 flushes"/>
 <node COLOR="#111111" CREATED="1515957462014" ID="ID_1292146758" MODIFIED="1515957477903" TEXT="create a &quot;setDebug&quot; method to turn on/off debug rendering">
